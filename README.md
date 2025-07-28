@@ -29,9 +29,9 @@
 ## ⚙️ Tech Stack
 
 - **Frontend:** HTML5, Tailwind CSS, JavaScript
-- **Backend:** *(Coming soon - Python/Node.js)*
-- **Database:** PostgreSQL *(planned)*
-- **Cloud:** Cloudinary, Google Drive integration
+- **Backend:** 
+- **Database:** 
+- **Cloud:**
 
 ---
 
