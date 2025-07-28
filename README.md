@@ -18,7 +18,7 @@
 - 🌟 Seller ratings and reputation
 - 📊 Performance insights and analytics
 
-### 🛒 For Buyers *(Coming Soon)*
+### 🛒 For Buyers
 - Browse categories and search products
 - Add items to wishlist and cart
 - Secure checkout and payment
