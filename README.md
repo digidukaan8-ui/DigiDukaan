@@ -1,2 +1,42 @@
 # DigiDukaan
-An online e-commerce website for individuals, local shop owners, and solo businesses to sell and buy their products.
+
+**🛍️Digi Dukan** is a modern, responsive e-commerce platform designed to empower individuals and small businesses across India to buy and sell products easily and efficiently. Whether you're a seller looking to manage your store or a buyer browsing for your next great find — Digi Dukan makes it simple, smart, and seamless.
+
+---
+
+## 📌 Features
+
+### 🧑‍💼 For Sellers
+- 📄 Register an account to start selling
+- 🚚 Define your delivery areas
+- 💸 Flexible pricing options
+- 🧰 Product management tools
+- 🔁 Sell pre-owned or second-hand items
+- 💬 Buyer-seller messaging
+- 🔐 Secure payments and commission
+- 📦 Delivery tracking and confirmation
+- 🌟 Seller ratings and reputation
+- 📊 Performance insights and analytics
+
+### 🛒 For Buyers *(Coming Soon)*
+- Browse categories and search products
+- Add items to wishlist and cart
+- Secure checkout and payment
+- Order tracking and support
+
+---
+
+## ⚙️ Tech Stack
+
+- **Frontend:** HTML5, Tailwind CSS, JavaScript
+- **Backend:** *(Coming soon - Python/Node.js)*
+- **Database:** PostgreSQL *(planned)*
+- **Cloud:** Cloudinary, Google Drive integration
+
+---
+
+## 📱 Responsiveness
+
+Digi Dukan is built to work on all screen sizes. Smooth animations, clean layout, and adaptive components ensure a great experience across desktops and mobile devices.
+
+---
