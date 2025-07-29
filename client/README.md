@@ -28,10 +28,10 @@
 
 ## ⚙️ Tech Stack
 
-- **Frontend:** HTML5, Tailwind CSS, JavaScript
-- **Backend:** 
-- **Database:** 
-- **Cloud:**
+- **Frontend:** React Js, Tailwind CSS
+- **Backend:** Node Js, Express Js
+- **Database:** MongoDb
+- **Cloud:** Cloudinary
 
 ---
 
