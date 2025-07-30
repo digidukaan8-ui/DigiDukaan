@@ -23,7 +23,7 @@ const Register = () => {
     <div className="min-h-screen py-20 flex justify-center items-center bg-gray-100 text-black dark:bg-neutral-950 dark:text-white">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-md p-6 rounded-lg shadow-md border border-gray-300 bg-white dark:bg-neutral-900 dark:border-gray-700 space-y-4"
+        className="w-full max-w-sm p-6 rounded-lg shadow-md border border-gray-300 bg-white dark:bg-neutral-900 dark:border-gray-700 space-y-4"
       >
         <h2 className="text-2xl font-semibold text-center mb-4">Register</h2>
 
