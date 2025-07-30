@@ -6,6 +6,9 @@ import morgan from 'morgan';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import userRouter from './routes/user.route.js';
+import buyerRouter from './routes/buyer.route.js';
+import sellerRouter from './routes/seller.route.js';
+import adminRouter from './routes/admin.route.js';
 
 dotenv.config();
 const app = express();
@@ -29,6 +32,9 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/users', userRouter);
+app.use('/api/buyer', buyerRouter);
+app.use('/api/seller', sellerRouter);
+app.use('/api/admin', adminRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
