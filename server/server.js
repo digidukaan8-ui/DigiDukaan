@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
+import connectDB from './db/connection.js'
 import userRouter from './routes/user.route.js';
 import buyerRouter from './routes/buyer.route.js';
 import sellerRouter from './routes/seller.route.js';
@@ -30,6 +31,8 @@ app.use(cookieParser());
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
+
+connectDB();
 
 app.use('/api/users', userRouter);
 app.use('/api/buyer', buyerRouter);

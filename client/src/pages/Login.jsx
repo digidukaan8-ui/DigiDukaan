@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { FaArrowLeft } from 'react-icons/fa'
-import { useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { loginUser } from '../api/user.js'
 
 export default function Login() {
-  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -33,7 +32,7 @@ export default function Login() {
 
   const onLoginSubmit = async (data) => {
     try {
-      const result = await loginUser();
+      const result = await loginUser(data);
       if (result.success) {
         navigate('');
       }
@@ -130,8 +129,8 @@ export default function Login() {
               </div>
 
               <div className="flex justify-end mt-2">
-                <button
-                  type="button"
+                <NavLink
+                  to='/register'
                   onClick={() => {
                     setShowOtp(true)
                     setResendCountdown(30)
@@ -139,7 +138,7 @@ export default function Login() {
                   className="text-sm text-sky-600 hover:underline"
                 >
                   Forgot Password?
-                </button>
+                </NavLink>
               </div>
 
               <div className="flex justify-center">

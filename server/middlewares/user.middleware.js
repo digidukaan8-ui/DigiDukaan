@@ -1,13 +1,16 @@
-const handleRegister = (req, res, next) => {
-    try {
-        const { name, email, password, role, phone } = req.body;
+import User from "../models/user.model.js";
 
-        if (!name || !email || !password || !role || !phone) {
+const handleRegister = async (req, res, next) => {
+    try {
+        const { name, username, email, password, role, phone } = req.body;
+
+        if (!name || !username || !email || !password || !role || !phone) {
             return res.status(400).json({ success: false, message: 'All fields are required.' });
         }
 
         if (
             typeof name !== 'string' ||
+            typeof username !== 'string' ||
             typeof email !== 'string' ||
             typeof password !== 'string' ||
             typeof role !== 'string' ||
@@ -16,11 +19,27 @@ const handleRegister = (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Invalid input format.' });
         }
 
-        const usernameRegex = /^[A-Za-z0-9]{3,}$/;
-        if (!usernameRegex.test(name)) {
+        const nameRegex = /^[A-Za-z0-9]{3,15}$/;
+        if (!nameRegex.test(name)) {
             return res.status(400).json({
                 success: false,
-                message: 'Username must be at least 3 characters and contain only letters and numbers.',
+                message: 'Name must be 3-15 characters and contain only letters and numbers.',
+            });
+        }
+
+        const usernameRegex = /^[a-zA-Z0-9_]{5,10}$/;
+        if (!usernameRegex.test(username)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Username must be 5-10 characters and contain only letters, numbers, and underscore.',
+            });
+        }
+
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'Username already exists.',
             });
         }
 
@@ -61,7 +80,7 @@ const handleRegister = (req, res, next) => {
     }
 };
 
-const hadleLogin = async (req, res, next) => {
+const handleLogin = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
@@ -74,7 +93,6 @@ const hadleLogin = async (req, res, next) => {
         }
 
         const emailRegex = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
-
         if (!emailRegex.test(email) || password.length < 8) {
             return res.status(400).json({ success: false, message: 'Invalid credentials.' });
         }
@@ -84,6 +102,6 @@ const hadleLogin = async (req, res, next) => {
         console.error('Error in login middleware: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
-}
+};
 
-export { handleRegister, hadleLogin };
+export { handleRegister, handleLogin };
