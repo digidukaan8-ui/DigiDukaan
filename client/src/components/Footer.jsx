@@ -9,6 +9,12 @@ export default function Footer() {
     { to: '/faq', label: 'FAQ' },
   ]
 
+  const resources = [
+    { to: '/termsofservice', label: 'Terms of Service' },
+    { to: '/privacypolicy', label: 'Privacy Policy' },
+    { to: '/support', label: 'Support' },
+  ]
+
   return (
     <footer className="bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-300 border-t shadow-xl">
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-12">
@@ -29,10 +35,9 @@ export default function Footer() {
                 <NavLink
                   to={link.to}
                   className={({ isActive }) =>
-                    `block text-sm transition-all duration-200 ${
-                      isActive
-                        ? 'text-sky-600 font-medium'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-sky-500'
+                    `block text-sm transition-all duration-200 ${isActive
+                      ? 'text-sky-600 font-medium'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-sky-500'
                     }`
                   }
                 >
@@ -46,14 +51,14 @@ export default function Footer() {
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Resources</h3>
           <ul className="space-y-2">
-            {['Privacy Policy', 'Terms of Service', 'Support'].map((label, i) => (
+            {resources.map((link, i) => (
               <li key={i}>
-                <a
-                  href="#"
+                <NavLink
+                  to={link.to}
                   className="block text-sm text-gray-600 dark:text-gray-400 hover:text-sky-500 transition-colors"
                 >
-                  {label}
-                </a>
+                  {link.label}
+                </NavLink>
               </li>
             ))}
           </ul>
