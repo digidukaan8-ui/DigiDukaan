@@ -34,7 +34,7 @@ export default function Header() {
           DigiDukaan
         </h1>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-end gap-8">
           {links.map(link => (
             <NavLink
               key={link.to}

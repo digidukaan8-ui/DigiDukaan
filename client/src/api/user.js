@@ -33,10 +33,9 @@ const loginUser = async (data) => {
         });
         const result = await response.json();
         if (!result.success) {
-            toast.error(result.message || 'Registration failed');
-            throw new Error(result.message || 'Failed to register user');
+            toast.error(result.message || 'Login failed');
+            throw new Error(result.message || 'Failed to Login user');
         }
-        console.log(result)
         return result;
     } catch (error) {
         console.error("Error login user: ", error);
@@ -61,4 +60,67 @@ const logoutUser = async () => {
     }
 }
 
-export { registerUser, loginUser, logoutUser };
+const getOtp = async (email) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/users/getotp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(email)
+        });
+        const data = await response.json();
+        if (!data.success) {
+            toast.error(result.message || 'Failed to send otp');
+            throw new Error(result.message || 'Failed to send otp');
+        }
+        return data;
+    } catch (error) {
+        console.error("Error get otp: ", error);
+        throw error;
+    }
+}
+
+const verifyOtp = async (data) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/users/verifyotp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (!result.success) {
+            toast.error(result.message || 'Failed to verify otp');
+            throw new Error(result.message || 'Failed to verify otp');
+        }
+        return result;
+    } catch (error) {
+        console.error("Error verify otp: ", error);
+        throw error;
+    }
+}
+
+const setNewPass = async (data) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/users/setnewpass', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (!result.success) {
+            toast.error(result.message || 'Failed to verify otp');
+            throw new Error(result.message || 'Failed to verify otp');
+        }
+        return result;
+    } catch (error) {
+        console.error("Error new password: ", error);
+        throw error;
+    }
+}
+
+export { registerUser, loginUser, logoutUser, getOtp, verifyOtp, setNewPass };
