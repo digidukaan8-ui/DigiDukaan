@@ -6,6 +6,7 @@ export default function Footer() {
     { to: '/', label: 'Home' },
     { to: '/about', label: 'About' },
     { to: '/contact', label: 'Contact' },
+    { to: '/faq', label: 'FAQ' },
   ]
 
   return (
@@ -16,7 +17,7 @@ export default function Footer() {
           <h2 className="text-3xl font-extrabold text-sky-600 mb-3">DigiDukaan</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
             Your digital storefront made simple. Run your business, sell smarter,
-            and grow online — all with DigiDukaan.
+            and grow online all with DigiDukaan.
           </p>
         </div>
 
