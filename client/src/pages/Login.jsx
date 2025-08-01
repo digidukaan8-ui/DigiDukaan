@@ -71,7 +71,7 @@ export default function Login() {
 
   return (
     <div className='min-h-screen py-20 flex justify-center items-center bg-gray-100 text-black dark:bg-neutral-950 dark:text-white'>
-      <div className="w-full max-w-sm p-6 rounded-lg shadow-md border border-black bg-white dark:bg-neutral-900 dark:border-white space-y-4 relative">
+      <div className="w-full max-w-sm mx-5 p-6 rounded-lg shadow-md border border-black bg-white dark:bg-neutral-900 dark:border-white space-y-4 relative">
         {(showOtp || otpVerified) && (
           <button onClick={goBack} className="absolute top-4 left-4 text-gray-600 dark:text-white">
             <FaArrowLeft size={20} />
@@ -129,8 +129,8 @@ export default function Login() {
               </div>
 
               <div className="flex justify-end mt-2">
-                <NavLink
-                  to='/register'
+                <button
+                  type='button'
                   onClick={() => {
                     setShowOtp(true)
                     setResendCountdown(30)
@@ -138,7 +138,7 @@ export default function Login() {
                   className="text-sm text-sky-600 hover:underline"
                 >
                   Forgot Password?
-                </NavLink>
+                </button>
               </div>
 
               <div className="flex justify-center">
@@ -153,9 +153,9 @@ export default function Login() {
 
             <p className="text-sm mt-6 text-center text-gray-700 dark:text-gray-300">
               New to DigiDukaan?{' '}
-              <span onClick={() => navigate('register')} className="text-sky-600 hover:underline">
+              <NavLink to='/register' className="text-sky-600 hover:underline">
                 Register here
-              </span>
+              </NavLink>
             </p>
           </>
         )}
