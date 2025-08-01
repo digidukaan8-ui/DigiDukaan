@@ -2,9 +2,9 @@ import User from "../models/user.model.js";
 
 const handleRegister = async (req, res, next) => {
     try {
-        const { name, username, email, password, role, phone } = req.body;
+        const { name, username, email, password, role, mobile } = req.body;
 
-        if (!name || !username || !email || !password || !role || !phone) {
+        if (!name || !username || !email || !password || !role || !mobile) {
             return res.status(400).json({ success: false, message: 'All fields are required.' });
         }
 
@@ -14,16 +14,24 @@ const handleRegister = async (req, res, next) => {
             typeof email !== 'string' ||
             typeof password !== 'string' ||
             typeof role !== 'string' ||
-            typeof phone !== 'string'
+            typeof mobile !== 'string'
         ) {
             return res.status(400).json({ success: false, message: 'Invalid input format.' });
         }
 
-        const nameRegex = /^[A-Za-z0-9]{3,15}$/;
+        const nameRegex = /^(?!.*  )(?! )[A-Za-z0-9]+(?: [A-Za-z0-9]+)*$/;
+
         if (!nameRegex.test(name)) {
             return res.status(400).json({
                 success: false,
-                message: 'Name must be 3-15 characters and contain only letters and numbers.',
+                message: 'Name must be letters/numbers only, and single spaces are allowed (no double or trailing spaces).',
+            });
+        }
+
+        if (name.length < 3 || name.length > 15) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name must be between 3 and 15 characters long.',
             });
         }
 
@@ -51,11 +59,11 @@ const handleRegister = async (req, res, next) => {
             });
         }
 
-        const phoneRegex = /^\+91\d{10}$/;
-        if (!phoneRegex.test(phone)) {
+        const mobileRegex = /^\+91\d{10}$/;
+        if (!mobileRegex.test(mobile)) {
             return res.status(400).json({
                 success: false,
-                message: 'Phone number must start with +91 and contain exactly 10 digits after.',
+                message: 'mobile number must start with +91 and contain exactly 10 digits after.',
             });
         }
 

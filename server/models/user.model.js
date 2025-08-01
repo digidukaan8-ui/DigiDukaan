@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
         trim: true,
         default: 'buyer'
     },
-    phone: {
+    mobile: {
         type: String,
         required: true,
         trim: true

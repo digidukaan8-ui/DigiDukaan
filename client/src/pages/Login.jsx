@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { FaArrowLeft } from 'react-icons/fa'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { loginUser } from '../api/user.js'
+import toast from 'react-hot-toast'
 
 export default function Login() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -34,7 +36,9 @@ export default function Login() {
     try {
       const result = await loginUser(data);
       if (result.success) {
-        navigate('');
+        toast.success('Registered successfully!');
+        reset();
+        setTimeout(() => navigate('/'), 1500);
       }
     } catch (error) {
       console.error('Error in login: ', error);

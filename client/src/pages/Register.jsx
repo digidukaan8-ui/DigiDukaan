@@ -1,7 +1,10 @@
 import { useForm } from 'react-hook-form'
 import { registerUser } from '../api/user.js'
+import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 
 const Register = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -13,9 +16,17 @@ const Register = () => {
   const password = watch('password')
 
   const onSubmit = async (data) => {
-    const result = await registerUser(data);
+    const { confirmPassword, ...cleanData } = data;
+
+    const finalData = {
+      ...cleanData,
+      mobile: `+91${cleanData.mobile}`
+    };
+    const result = await registerUser(finalData);
     if (result.success) {
+      toast.success('Registered successfully!');
       reset();
+      setTimeout(() => navigate('/login'), 1500);
     }
   }
 
@@ -169,7 +180,7 @@ const Register = () => {
         >
           Register
         </button>
-    </form>
+      </form>
     </div >
   )
 }

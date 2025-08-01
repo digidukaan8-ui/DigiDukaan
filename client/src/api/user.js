@@ -1,3 +1,5 @@
+import toast from 'react-hot-toast'
+
 const registerUser = async (data) => {
     try {
         const response = await fetch('http://localhost:3000/api/users/register', {
@@ -7,8 +9,9 @@ const registerUser = async (data) => {
             },
             body: JSON.stringify(data)
         });
-        const result = response.json();
-        if (!response.ok) {
+        const result = await response.json();
+        if (!result.success) {
+            toast.error(result.message || 'Registration failed');
             throw new Error(result.message || 'Failed to register user');
         }
         return result;
@@ -28,10 +31,12 @@ const loginUser = async (data) => {
             credentials: 'include',
             body: JSON.stringify(data)
         });
-        const result = response.json();
-        if (!response.ok) {
-            throw new Error(result.message || 'Failed to login user');
+        const result = await response.json();
+        if (!result.success) {
+            toast.error(result.message || 'Registration failed');
+            throw new Error(result.message || 'Failed to register user');
         }
+        console.log(result)
         return result;
     } catch (error) {
         console.error("Error login user: ", error);

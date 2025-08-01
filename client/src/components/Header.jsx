@@ -52,7 +52,7 @@ export default function Header() {
 
           <button
             onClick={toggleDarkMode}
-            className="ml-2 text-xl text-gray-700 dark:text-gray-300 hover:text-sky-500 transition"
+            className="text-xl text-gray-700 dark:text-gray-300 hover:text-sky-500 transition"
             aria-label="Toggle Dark Mode"
           >
             {darkMode ? <FiSun /> : <FiMoon />}
