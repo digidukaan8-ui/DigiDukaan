@@ -1,6 +1,6 @@
 # DigiDukaan
 
-**🛍️Digi Dukan** is a modern, responsive e-commerce platform designed to empower individuals and small businesses across India to buy and sell products easily and efficiently. Whether you're a seller looking to manage your store or a buyer browsing for your next great find — Digi Dukan makes it simple, smart, and seamless.
+**🛍️Digi Dukaan** is a modern, responsive e-commerce platform designed to empower individuals and small businesses across India to buy and sell products easily and efficiently. Whether you're a seller looking to manage your store or a buyer browsing for your next great find — Digi Dukaan makes it simple, smart, and seamless.
 
 ---
 
