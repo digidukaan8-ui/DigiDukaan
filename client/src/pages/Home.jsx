@@ -92,6 +92,47 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Deal of the Day */}
+<section className="py-16 bg-gradient-to-r from-yellow-50 to-yellow-100">
+  <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-10">
+    <motion.img 
+      src="https://images.unsplash.com/photo-1606813906775-c7b9be2b4533" 
+      alt="deal of the day" 
+      className="w-full md:w-1/2 h-80 object-cover rounded-xl shadow-lg"
+      initial={{ opacity: 0, x: -50 }} 
+      whileInView={{ opacity: 1, x: 0 }} 
+      transition={{ duration: 0.6 }}
+    />
+    <motion.div 
+      className="md:w-1/2 space-y-4"
+      initial={{ opacity: 0, x: 50 }} 
+      whileInView={{ opacity: 1, x: 0 }} 
+      transition={{ duration: 0.6 }}
+    >
+      <h3 className="text-3xl font-bold text-yellow-800">🔥 Deal of the Day</h3>
+      <p className="text-gray-700 text-lg">Get up to <span className="font-semibold text-yellow-700">50% OFF</span> on our best-selling smart watch.</p>
+      <div className="flex space-x-4 text-center">
+        <div>
+          <p className="text-3xl font-bold text-gray-900">12</p>
+          <span className="text-sm text-gray-600">Hrs</span>
+        </div>
+        <div>
+          <p className="text-3xl font-bold text-gray-900">43</p>
+          <span className="text-sm text-gray-600">Mins</span>
+        </div>
+        <div>
+          <p className="text-3xl font-bold text-gray-900">27</p>
+          <span className="text-sm text-gray-600">Secs</span>
+        </div>
+      </div>
+      <button className="mt-4 bg-yellow-600 text-white px-6 py-3 rounded-lg hover:bg-yellow-700 transition">
+        Grab the Deal
+      </button>
+    </motion.div>
+  </div>
+</section>
+
     </div>
   );
 };
