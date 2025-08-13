@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import {
   Store,
@@ -26,7 +25,6 @@ export default function About() {
     <div className="min-h-screen w-full px-6 py-14 sm:px-10 md:px-20 bg-gradient-to-b from-gray-100 via-white to-gray-100 dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-900 text-gray-900 dark:text-gray-100">
       <div className="max-w-6xl mx-auto space-y-24">
 
-        {/* Header */}
         <motion.section
           className="text-center space-y-6"
           initial="hidden"
@@ -38,11 +36,10 @@ export default function About() {
             About DigiDukaan
           </h1>
           <p className="text-lg sm:text-xl max-w-3xl mx-auto text-gray-700 dark:text-gray-300 leading-relaxed">
-            DigiDukaan isn’t just an app — it’s a movement to empower India’s micro-businesses to thrive digitally. Launch your online store in minutes, serve locally, grow nationally.
+            DigiDukaan isn’t just an app it’s a movement to empower India’s micro-businesses to thrive digitally. Launch your online store in minutes, serve locally, grow nationally.
           </p>
         </motion.section>
 
-        {/* What is DigiDukaan */}
         <motion.section
           className="space-y-5"
           initial="hidden"
@@ -55,11 +52,10 @@ export default function About() {
             <Store className="text-sky-600" /> What is DigiDukaan?
           </h2>
           <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-            DigiDukaan is a no-code SaaS platform for sellers to build and manage online stores with ease. Designed specifically for Indian retailers — it brings digital commerce to the masses.
+            DigiDukaan is a no-code SaaS platform for sellers to build and manage online stores with ease. Designed specifically for Indian retailers it brings digital commerce to the masses.
           </p>
         </motion.section>
 
-        {/* Features */}
         <motion.section
           className="space-y-5"
           initial="hidden"
@@ -83,7 +79,7 @@ export default function About() {
               'Multilingual support.',
               'Mobile-first UI.',
               'No app required for buyers.',
-              'Sell anything: grocery, electronics, fashion.',
+              'Sell anything.',
               'Supports resale, home businesses.',
             ].map((item, i) => (
               <motion.div
@@ -98,7 +94,6 @@ export default function About() {
           </div>
         </motion.section>
 
-        {/* How It Works */}
         <motion.section
           className="space-y-5"
           initial="hidden"
@@ -121,7 +116,6 @@ export default function About() {
           </ol>
         </motion.section>
 
-        {/* Why DigiDukaan */}
         <motion.section
           className="space-y-5"
           initial="hidden"
@@ -134,16 +128,15 @@ export default function About() {
             <Globe className="text-indigo-600" /> Why DigiDukaan?
           </h2>
           <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300">
-            Millions of Indian sellers still use offline methods. DigiDukaan brings the future to their doorstep — no ads, no coding, no tech barriers.
+            Millions of Indian sellers still use offline methods. DigiDukaan brings the future to their doorstep no ads, no coding, no tech barriers.
           </p>
           <ul className="list-disc list-inside space-y-2 text-base sm:text-lg text-gray-700 dark:text-gray-300">
             <li>Reach local buyers with zero ad cost.</li>
             <li>Build trust with a clean, responsive storefront.</li>
-            <li>Scale at your own pace — from lane to city.</li>
+            <li>Scale at your own pace from lane to city.</li>
           </ul>
         </motion.section>
 
-        {/* Earnings */}
         <motion.section
           className="space-y-5"
           initial="hidden"
@@ -156,14 +149,13 @@ export default function About() {
             <Wallet className="text-yellow-600" /> How Earnings Work
           </h2>
           <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300">
-            We only support online payments — to reduce fraud and increase seller safety. Earnings are instantly credited to your wallet after each order.
+            We only support online payments to reduce fraud and increase seller safety. Earnings are instantly credited to your wallet after each order.
           </p>
           <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300">
-            Withdraw to your bank account anytime. No hidden fees — just a small success commission.
+            Withdraw to your bank account anytime. No hidden fees just a small success commission.
           </p>
         </motion.section>
 
-        {/* CTA */}
         <motion.section
           className="text-center"
           initial={{ opacity: 0 }}
@@ -172,7 +164,7 @@ export default function About() {
           transition={{ delay: 0.2, duration: 0.6 }}
         >
           <p className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mt-6">
-            🚀 Start your DigiDukaan journey today — it’s fast, free, and made for you.
+            Start your DigiDukaan journey today it’s fast, free, and made for you.
           </p>
         </motion.section>
       </div>

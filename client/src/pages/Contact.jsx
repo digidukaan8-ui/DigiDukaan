@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form'
+import { motion } from 'framer-motion'
 
 export default function Contact() {
   const {
@@ -16,7 +17,12 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen py-20 flex justify-center items-center bg-gray-100 text-black dark:bg-neutral-950 dark:text-white">
-      <div className="w-full max-w-lg mx-5 p-6 rounded-lg shadow-md border border-black dark:border-white bg-white dark:bg-neutral-900 space-y-6">
+      <motion.div
+      initial={{ y: 40, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      style={{ willChange: "transform, opacity" }}
+      className="w-full max-w-lg mx-5 p-6 rounded-lg shadow-md border border-black dark:border-white bg-white dark:bg-neutral-900 space-y-6">
         <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-white">
           Contact Us
         </h2>
@@ -81,7 +87,7 @@ export default function Contact() {
             </button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   )
 }

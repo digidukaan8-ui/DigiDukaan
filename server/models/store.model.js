@@ -20,7 +20,7 @@ const storeSchema = new mongoose.Schema({
     trim: true,
   },
   storeType: {
-    type: String,
+    type: [String],
     trim: true,
   },
   addresses: {
