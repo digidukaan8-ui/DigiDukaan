@@ -37,7 +37,7 @@ export default function Login() {
     try {
       const result = await loginUser(data);
       if (result.success) {
-        toast.success('Registered successfully!');
+        toast.success('Login successfully!');
         reset();
         setTimeout(() => navigate('/'), 1500);
       }
