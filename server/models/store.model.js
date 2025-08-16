@@ -6,50 +6,55 @@ const storeSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  storeName: {
+  name: {
     type: String,
     required: true,
     trim: true,
   },
-  image: {
-    type: String,
-    trim: true,
+  img: {
+    url: String,
+    publicId: String
   },
   description: {
     type: String,
     trim: true,
   },
-  storeType: {
-    type: [String],
-    trim: true,
-  },
-  addresses: {
-    type: [
-      {
-        addressLine1: {
-          type: String,
-          required: true,
-          trim: true,
-        },
-        city: {
-          type: String,
-          required: true,
-          trim: true,
-        },
-        state: {
-          type: String,
-          required: true,
-          trim: true,
-        },
-        pincode: {
-          type: String,
-          required: true,
-          trim: true,
-        }
+  storeType: [
+    {
+      type: String,
+      trim: true
+    }
+  ],
+  addresses: [
+    {
+      addressLine1: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      addressLine2: {
+        type: String,
+        trim: true,
+      },
+      city: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      state: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      pincode: {
+        type: String,
+        required: true,
+        trim: true,
       }
-    ],
-    default: [],
-  }
+    }
+  ],
 }, { timestamps: true });
 
-export default mongoose.model("Store", storeSchema);
+const Store = mongoose.model("Store", storeSchema);
+
+export default Store;

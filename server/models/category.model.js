@@ -19,7 +19,8 @@ const categorySchema = new mongoose.Schema({
     lowercase: true
   },
   image: {
-    type: String
+    type: String,
+    default: null
   },
   subCategories: [
     {
@@ -34,9 +35,10 @@ const categorySchema = new mongoose.Schema({
         trim: true,
         lowercase: true
       },
-      image: {
-        type: String
-      }
+      img: {
+        url: String,
+        publicId: String
+      },
     }
   ]
 }, { timestamps: true });

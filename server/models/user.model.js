@@ -13,13 +13,16 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true
     },
+    avatar: {
+        type: String,
+        default: null
+    },
     email: {
         type: String,
         required: true,
         unique: true,
         trim: true,
         lowercase: true
-
     },
     password: {
         type: String,
