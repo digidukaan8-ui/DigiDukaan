@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { FaArrowLeft } from 'react-icons/fa'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { loginUser } from '../api/user.js'
+import { loginUser } from '../../api/user.js'
 import toast from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
 

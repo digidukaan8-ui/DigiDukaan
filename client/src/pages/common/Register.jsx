@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { registerUser } from '../api/user.js'
+import { registerUser } from '../../api/user.js'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
