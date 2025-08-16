@@ -1,4 +1,5 @@
 import toast from 'react-hot-toast'
+import useAuthStore from '../store/auth';
 
 const registerUser = async (data) => {
     try {
@@ -14,6 +15,7 @@ const registerUser = async (data) => {
             toast.error(result.message || 'Registration failed');
             throw new Error(result.message || 'Failed to register user');
         }
+
         return result;
     } catch (error) {
         console.error("Error registering user: ", error);
@@ -36,6 +38,9 @@ const loginUser = async (data) => {
             toast.error(result.message || 'Login failed');
             throw new Error(result.message || 'Failed to Login user');
         }
+
+        useAuthStore.getState().login(result.data);
+
         return result;
     } catch (error) {
         console.error("Error login user: ", error);

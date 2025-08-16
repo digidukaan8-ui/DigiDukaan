@@ -63,7 +63,14 @@ const loginUser = async (req, res) => {
 
         await User.findByIdAndUpdate(user._id, { refreshToken: refreshToken });
 
-        return res.status(200).json({ success: true, message: 'Login successfully' });
+        const data = {
+            _id: user._id,
+            name: user.name,
+            username: user.username,
+            role: user.role
+        }
+
+        return res.status(200).json({ success: true, message: 'Login successfully', data: data });
     } catch (error) {
         console.error('Error in loginUser controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
