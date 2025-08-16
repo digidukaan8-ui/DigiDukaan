@@ -3,8 +3,10 @@ import { registerUser } from '../../api/user.js'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
+import useLoaderStore from '../../store/loader.js'
 
 const Register = () => {
+  const { startLoading, stopLoading } = useLoaderStore();
   const navigate = useNavigate();
   const {
     register,
@@ -17,6 +19,7 @@ const Register = () => {
   const password = watch('password')
 
   const onSubmit = async (data) => {
+    startLoading('register');
     const { confirmPassword, ...cleanData } = data;
 
     const finalData = {
@@ -25,9 +28,12 @@ const Register = () => {
     };
     const result = await registerUser(finalData);
     if (result.success) {
-      toast.success('Registered successfully!');
       reset();
-      setTimeout(() => navigate('/login'), 1500);
+      stopLoading();
+      setTimeout(() => {
+        navigate('/login')
+        toast.success('Registered successfully!');
+      }, 500);
     }
   }
 

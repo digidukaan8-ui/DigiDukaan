@@ -5,8 +5,10 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { loginUser } from '../../api/user.js'
 import toast from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
+import useLoaderStore from '../../store/loader.js'
 
 export default function Login() {
+  const { startLoading, stopLoading } = useLoaderStore();
   const navigate = useNavigate();
   const {
     register,
@@ -34,15 +36,20 @@ export default function Login() {
   }, [showOtp, resendCountdown])
 
   const onLoginSubmit = async (data) => {
+    startLoading('login');
     try {
       const result = await loginUser(data);
       if (result.success) {
-        toast.success('Login successfully!');
         reset();
-        setTimeout(() => navigate('/'), 1500);
+        setTimeout(() => {
+          navigate('/')
+          toast.success('Login successfully!');
+        }, 500);
       }
     } catch (error) {
       console.error('Error in login: ', error);
+    } finally {
+      stopLoading();
     }
   }
 

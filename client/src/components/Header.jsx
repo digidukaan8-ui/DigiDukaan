@@ -3,30 +3,51 @@ import { NavLink } from 'react-router-dom';
 import { FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
 import logo from '../assets/logo.webp'
 import useThemeStore from '../store/theme';
+import useAuthStore from '../store/auth';
+import { motion } from 'framer-motion'
 
 export default function Header() {
   const { isDark, toggleMode } = useThemeStore();
+  const { user, isAuthenticated } = useAuthStore();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = useCallback(() => setMenuOpen(prev => !prev), []);
 
-  const links = [
-    { to: '/', label: 'Home' },
-    { to: '/about', label: 'About' },
-    { to: '/contact', label: 'Contact' },
-    { to: '/login', label: 'Login' },
-    { to: '/register', label: 'Register' },
-  ];
+  const links = () => {
+    if (isAuthenticated && user.role === 'buyer') {
+      return [
+        { to: '/', label: 'Home' },
+        { to: '/order', label: 'Orders' },
+        { to: '/notification', label: 'Notification' },
+        { to: '/profile', label: 'Profile' },
+        { to: '/logout', label: 'Logout' },
+      ];
+    } else {
+      return [
+        { to: '/', label: 'Home' },
+        { to: '/about', label: 'About' },
+        { to: '/contact', label: 'Contact' },
+        { to: '/login', label: 'Login' },
+        { to: '/register', label: 'Register' },
+      ];
+    }
+  }
+
 
   return (
     <header className="bg-white dark:bg-neutral-900 shadow-md sticky top-0 z-50 transition-all duration-300">
-      <div className="w-full mx-auto px-5 md:px-10 py-2 flex justify-between items-center">
+      <motion.div
+        initial={{ y: -40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        style={{ willChange: "transform, opacity" }}
+        className="w-full mx-auto px-5 md:px-10 py-4 flex justify-between items-center">
         <div className='flex justify-center items-center'>
-          <img src={logo} alt="DigiDukaan" className='w-16 sm:w-20 h-fit object-cover' />
+          <img src={logo} alt="DigiDukaan" className='w-10 sm:w-12 h-fit object-cover' />
         </div>
 
         <nav className="hidden md:flex items-center gap-10" aria-label="Main Navigation">
-          {links.map(link => (
+          {links().map(link => (
             <NavLink
               key={link.to}
               to={link.to}
@@ -65,11 +86,16 @@ export default function Header() {
             {menuOpen ? <FiX /> : <FiMenu />}
           </button>
         </div>
-      </div>
+      </motion.div>
 
       {menuOpen && (
-        <div className="md:hidden animate-slide-down origin-top bg-white dark:bg-neutral-900 border-t px-4 pt-3 pb-4 rounded-b-xl shadow-md">
-          {links.map(link => (
+        <motion.div
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          style={{ willChange: "transform, opacity" }}
+          className="md:hidden animate-slide-down origin-top bg-white dark:bg-neutral-900 border-t px-4 pt-3 pb-4 rounded-b-xl shadow-md">
+          {links().map(link => (
             <NavLink
               key={link.to}
               to={link.to}
@@ -84,7 +110,7 @@ export default function Header() {
               {link.label}
             </NavLink>
           ))}
-        </div>
+        </motion.div>
       )}
     </header>
   );
