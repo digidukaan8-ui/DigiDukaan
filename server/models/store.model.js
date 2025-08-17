@@ -12,8 +12,16 @@ const storeSchema = new mongoose.Schema({
     trim: true,
   },
   img: {
-    url: String,
-    publicId: String
+    url: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    publicId: {
+      type: String,
+      required: true,
+      trim: true,
+    },
   },
   description: {
     type: String,

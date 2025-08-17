@@ -16,7 +16,6 @@ const userSchema = new mongoose.Schema({
     avatar: {
         url: String,
         publicId: String,
-        default: null
     },
     email: {
         type: String,

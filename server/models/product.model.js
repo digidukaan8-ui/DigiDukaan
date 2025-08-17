@@ -1,85 +1,118 @@
 import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
-    name: {
+    storeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Store',
+        required: true
+    },
+    title: {
         type: String,
         required: true,
         trim: true
     },
+
     slug: {
         type: String,
-        default: null
+        unique: true,
+        lowercase: true,
+        trim: true
     },
+
     description: {
         type: String,
         required: true,
         trim: true
     },
-    store: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Store',
-        required: true
-    },
+
     category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category',
-        required: true
+        type: String,
+        required: true,
+        trim: true
     },
-    images: {
-        type: [String],
-        validate: {
-            validator: function (val) {
-                return val.length >= 1 && val.length <= 4;
+
+    subCategory: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
+    img: [
+        {
+            url: {
+                type: String,
+                required: true
             },
-            message: 'You must provide between 1 and 4 images.'
+            publicId: {
+                type: String,
+                required: true
+            }
+        }
+    ],
+
+    video: {
+        url: {
+            type: String
         },
-        required: true
+        publicId: {
+            type: String
+        }
     },
+
     price: {
         type: Number,
         required: true
     },
-    mrp: {
-        type: Number
-    },
+
     discount: {
-        type: Number,
-        default: 0
+        percentage: {
+            type: Number,
+            min: 0,
+            max: 100,
+            default: null
+        },
+        amount: {
+            type: Number,
+            min: 0,
+            default: null
+        }
     },
+
     stock: {
         type: Number,
-        required: true
+        required: true,
+        default: 0
     },
-    color: {
-        type: String,
-        trim: true
-    },
-    size: {
-        type: String,
-        trim: true
-    },
-    weight: {
-        type: String,
-        trim: true
-    },
+
+    attributes: [
+        {
+            key: { type: String, required: true },
+            value: { type: String, required: true }
+        }
+    ],
+
     brand: {
         type: String,
         trim: true
     },
+
     isAvailable: {
         type: Boolean,
-        default: false
+        default: true
     },
+
     tags: {
         type: [String],
         default: []
     },
+
     reviews: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Review',
         }
     ],
+
     variants: [
         {
             type: mongoose.Schema.Types.ObjectId,
