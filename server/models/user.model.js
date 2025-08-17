@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema({
         lowercase: true
     },
     avatar: {
-        type: String,
+        url: String,
+        publicId: String,
         default: null
     },
     email: {
