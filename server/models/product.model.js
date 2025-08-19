@@ -6,6 +6,7 @@ const productSchema = new mongoose.Schema({
         ref: 'Store',
         required: true
     },
+    
     title: {
         type: String,
         required: true,
