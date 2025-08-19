@@ -27,7 +27,7 @@ const storeSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
-  storeType: [
+  category: [
     {
       type: String,
       trim: true

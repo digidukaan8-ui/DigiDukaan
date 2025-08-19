@@ -2,9 +2,9 @@ import User from "../models/user.model.js";
 
 const handleCreateStore = async (req, res, next) => {
     try {
-        const { userId, name, description, storeType, addresses } = req.body;
+        const { userId, name, description, category, addresses } = req.body;
 
-        if (!userId || !name || !description || !storeType || storeType.length === 0 || !addresses || addresses.length === 0) {
+        if (!userId || !name || !description || !category || category.length === 0 || !addresses || addresses.length === 0) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
 
@@ -17,8 +17,8 @@ const handleCreateStore = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'User not found' });
         }
 
-        if (!Array.isArray(storeType)) {
-            return res.status(400).json({ success: false, message: "storeType must be an array" });
+        if (!Array.isArray(category)) {
+            return res.status(400).json({ success: false, message: "category must be an array" });
         }
 
         if (!Array.isArray(addresses)) {

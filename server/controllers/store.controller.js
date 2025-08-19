@@ -3,7 +3,7 @@ import uploadToCloudinary from '../utils/cloudinary.config.js';
 
 const createStore = async (req, res) => {
     try {
-        const { userId, name, description, storeType, addresses } = req.body;
+        const { userId, name, description, category, addresses } = req.body;
 
         let imgData = null;
         if (req.file) {
@@ -22,7 +22,7 @@ const createStore = async (req, res) => {
             userId,
             name,
             description,
-            storeType,
+            category,
             addresses,
             img: imgData
         });

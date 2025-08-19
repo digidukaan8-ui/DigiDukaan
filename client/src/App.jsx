@@ -19,7 +19,7 @@ function App() {
   return (
     <>
       <Header />
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster position="top-center" reverseOrder={false} theme={isDark?"dark":"light"} />
       <Loader/>
       <Outlet />
       <Footer />

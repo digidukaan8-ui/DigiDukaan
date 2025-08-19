@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
-import { Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support } from './pages/index.js'
+import { Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, UsedProduct, AddProduct, StoreForm } from './pages/index.js'
 import { BuyerRoute, SellerRoute, AdminRoute } from './components/index.js'
 
 const router = createBrowserRouter(
@@ -18,21 +18,21 @@ const router = createBrowserRouter(
       <Route path='termsofservice' element={<TermsOfService />} />
       <Route path='privacypolicy' element={<PrivacyPolicy />} />
       <Route path='support' element={<Support />} />
-      <Route path='buyer' element={
-        <BuyerRoute>
+      <Route path='add-product' element={<AddProduct />} />
+      <Route path='store' element={<StoreForm />} />
+      <Route path='used-product' element={<UsedProduct />} />
 
-        </BuyerRoute>
-      } />
-      <Route path='seller' element={
-        <SellerRoute>
+      <Route path='buyer' element={<BuyerRoute />} >
 
-        </SellerRoute>
-      } />
-      <Route path='admin' element={
-        <AdminRoute>
+      </Route>
 
-        </AdminRoute>
-      } />
+      <Route path='seller' element={<SellerRoute />} >
+        <Route path='used-product' element={<UsedProduct />} />
+      </Route>
+
+      <Route path='admin' element={<AdminRoute />} >
+
+      </Route>
     </Route>
   )
 )
