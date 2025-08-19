@@ -8,6 +8,7 @@ export default function Loader() {
 
   const messages = {
     login: "Logging in...",
+    logout: "Logging out...",
     register: "Creating your account...",
     orders: "Fetching your orders...",
     cart: "Updating cart...",
@@ -16,6 +17,7 @@ export default function Loader() {
 
   const colors = {
     login: "text-blue-500",
+    logout: "text-cyan-500",
     register: "text-green-500",
     orders: "text-orange-500",
     cart: "text-pink-500",

@@ -8,8 +8,7 @@ import TermsOfService from "./common/TermsOfService";
 import PrivacyPolicy from "./common/PrivacyPolicy";
 import Support from "./common/Support";
 import ProductDetails from "./common/ProductDetails";
-import UsedProduct from "./seller/UsedProducts";
-import StoreForm from "./seller/StoreForm";
-import AddProduct from "./seller/AddProduct";
+import Logout from "./common/Logout";
+import Store from "./seller/Store";
 
-export { Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, ProductDetails, StoreForm, AddProduct, UsedProduct };
+export { Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, ProductDetails, Logout, Store };

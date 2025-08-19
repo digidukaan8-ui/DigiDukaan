@@ -57,12 +57,16 @@ const logoutUser = async () => {
             },
             credentials: 'include',
         });
-        const result = response.json();
+        const result = await response.json();
+        if (result.success) {
+            useAuthStore.getState().logout();
+        }
+
         return result;
     } catch (error) {
         console.error("Error login user: ", error);
         throw error;
-    }
+    } 
 }
 
 const getOtp = async (email) => {

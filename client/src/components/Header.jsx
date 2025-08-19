@@ -22,6 +22,14 @@ export default function Header() {
         { to: '/profile', label: 'Profile' },
         { to: '/logout', label: 'Logout' },
       ];
+    } else if (isAuthenticated && user.role === 'seller') {
+      return [
+        { to: '/', label: 'Store' },
+        { to: '/order', label: 'Orders' },
+        { to: '/notification', label: 'Notification' },
+        { to: '/profile', label: 'Profile' },
+        { to: '/logout', label: 'Logout' },
+      ];
     } else {
       return [
         { to: '/', label: 'Home' },
