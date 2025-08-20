@@ -1,9 +1,10 @@
 import useStore from "../../store/store";
 import { useNavigate } from "react-router-dom";
-import { FiMapPin, FiHome } from "react-icons/fi";
+import { FiMapPin, FiHome, FiEdit3 } from "react-icons/fi";
+import Card from "../../components/Card";
 
 export default function StorePage() {
-  const { store } = useStore();
+  const { store, products = [] } = useStore(); // assuming products bhi aa rahe hain
   const navigate = useNavigate();
 
   if (!store) {
@@ -22,8 +23,21 @@ export default function StorePage() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 py-6 px-4">
       <div className="max-w-7xl mx-auto bg-white dark:bg-neutral-900 rounded-lg shadow-lg overflow-hidden border border-black dark:border-white">
-        <div className="flex flex-col md:flex-row gap-6 p-6">
-          
+        {/* Store Header */}
+        <div className="flex justify-between items-start p-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            {store.name}
+          </h1>
+          <button
+            onClick={() => navigate("/seller/store-details")}
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-neutral-700 transition"
+          >
+            <FiEdit3 className="text-xl text-gray-700 dark:text-gray-300" />
+          </button>
+        </div>
+
+        {/* Store Details */}
+        <div className="flex flex-col md:flex-row gap-6 px-6 pb-6">
           <div className="flex-shrink-0 w-full md:w-[400px] h-[350px] rounded-lg overflow-hidden shadow-lg">
             {store.img?.url && (
               <img
@@ -34,11 +48,8 @@ export default function StorePage() {
             )}
           </div>
 
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 flex-1">
             <div className="space-y-3">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                {store.name}
-              </h1>
               <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base line-clamp-3">
                 {store.description}
               </p>
@@ -74,9 +85,40 @@ export default function StorePage() {
                 </div>
               ))}
             </div>
-          </div>
 
+            {/* Action Buttons */}
+            <div className="flex gap-4">
+              <button
+                onClick={() => navigate("/seller/add-product")}
+                className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg shadow"
+              >
+                Add New Product
+              </button>
+              <button
+                onClick={() => navigate("/seller/add-used-product")}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow"
+              >
+                Add Used Product
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Product Section */}
+      <div className="max-w-7xl mx-auto mt-8">
+        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+          Products
+        </h2>
+        {products.length === 0 ? (
+          <p className="text-gray-600 dark:text-gray-400">No products yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {products.map((product) => (
+              <Card key={product._id} product={product} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
