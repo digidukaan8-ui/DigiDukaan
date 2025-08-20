@@ -24,7 +24,7 @@ export default function Header() {
       ];
     } else if (isAuthenticated && user.role === 'seller') {
       return [
-        { to: '/', label: 'Store' },
+        { to: '/seller/store', label: 'Store' },
         { to: '/order', label: 'Orders' },
         { to: '/notification', label: 'Notification' },
         { to: '/profile', label: 'Profile' },

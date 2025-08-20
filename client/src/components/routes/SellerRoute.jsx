@@ -1,9 +1,18 @@
-import React from 'react'
+import { Outlet, Navigate } from "react-router-dom";
+import useAuthStore from "../../store/auth"; 
 
 function SellerRoute() {
-  return (
-    <div>SellerRoute</div>
-  )
+  const { user } = useAuthStore(); 
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== "seller") {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
 }
 
-export default SellerRoute
+export default SellerRoute;

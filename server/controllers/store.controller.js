@@ -3,7 +3,28 @@ import uploadToCloudinary from '../utils/cloudinary.config.js';
 
 const createStore = async (req, res) => {
     try {
-        const { userId, name, description, category, addresses } = req.body;
+        let { userId, name, description, category, addresses } = req.body;
+
+        const storeExists = await Store.findOne({ userId });
+        if (storeExists) {
+            return res.status(400).json({ success: false, message: "Store already exists, can't create new" });
+        }
+
+        if (typeof category === "string") {
+            try {
+                category = JSON.parse(category);
+            } catch (err) {
+                return res.status(400).json({ success: false, message: "Invalid category format" });
+            }
+        }
+
+        if (typeof addresses === "string") {
+            try {
+                addresses = JSON.parse(addresses);
+            } catch (err) {
+                return res.status(400).json({ success: false, message: "Invalid addresses format" });
+            }
+        }
 
         let imgData = null;
         if (req.file) {
@@ -29,7 +50,16 @@ const createStore = async (req, res) => {
 
         await store.save();
 
-        return res.status(201).json({ success: true, data: store });
+        const data = {
+            userId,
+            name,
+            description,
+            category,
+            addresses,
+            img: imgData.url,
+        }
+
+        return res.status(201).json({ success: true, data: data });
     } catch (error) {
         console.error('Error in createStore controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });

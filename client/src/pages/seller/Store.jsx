@@ -1,9 +1,83 @@
-import React from 'react'
+import useStore from "../../store/store";
+import { useNavigate } from "react-router-dom";
+import { FiMapPin, FiHome } from "react-icons/fi";
 
-function Store() {
+export default function StorePage() {
+  const { store } = useStore();
+  const navigate = useNavigate();
+
+  if (!store) {
+    return (
+      <div className="h-screen flex justify-center items-center bg-gray-100 dark:bg-neutral-950">
+        <p
+          onClick={() => navigate("/seller/store-details")}
+          className="text-lg cursor-pointer text-black dark:text-white font-semibold hover:underline"
+        >
+          Add your store details
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div>Store</div>
-  )
-}
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 py-6 px-4">
+      <div className="max-w-7xl mx-auto bg-white dark:bg-neutral-900 rounded-lg shadow-lg overflow-hidden border border-black dark:border-white">
+        <div className="flex flex-col md:flex-row gap-6 p-6">
+          
+          <div className="flex-shrink-0 w-full md:w-[400px] h-[350px] rounded-lg overflow-hidden shadow-lg">
+            {store.img?.url && (
+              <img
+                src={store.img.url}
+                alt={store.name}
+                className="w-full h-full object-cover"
+              />
+            )}
+          </div>
 
-export default Store
+          <div className="flex flex-col gap-6">
+            <div className="space-y-3">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                {store.name}
+              </h1>
+              <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base line-clamp-3">
+                {store.description}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {store.category.map((cat, idx) => (
+                  <span
+                    key={idx}
+                    className="bg-sky-500 text-white px-3 py-1 rounded border border-black dark:border-white text-sm font-medium"
+                  >
+                    {cat}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {store.addresses.map((addr, index) => (
+                <div
+                  key={index}
+                  className="p-4 bg-gray-100 dark:bg-neutral-950 border border-black dark:border-white rounded-2xl shadow-sm hover:shadow-md transition duration-300"
+                >
+                  <p className="font-semibold text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-2">
+                    <FiHome className="text-sky-500" />
+                    Address {index + 1}
+                  </p>
+                  <p className="text-gray-700 dark:text-gray-300">{addr.addressLine1}</p>
+                  {addr.addressLine2 && (
+                    <p className="text-gray-700 dark:text-gray-300">{addr.addressLine2}</p>
+                  )}
+                  <p className="flex items-center text-gray-600 dark:text-gray-400 mt-1 gap-1">
+                    <FiMapPin className="text-sky-500" /> {addr.city}, {addr.state} - {addr.pincode}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
