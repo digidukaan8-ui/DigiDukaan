@@ -7,13 +7,15 @@ import useLoaderStore from "../../store/loader";
 import useAuthStore from "../../store/auth";
 import useStore from "../../store/store";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
-export default function StoreForm({ initialData = null }) {
+export default function StoreForm() {
+  const location = useLocation();
+  const { initialData } = location.state || {};
   const [imagePreview, setImagePreview] = useState(initialData?.img || "");
   const { startLoading, stopLoading } = useLoaderStore();
   const { user } = useAuthStore();
-  const naviagte = useNavigate();
+  const navigate = useNavigate();
 
   const { register, control, handleSubmit, reset, setValue } = useForm({
     defaultValues: {
@@ -71,14 +73,14 @@ export default function StoreForm({ initialData = null }) {
       userId: user._id,
     };
 
-    if (initialData === null) {
+    if (!initialData || Object.keys(initialData).length === 0) {
       startLoading("store");
       try {
         const result = await createStore(storeData);
         if (result.data.userId === user._id) {
           useStore.getState().addDetails(result.data);
           toast.success("Store created successfully");
-          naviagte('/seller/store');
+          navigate('/seller/store');
         }
         setImagePreview("");
         reset();
@@ -93,12 +95,7 @@ export default function StoreForm({ initialData = null }) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="min-h-screen bg-gray-100 dark:bg-neutral-950 py-20 px-4"
-    >
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pb-20 px-4 pt-40">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -293,6 +290,6 @@ export default function StoreForm({ initialData = null }) {
           </div>
         </form>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }

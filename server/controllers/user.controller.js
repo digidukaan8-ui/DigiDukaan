@@ -2,6 +2,7 @@ import User from '../models/user.model.js';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import Store from '../models/store.model.js';
 
 dotenv.config();
 
@@ -70,7 +71,21 @@ const loginUser = async (req, res) => {
             role: user.role
         }
 
-        return res.status(200).json({ success: true, message: 'Login successfully', data: data });
+        const storeData = await Store.findOne({ userId: user._id });
+        let store = null;
+        if (storeData) {
+            store = {
+                _id: storeData._id,
+                userId: storeData.userId,
+                name: storeData.name,
+                description: storeData.description,
+                category: storeData.category,
+                addresses: storeData.addresses,
+                img: storeData.img?.url || "",
+            };
+        }
+
+        return res.status(200).json({ success: true, message: 'Login successfully', data, store });
     } catch (error) {
         console.error('Error in loginUser controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });

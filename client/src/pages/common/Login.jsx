@@ -41,10 +41,17 @@ export default function Login() {
       const result = await loginUser(data);
       if (result.success) {
         reset();
-        setTimeout(() => {
-          navigate('/')
-          toast.success('Login successfully!');
-        }, 500);
+        if (result.data.role==='seller') {
+          setTimeout(() => {
+            navigate('/seller/store')
+            toast.success('Login successfully!');
+          }, 500);
+        } else {
+          setTimeout(() => {
+            navigate('/')
+            toast.success('Login successfully!');
+          }, 500);
+        }
       }
     } catch (error) {
       console.error('Error in login: ', error);

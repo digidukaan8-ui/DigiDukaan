@@ -1,5 +1,6 @@
 import toast from 'react-hot-toast'
 import useAuthStore from '../store/auth';
+import useStore from '../store/store';
 
 const registerUser = async (data) => {
     try {
@@ -18,7 +19,7 @@ const registerUser = async (data) => {
 
         return result;
     } catch (error) {
-        console.error("Error registering user: ", error);
+        console.error("Error in registering user: ", error);
         throw error;
     }
 }
@@ -40,10 +41,13 @@ const loginUser = async (data) => {
         }
 
         useAuthStore.getState().login(result.data);
+        if (result.store != null) {
+            useStore.getState().addDetails(result.store);
+        }
 
         return result;
     } catch (error) {
-        console.error("Error login user: ", error);
+        console.error("Error in login user: ", error);
         throw error;
     }
 }
@@ -64,9 +68,9 @@ const logoutUser = async () => {
 
         return result;
     } catch (error) {
-        console.error("Error login user: ", error);
+        console.error("Error in logout user: ", error);
         throw error;
-    } 
+    }
 }
 
 const getOtp = async (email) => {

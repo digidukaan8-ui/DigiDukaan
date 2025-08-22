@@ -4,7 +4,7 @@ import { FiMapPin, FiHome, FiEdit3 } from "react-icons/fi";
 import Card from "../../components/Card";
 
 export default function StorePage() {
-  const { store, products = [] } = useStore(); // assuming products bhi aa rahe hain
+  const { store, products = [] } = useStore();
   const navigate = useNavigate();
 
   if (!store) {
@@ -21,27 +21,25 @@ export default function StorePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 py-6 px-4">
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pb-20 pt-40 px-4">
       <div className="max-w-7xl mx-auto bg-white dark:bg-neutral-900 rounded-lg shadow-lg overflow-hidden border border-black dark:border-white">
-        {/* Store Header */}
         <div className="flex justify-between items-start p-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {store.name}
           </h1>
           <button
-            onClick={() => navigate("/seller/store-details")}
+            onClick={() => navigate("/seller/store-details", { state: { initialData: store } })}
             className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-neutral-700 transition"
           >
             <FiEdit3 className="text-xl text-gray-700 dark:text-gray-300" />
           </button>
         </div>
 
-        {/* Store Details */}
         <div className="flex flex-col md:flex-row gap-6 px-6 pb-6">
           <div className="flex-shrink-0 w-full md:w-[400px] h-[350px] rounded-lg overflow-hidden shadow-lg">
-            {store.img?.url && (
+            {store.img && (
               <img
-                src={store.img.url}
+                src={store.img}
                 alt={store.name}
                 className="w-full h-full object-cover"
               />
@@ -86,17 +84,16 @@ export default function StorePage() {
               ))}
             </div>
 
-            {/* Action Buttons */}
             <div className="flex gap-4">
               <button
-                onClick={() => navigate("/seller/add-product")}
-                className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg shadow"
+                onClick={() => navigate("/seller/add-new-product")}
+                className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg shadow border border-black dark:border-white"
               >
                 Add New Product
               </button>
               <button
                 onClick={() => navigate("/seller/add-used-product")}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow border border-black dark:border-white"
               >
                 Add Used Product
               </button>
@@ -105,7 +102,6 @@ export default function StorePage() {
         </div>
       </div>
 
-      {/* Product Section */}
       <div className="max-w-7xl mx-auto mt-8">
         <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
           Products

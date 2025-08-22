@@ -10,11 +10,12 @@ const useStore = create(
         set((state) => ({
           store: { ...state.store, ...data },
         })),
+      removeDetails: () => set({ store: null })
     }),
     {
       name: "store-storage",
       partialize: (state) => ({
-        store: state.store, 
+        store: state.store,
       }),
     }
   )

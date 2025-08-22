@@ -51,6 +51,7 @@ const createStore = async (req, res) => {
         await store.save();
 
         const data = {
+            _id: store._id,
             userId,
             name,
             description,

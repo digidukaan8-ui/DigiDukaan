@@ -25,7 +25,7 @@ const createStore = async (data) => {
 
         return result;
     } catch (error) {
-        console.error("Error creating store: ", error);
+        console.error("Error in creating store: ", error);
         throw error;
     }
 };

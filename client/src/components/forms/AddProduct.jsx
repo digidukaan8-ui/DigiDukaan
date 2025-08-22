@@ -2,12 +2,24 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { FiTrash2, FiPlus, FiX } from "react-icons/fi";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { addProduct } from "../../api/product";
+import { useLocation, useNavigate } from "react-router-dom";
+import useStore from '../../store/store';
+import useLoaderStore from "../../store/loader";
+import useProductStore from "../../store/product";
+import toast from "react-hot-toast";
 
-export default function AddProductForm({ initialData = null, onSubmit }) {
+export default function AddProductForm() {
+  const location = useLocation();
+  const { initialData } = location.state || {};
+  const { startLoading, stopLoading } = useLoaderStore();
+  const { store } = useStore();
+  const navigate = useNavigate();
   const [imagePreviews, setImagePreviews] = useState(initialData?.images || []);
   const [videoPreview, setVideoPreview] = useState(initialData?.video || "");
+  const [imgFile, setImgFile] = useState([]);
 
-  const { register, control, handleSubmit, reset } = useForm({
+  const { register, control, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
       title: initialData?.title || "",
       description: initialData?.description || "",
@@ -18,6 +30,7 @@ export default function AddProductForm({ initialData = null, onSubmit }) {
       discount: initialData?.discount || { type: "percentage", value: "" },
       tags: initialData?.tags || "",
       attributes: initialData?.attributes || [{ key: "", value: "" }],
+      stock: initialData?.stock || "",
     },
   });
 
@@ -29,24 +42,31 @@ export default function AddProductForm({ initialData = null, onSubmit }) {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    const newImages = [];
+    const validFiles = [];
 
     files.forEach((file) => {
       if (file.size <= 2 * 1024 * 1024) {
+        validFiles.push(file);
+
         const reader = new FileReader();
         reader.onloadend = () => {
-          newImages.push(reader.result);
-          if (newImages.length === files.length) {
-            setImagePreviews((prev) => [...prev, ...newImages].slice(0, 5));
-          }
+          setImagePreviews((prev) =>
+            [...prev, reader.result].slice(0, 5)
+          );
         };
         reader.readAsDataURL(file);
+      } else {
+        toast.error("Image size should not exceed 2MB");
       }
     });
+
+    setImgFile((prev) => [...prev, ...validFiles].slice(0, 5));
+    e.target.value = "";
   };
 
   const removeImage = (index) => {
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    setImgFile((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleVideoChange = (e) => {
@@ -55,28 +75,56 @@ export default function AddProductForm({ initialData = null, onSubmit }) {
       const reader = new FileReader();
       reader.onloadend = () => setVideoPreview(reader.result);
       reader.readAsDataURL(file);
+    } else {
+      toast.error("Video size should not exceed 20MB");
+      e.target.value = "";
     }
+  };
+
+  const cleanTags = (raw) => {
+    return raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
   };
 
   const removeVideo = () => setVideoPreview("");
 
-  const onFormSubmit = (data) => {
+  const onFormSubmit = async (data) => {
     const productData = {
       ...data,
-      images: imagePreviews,
+      storeId: store._id,
+      img: imgFile,
       video: videoPreview,
       attributes: data.attributes.filter(
         (attr) => attr.key.trim() && attr.value.trim()
       ),
+      tags: cleanTags(data.tags)
     };
-    if (onSubmit) onSubmit(productData);
+    if (!initialData || Object.keys(initialData).length === 0) {
+      startLoading("product");
+      try {
+        const result = await addProduct(productData);
+        if (result.data.storeId === store._id) {
+          useProductStore.getState().addProduct(result.data);
+          toast.success("Product added successfully");
+          navigate('/seller/store');
+        }
+      } catch (error) {
+        console.error("Error creating store: ", error);
+        throw error;
+      } finally {
+        stopLoading();
+      }
+    } else {
+    }
     reset();
     setImagePreviews([]);
     setVideoPreview("");
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 py-20 px-4">
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pb-20 px-4 pt-40">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -88,17 +136,39 @@ export default function AddProductForm({ initialData = null, onSubmit }) {
         </h2>
 
         <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
-          <div>
-            <label htmlFor="title" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-              Product Title
-            </label>
-            <input
-              id="title"
-              autoComplete="off"
-              {...register("title", { required: true })}
-              placeholder="Enter product title"
-              className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="title" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Product Title
+              </label>
+              <input
+                id="title"
+                autoComplete="off"
+                {...register("title", {
+                  required: "Title is required",
+                  maxLength: {
+                    value: 70,
+                    message: "Title cannot exceed 70 characters",
+                  },
+                })}
+                placeholder="Enter product title"
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              />
+              {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="brand" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Brand Name
+              </label>
+              <input
+                id="brand"
+                autoComplete="off"
+                {...register("brand")}
+                placeholder="Enter brand name"
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              />
+            </div>
           </div>
 
           <div>
@@ -108,11 +178,17 @@ export default function AddProductForm({ initialData = null, onSubmit }) {
             <textarea
               id="description"
               autoComplete="off"
-              {...register("description")}
-              placeholder="Enter product description"
+              {...register("description", {
+                required: "Description is required",
+                validate: (value) =>
+                  value.split(/\s+/).length <= 300 ||
+                  "Description cannot exceed 300 words",
+              })}
+              placeholder="Enter product description (max 300 words)"
               rows="3"
               className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
             ></textarea>
+            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -123,10 +199,11 @@ export default function AddProductForm({ initialData = null, onSubmit }) {
               <input
                 id="category"
                 autoComplete="off"
-                {...register("category", { required: true })}
+                {...register("category", { required: "Category is required" })}
                 placeholder="Enter category"
                 className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
               />
+              {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
             </div>
             <div>
               <label htmlFor="subCategory" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
@@ -144,16 +221,17 @@ export default function AddProductForm({ initialData = null, onSubmit }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="brand" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-                Brand Name
+              <label htmlFor="stock" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Stock
               </label>
               <input
-                id="brand"
+                id="stock"
                 autoComplete="off"
-                {...register("brand", { required: true })}
-                placeholder="Enter brand name"
+                {...register("stock", { required: "Stock is required" })}
+                placeholder="Enter stock"
                 className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
               />
+              {errors.stock && <p className="text-red-500 text-sm mt-1">{errors.stock.message}</p>}
             </div>
             <div>
               <label htmlFor="price" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
@@ -163,10 +241,11 @@ export default function AddProductForm({ initialData = null, onSubmit }) {
                 id="price"
                 type="number"
                 autoComplete="off"
-                {...register("price", { required: true })}
+                {...register("price", { required: "Price is required" })}
                 placeholder="Enter price"
                 className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
               />
+              {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
             </div>
           </div>
 
@@ -316,18 +395,24 @@ export default function AddProductForm({ initialData = null, onSubmit }) {
                     <input
                       id={`attr-key-${index}`}
                       autoComplete="off"
-                      {...register(`attributes.${index}.key`)}
+                      {...register(`attributes.${index}.key`, { required: "Key is required" })}
                       placeholder="Attribute Key (e.g. Color)"
                       className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white focus:ring-2 focus:ring-sky-500"
                     />
                     <input
                       id={`attr-value-${index}`}
                       autoComplete="off"
-                      {...register(`attributes.${index}.value`)}
+                      {...register(`attributes.${index}.value`, { required: "Value is required" })}
                       placeholder="Attribute Value (e.g. Red)"
                       className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white focus:ring-2 focus:ring-sky-500"
                     />
                   </div>
+                  {errors.attributes?.[index]?.key && (
+                    <p className="text-red-500 text-sm mt-1">{errors.attributes[index].key.message}</p>
+                  )}
+                  {errors.attributes?.[index]?.value && (
+                    <p className="text-red-500 text-sm mt-1">{errors.attributes[index].value.message}</p>
+                  )}
                 </motion.div>
               ))}
             </AnimatePresence>
