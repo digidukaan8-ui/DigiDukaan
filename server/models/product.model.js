@@ -6,7 +6,7 @@ const productSchema = new mongoose.Schema({
         ref: 'Store',
         required: true
     },
-    
+
     title: {
         type: String,
         required: true,
@@ -118,6 +118,11 @@ const productSchema = new mongoose.Schema({
     tags: {
         type: [String],
         default: []
+    },
+
+    rating: {
+        type: Number,
+        default: 0
     },
 
     reviews: [

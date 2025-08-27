@@ -42,4 +42,24 @@ const addProduct = async (data) => {
     }
 }
 
-export { addProduct };
+const getProduct = async (id) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/seller/${id}/products`, {
+            method: "GET",
+            credentials: "include"
+        });
+        const data = await response.json();
+
+        if (!data.success) {
+            toast.error(data.message || "Failed to fetch product");
+            throw new Error(data.message || "Failed to fetch product");
+        }
+
+        return data.data;
+    } catch (error) {
+        console.error("Error in fetching Product: ", error);
+        throw error;
+    }
+}
+
+export { addProduct, getProduct };

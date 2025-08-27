@@ -53,8 +53,6 @@ export default function Login() {
           }, 500);
         }
       }
-    } catch (error) {
-      console.error('Error in login: ', error);
     } finally {
       stopLoading();
     }

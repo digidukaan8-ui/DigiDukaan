@@ -110,9 +110,6 @@ export default function AddProductForm() {
           toast.success("Product added successfully");
           navigate('/seller/store');
         }
-      } catch (error) {
-        console.error("Error creating store: ", error);
-        throw error;
       } finally {
         stopLoading();
       }

@@ -84,9 +84,6 @@ export default function StoreForm() {
         }
         setImagePreview("");
         reset();
-      } catch (error) {
-        console.error("Error creating store: ", error);
-        throw error;
       } finally {
         stopLoading();
       }

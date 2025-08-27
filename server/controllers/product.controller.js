@@ -1,18 +1,10 @@
+import Store from "../models/store.model.js";
 import Product from "../models/product.model.js";
 import uploadToCloudinary from "../utils/cloudinary.config.js";
 
 const addProduct = async (req, res) => {
     try {
-        const {
-            storeId,
-            title,
-            description,
-            category,
-            subCategory,
-            price,
-            stock,
-            brand,
-        } = req.body;
+        const { storeId, title, description, category, subCategory, price, stock, brand, } = req.body;
         const attributes = req.body.attributes;
         const tags = req.body.tags;
         const discount = req.body.discount;
@@ -71,4 +63,25 @@ const addProduct = async (req, res) => {
     }
 };
 
-export { addProduct };
+const getProduct = async (req, res) => {
+    try {
+        const { storeId } = req.params;
+
+        const storeExist = await Store.findById(storeId);
+        if (!storeExist) {
+            return res.status(404).json({ success: false, message: 'Store not found' });
+        }
+
+        const products = await Product.find({ storeId });
+        if (products.length === 0) {
+            return res.status(200).json({ success: true, message: 'No products found for this store', data: [] });
+        }
+
+        return res.status(200).json({ success: true, message: 'Product fetched successfully', data: products });
+    } catch (error) {
+        console.error('Error in Get Product controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
+export { addProduct, getProduct };
