@@ -34,11 +34,11 @@ const handleCreateStore = async (req, res, next) => {
         }
 
         if (!Array.isArray(category) || category.length === 0) {
-            return res.status(400).json({ success: false, message: "category must be a non-empty array" });
+            return res.status(400).json({ success: false, message: "Category must be a non-empty array" });
         }
 
         if (!Array.isArray(addresses) || addresses.length === 0) {
-            return res.status(400).json({ success: false, message: "addresses must be a non-empty array" });
+            return res.status(400).json({ success: false, message: "Addresses must be a non-empty array" });
         }
 
         if (!req.file) {
@@ -52,4 +52,23 @@ const handleCreateStore = async (req, res, next) => {
     }
 };
 
-export { handleCreateStore };
+const handleDeliveryZone = async (req, res, next) => {
+    try {
+        const { storeId, deliveryArea, areaName } = req.body;
+
+        if (!storeId || !deliveryArea || !areaName) {
+            return res.status(400).json({ success: false, message: 'All fields are required' });
+        }
+
+        if (typeof (storeId) !== 'string' || typeof (deliveryArea) !== 'string' || typeof (areaName) !== 'string') {
+            return res.status(400).json({ success: false, message: 'Invalid input format' });
+        }
+
+        return next();
+    } catch (error) {
+        console.error("Error in Delivery Zone middleware: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
+
+export { handleCreateStore, handleDeliveryZone };

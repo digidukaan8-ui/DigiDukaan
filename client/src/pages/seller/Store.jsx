@@ -7,7 +7,6 @@ import { getProduct } from "../../api/product";
 import useLoaderStore from "../../store/loader";
 import useProductStore from "../../store/product";
 import { toast } from "react-hot-toast";
-import AddProduct from "../../components/forms/AddProduct"
 
 export default function StorePage() {
   const { store } = useStore();
@@ -113,19 +112,26 @@ export default function StorePage() {
               ))}
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-wrap justify-center sm:justify-normal items-center sm:justify-items-normal gap-4">
               <button
                 onClick={() => navigate("/seller/add-new-product")}
-                className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg shadow border border-black dark:border-white"
+                className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg shadow border border-black dark:border-white cursor-pointer"
               >
                 Add New Product
               </button>
               <button
                 onClick={() => navigate("/seller/add-used-product")}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow border border-black dark:border-white"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow border border-black dark:border-white cursor-pointer"
               >
                 Add Used Product
               </button>
+              <button
+                onClick={() => navigate("/seller/delivery-zone")}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow border border-black dark:border-white cursor-pointer"
+              >
+                Manage Delivery Zone
+              </button>
+              
             </div>
           </div>
         </div>

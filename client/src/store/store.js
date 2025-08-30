@@ -10,7 +10,7 @@ const useStore = create(
         set((state) => ({
           store: { ...state.store, ...data },
         })),
-      removeDetails: () => set({ store: null })
+      clearStore: () => set({ store: null })
     }),
     {
       name: "store-storage",

@@ -1,6 +1,8 @@
 import toast from 'react-hot-toast'
 import useAuthStore from '../store/auth';
 import useStore from '../store/store';
+import useProductStore from '../store/product';
+import useDeliveryStore from '../store/deliveryZone';
 
 const registerUser = async (data) => {
     try {
@@ -45,6 +47,10 @@ const loginUser = async (data) => {
             useStore.getState().addDetails(result.store);
         }
 
+        if (result.deliveryZone != null) {
+            useDeliveryStore.getState().setZones(result.deliveryZone);
+        }
+
         return result;
     } catch (error) {
         console.error("Error in login user: ", error);
@@ -61,9 +67,13 @@ const logoutUser = async () => {
             },
             credentials: 'include',
         });
+
         const result = await response.json();
         if (result.success) {
             useAuthStore.getState().logout();
+            useStore.getState().clearStore();
+            useProductStore.getState().clearProducts();
+            useDeliveryStore.getState().clearZones();
         }
 
         return result;

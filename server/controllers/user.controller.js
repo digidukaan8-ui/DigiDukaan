@@ -3,6 +3,7 @@ import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import Store from '../models/store.model.js';
+import DeliveryZone from '../models/deliveryzone.model.js';
 
 dotenv.config();
 
@@ -73,6 +74,8 @@ const loginUser = async (req, res) => {
 
         const storeData = await Store.findOne({ userId: user._id });
         let store = null;
+        let deliveryZone = null;
+
         if (storeData) {
             store = {
                 _id: storeData._id,
@@ -83,9 +86,14 @@ const loginUser = async (req, res) => {
                 addresses: storeData.addresses,
                 img: storeData.img?.url || "",
             };
+
+            const deliveryZoneData = await DeliveryZone.find({ storeId: storeData?._id });
+            if (deliveryZoneData && deliveryZoneData.length > 0) {
+                deliveryZone = deliveryZoneData;
+            }
         }
 
-        return res.status(200).json({ success: true, message: 'Login successfully', data, store });
+        return res.status(200).json({ success: true, message: 'Login successfully', data, store, deliveryZone });
     } catch (error) {
         console.error('Error in loginUser controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });

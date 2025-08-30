@@ -1,4 +1,5 @@
 import toast from 'react-hot-toast';
+import logoutHelper from '../utils/logoutHelper';
 
 const createStore = async (data) => {
     try {
@@ -19,6 +20,7 @@ const createStore = async (data) => {
         const result = await response.json();
 
         if (!result.success) {
+            logoutHelper(result.message);
             toast.error(result.message || "Failed to create store");
             throw new Error(result.message || "Failed to create store");
         }
@@ -30,4 +32,30 @@ const createStore = async (data) => {
     }
 };
 
-export { createStore };
+const addDeliveryZone = async (data) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/seller/addDeliveryZone', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to add delivery zone");
+            throw new Error(result.message || "Failed to add delivery zone");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in adding delivery zone: ", error);
+        throw error;
+    }
+}
+
+export { createStore, addDeliveryZone };

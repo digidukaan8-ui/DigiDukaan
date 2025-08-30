@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { logoutUser } from '../../api/user.js';
 import toast from 'react-hot-toast';
 import useLoaderStore from '../../store/loader';
-import useStore from '../../store/store.js';
 
 export default function Logout() {
     const { startLoading, stopLoading } = useLoaderStore();
@@ -19,7 +18,6 @@ export default function Logout() {
                         navigate('/')
                         toast.success('Logout successfully!');
                     }, 500);
-                    useStore.getState().removeDetails();
                 } else {
                     toast.error(result?.message || "Failed to logout");
                 }

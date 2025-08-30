@@ -9,7 +9,7 @@ import useLoaderStore from "../../store/loader";
 import useProductStore from "../../store/product";
 import toast from "react-hot-toast";
 
-export default function AddProductForm() {
+export default function NewProductForm() {
   const location = useLocation();
   const { initialData } = location.state || {};
   const { startLoading, stopLoading } = useLoaderStore();

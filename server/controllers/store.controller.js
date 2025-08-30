@@ -1,3 +1,4 @@
+import DeliveryZone from '../models/deliveryzone.model.js';
 import Store from '../models/store.model.js';
 import uploadToCloudinary from '../utils/cloudinary.config.js';
 
@@ -67,4 +68,35 @@ const createStore = async (req, res) => {
     }
 }
 
-export { createStore };
+const addDeliveryZone = async (req, res) => {
+    try {
+        const { storeId, deliveryArea, areaName } = req.body;
+
+        const store = await Store.findById(storeId);
+        if (!store) {
+            return res.status(404).json({ success: false, message: 'Store not found' });
+        }
+
+        const newDeliveryZone = new DeliveryZone({
+            storeId,
+            deliveryArea,
+            areaName
+        });
+
+        await newDeliveryZone.save();
+
+        const data = {
+            _id: newDeliveryZone._id,
+            storeId,
+            deliveryArea,
+            areaName
+        };
+
+        return res.status(201).json({ success: true, message: 'Delivery Zone added successfully', data });
+    } catch (error) {
+        console.error('Error in Delivery Zone controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
+export { createStore, addDeliveryZone };

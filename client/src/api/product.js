@@ -1,4 +1,5 @@
 import toast from 'react-hot-toast';
+import logoutHelper from '../utils/logoutHelper';
 
 const addProduct = async (data) => {
     try {
@@ -31,6 +32,7 @@ const addProduct = async (data) => {
         const result = await response.json();
 
         if (!result.success) {
+            logoutHelper(result.message);
             toast.error(result.message || "Failed to add product");
             throw new Error(result.message || "Failed to add product");
         }
@@ -48,14 +50,15 @@ const getProduct = async (id) => {
             method: "GET",
             credentials: "include"
         });
-        const data = await response.json();
+        const result = await response.json();
 
-        if (!data.success) {
-            toast.error(data.message || "Failed to fetch product");
-            throw new Error(data.message || "Failed to fetch product");
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to fetch product");
+            throw new Error(result.message || "Failed to fetch product");
         }
 
-        return data.data;
+        return result.data;
     } catch (error) {
         console.error("Error in fetching Product: ", error);
         throw error;

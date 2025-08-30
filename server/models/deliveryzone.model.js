@@ -1,24 +1,55 @@
 import mongoose from "mongoose";
 
-const deliveryZoneSchema = new mongoose.Schema({
-    storeId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Store",
-        required: true
-    },
-    level: {
-        type: String,
-        enum: ["locality", "pincode", "suburb", "city", "district", "state", "country"],
-        required: true
-    },
-    values: {
-        type: [String],
-        required: true,
-        validate: {
-            validator: (arr) => arr.length > 0,
-            message: "At least one location must be specified"
-        }
-    }
-}, { timestamps: true });
+function capitalizeFirst(str) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
 
-export default mongoose.model("DeliveryZone", deliveryZoneSchema);
+const deliveryZoneSchema = new mongoose.Schema(
+  {
+    storeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Store",
+      required: true,
+    },
+    deliveryArea: {
+      type: String,
+      required: true,
+      enum: [
+        "Country",
+        "State",
+        "District",
+        "City",
+        "Town",
+        "Village",
+        "Suburb",
+        "Area",
+        "Taluka",
+        "Tehsil",
+        "Locality",
+        "Street",
+        "Landmark",
+        "Pincode",
+      ],
+      trim: true,
+      required: true,
+      set: capitalizeFirst,
+    },
+    areaName: {
+      type: String,
+      required: true,
+      trim: true,
+      set: capitalizeFirst,
+    },
+  },
+  { timestamps: true }
+);
+
+deliveryZoneSchema.index(
+  { storeId: 1, areaName: 1 },
+  { unique: true }
+);
+
+const DeliveryZone = mongoose.model("DeliveryZone", deliveryZoneSchema);
+
+export default DeliveryZone;

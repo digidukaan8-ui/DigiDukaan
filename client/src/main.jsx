@@ -2,8 +2,8 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
-import { Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store } from './pages/index.js'
-import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, AddProductForm, UsedProductForm, ReviewForm } from './components/index.js'
+import { Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, ProductDetails } from './pages/index.js'
+import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm } from './components/index.js'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -18,16 +18,18 @@ const router = createBrowserRouter(
       <Route path='privacypolicy' element={<PrivacyPolicy />} />
       <Route path='support' element={<Support />} />
       <Route path='logout' element={<Logout />} />
+      <Route path='product-detail' element={<ProductDetails />} />
 
       <Route path='buyer' element={<BuyerRoute />} >
 
       </Route>
 
       <Route path='seller' element={<SellerRoute />} >
-        <Route path='add-used-product' element={<UsedProductForm />} />
-        <Route path='add-new-product' element={<AddProductForm />} />
+        <Route path='used-product' element={<UsedProductForm />} />
+        <Route path='new-product' element={<NewProductForm />} />
         <Route path='store' element={<Store />} />
         <Route path='store-details' element={<StoreForm />} />
+        <Route path='delivery-zone' element={<DeliveryForm />} />
       </Route>
 
       <Route path='admin' element={<AdminRoute />} >

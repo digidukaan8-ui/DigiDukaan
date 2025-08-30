@@ -5,8 +5,9 @@ import BuyerRoute from "./routes/BuyerRoute";
 import SellerRoute from "./routes/SellerRoute";
 import AdminRoute from "./routes/AdminRoute";
 import StoreForm from "./forms/StoreForm";
-import AddProductForm from "./forms/AddProduct";
+import NewProductForm from "./forms/NewProduct";
 import UsedProductForm from "./forms/UsedProducts";
 import ReviewForm from "./forms/ReviewForm";
+import DeliveryForm from "./forms/DeliveryForm";
 
-export { Header, Footer, Card, BuyerRoute, SellerRoute, AdminRoute, StoreForm, AddProductForm, UsedProductForm, ReviewForm };
+export { Header, Footer, Card, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm };
