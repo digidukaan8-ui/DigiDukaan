@@ -71,4 +71,23 @@ const handleDeliveryZone = async (req, res, next) => {
     }
 }
 
-export { handleCreateStore, handleDeliveryZone };
+const handleUpdateDeliveryZone = async (req, res, next) => {
+    try {
+        const { id, deliveryArea, areaName } = req.body;
+
+        if (!id || !deliveryArea || !areaName) {
+            return res.status(400).json({ success: false, message: 'All fields are required' });
+        }
+
+        if (typeof (id) !== 'string' || typeof (deliveryArea) !== 'string' || typeof (areaName) !== 'string') {
+            return res.status(400).json({ success: false, message: 'Invalid input format' });
+        }
+
+        return next();
+    } catch (error) {
+        console.error("Error in Update Delivery Zone middleware: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
+
+export { handleCreateStore, handleDeliveryZone, handleUpdateDeliveryZone };

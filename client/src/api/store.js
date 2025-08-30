@@ -58,4 +58,56 @@ const addDeliveryZone = async (data) => {
     }
 }
 
-export { createStore, addDeliveryZone };
+const updateDeliveryZone = async (data) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/seller/updateDeliveryZone', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to update delivery zone");
+            throw new Error(result.message || "Failed to update delivery zone");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in updating delivery zone: ", error);
+        throw error;
+    }
+};
+
+const removeDeliveryZone = async (id) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/seller/removeDeliveryZone', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ id })   // ✅ fix here
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to remove delivery zone");
+            throw new Error(result.message || "Failed to remove delivery zone");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in removing delivery zone: ", error);
+        throw error;
+    }
+};
+
+export { createStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone };

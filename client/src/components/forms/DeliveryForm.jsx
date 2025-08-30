@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import useDeliveryStore from "../../store/deliveryZone";
 import { MapPin, Pencil, Trash2 } from "lucide-react";
-import { addDeliveryZone } from "../../api/store";
+import { addDeliveryZone, updateDeliveryZone, removeDeliveryZone } from "../../api/store";
 import useLoaderStore from "../../store/loader";
 import { toast } from "react-hot-toast";
 import useStore from "../../store/store";
@@ -36,9 +36,15 @@ const DeliveryForm = () => {
     }
 
     if (editId) {
-      updateZone(editId, correctData);
-      setEditId(null);
-      toast.success("Delivery Zone updated");
+      startLoading("updateZone");
+      try {
+        const result = await updateDeliveryZone({ ...correctData, id: editId });
+        updateZone(result.data._id, { deliveryArea: result.data.deliveryArea, areaName: result.data.areaName });
+        setEditId(null);
+        toast.success("Delivery Zone updated successfully");
+      } finally {
+        stopLoading();
+      }
     } else {
       startLoading("zone");
       try {
@@ -58,6 +64,21 @@ const DeliveryForm = () => {
     setValue("areaName", zone.areaName);
     setEditId(zone._id);
   };
+
+  const handleRemove = async (id) => {
+    const confirmed = window.confirm("Are you sure you want to remove this delivery zone?");
+    if (!confirmed) return;
+    startLoading("removeZone");
+    try {
+      const result = await removeDeliveryZone(id);
+      if (result.success) {
+        removeZone(id);
+      }
+      toast.success("Delivery Zone removed successfully");
+    } finally {
+      stopLoading();
+    }
+  }
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center bg-gray-100 pt-40 dark:bg-neutral-950 dark:text-gray-100 p-6">
@@ -147,7 +168,7 @@ const DeliveryForm = () => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => removeZone(zone._id)}
+                    onClick={() => handleRemove(zone._id)}
                     className="p-2 rounded-lg bg-gray-100 dark:bg-neutral-950 text-red-600 dark:text-red-400 hover:bg-gray-200 dark:hover:bg-neutral-800 transition border border-black dark:border-white cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />

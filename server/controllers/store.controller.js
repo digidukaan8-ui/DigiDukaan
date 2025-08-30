@@ -99,4 +99,41 @@ const addDeliveryZone = async (req, res) => {
     }
 }
 
-export { createStore, addDeliveryZone };
+const updateDeliveryZone = async (req, res) => {
+    try {
+        const { id, deliveryArea, areaName } = req.body;
+
+        const updatedZone = await DeliveryZone.findByIdAndUpdate(
+            id,
+            { $set: { deliveryArea, areaName } },
+            { new: true }
+        );
+
+        if (!updatedZone) {
+            return res.status(404).json({ success: false, message: 'Delivery Zone not found' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Delivery zone updated successfully', data: updatedZone });
+    } catch (error) {
+        console.error('Error in Updating Delivery Zone controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+const removeDeliveryZone = async (req, res) => {
+    try {
+        const { id } = req.body;
+        const result = await DeliveryZone.deleteOne({ _id: id });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ success: false, message: 'Delivery Zone not found' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Delivery zone removed successfully' });
+    } catch (error) {
+        console.error('Error in Remove Delivery Zone controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+export { createStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone };

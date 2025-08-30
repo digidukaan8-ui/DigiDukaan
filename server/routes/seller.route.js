@@ -1,8 +1,8 @@
 import express from 'express'
 import { authMiddleware } from '../middlewares/auth.middleware.js'
-import { handleCreateStore, handleDeliveryZone } from '../middlewares/store.middleware.js';
+import { handleCreateStore, handleDeliveryZone, handleUpdateDeliveryZone } from '../middlewares/store.middleware.js';
 import { uploadProductMedia, validateFileSizes } from '../middlewares/upload.middleware.js';
-import { createStore, addDeliveryZone } from '../controllers/store.controller.js';
+import { createStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone } from '../controllers/store.controller.js';
 import { handleAddProduct } from '../middlewares/product.middleware.js';
 import { addProduct, getProduct } from '../controllers/product.controller.js';
 
@@ -14,5 +14,7 @@ sellerRouter.get('/:storeId/products', authMiddleware('seller'), getProduct);
 sellerRouter.post('/addProduct', authMiddleware('seller'), uploadProductMedia, validateFileSizes, handleAddProduct, addProduct);
 
 sellerRouter.post('/addDeliveryZone', authMiddleware('seller'), handleDeliveryZone, addDeliveryZone);
+sellerRouter.patch('/updateDeliveryZone', authMiddleware('seller'), handleUpdateDeliveryZone, updateDeliveryZone);
+sellerRouter.delete('/removeDeliveryZone', authMiddleware('seller'), removeDeliveryZone);
 
 export default sellerRouter;
