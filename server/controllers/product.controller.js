@@ -4,7 +4,8 @@ import { uploadToCloudinary } from "../utils/cloudinary.config.js";
 
 const addProduct = async (req, res) => {
     try {
-        const { storeId, title, description, category, subCategory, price, stock, brand,deliveryCharge } = req.body;
+        const { title, description, category, subCategory, price, stock, brand, deliveryCharge } = req.body;
+        const { storeId } = req.params;
         const attributes = req.body.attributes;
         const tags = req.body.tags;
         const discount = req.body.discount;
@@ -85,13 +86,30 @@ const getProduct = async (req, res) => {
     }
 }
 
-const updateProduct = async (req,res) => {
+const updateProduct = async (req, res) => {
     try {
-        
+        const { productId } = req.params;
+
     } catch (error) {
         console.error('Error in Update Product controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-export { addProduct, getProduct };
+const removeProduct = async (req, res) => {
+    try {
+        const { productId } = req.params;
+        const result = await Product.findByIdAndDelete(productId);
+
+        if (!result) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Product removed successfully' });
+    } catch (error) {
+        console.error('Error in Remove Product controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
+export { addProduct, getProduct, updateProduct, removeProduct };

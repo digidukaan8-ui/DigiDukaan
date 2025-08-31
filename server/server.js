@@ -35,9 +35,9 @@ app.get('/', (req, res) => {
 connectDB();
 
 app.use('/api/users', userRouter);
-app.use('/api/buyer', buyerRouter);
-app.use('/api/seller', sellerRouter);
-app.use('/api/admin', adminRouter);
+app.use('/api/buyers', buyerRouter);
+app.use('/api/sellers', sellerRouter);
+app.use('/api/admins', adminRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

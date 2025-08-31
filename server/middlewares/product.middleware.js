@@ -2,7 +2,8 @@ import Store from "../models/store.model.js";
 
 const handleAddProduct = async (req, res, next) => {
     try {
-        let { storeId, title, description, category, subCategory, price, discount, stock, attributes, brand, tags, deliveryCharge } = req.body;
+        let { title, description, category, subCategory, price, discount, stock, attributes, brand, tags, deliveryCharge } = req.body;
+        const { storeId } = req.params;
 
         if (attributes && typeof attributes === "string") {
             try {
@@ -37,7 +38,7 @@ const handleAddProduct = async (req, res, next) => {
             typeof title !== 'string' ||
             typeof category !== 'string' ||
             typeof description !== 'string' ||
-            typeof subCategory !== 'string' 
+            typeof subCategory !== 'string'
         ) {
             return res.status(400).json({ success: false, message: 'Invalid input format for required fields' });
         }
@@ -85,7 +86,8 @@ const handleAddProduct = async (req, res, next) => {
 
 const hadnleUpdateProduct = async (req, res, next) => {
     try {
-        let { productId, title, description, category, subCategory, price, discount, stock, attributes, brand, tags } = req.body;
+        let { title, description, category, subCategory, price, discount, stock, attributes, brand, tags } = req.body;
+        const { productId } = req.params;
 
         if (attributes && typeof attributes === "string") {
             try {
@@ -161,4 +163,4 @@ const hadnleUpdateProduct = async (req, res, next) => {
     }
 }
 
-export { handleAddProduct };
+export { handleAddProduct, hadnleUpdateProduct };

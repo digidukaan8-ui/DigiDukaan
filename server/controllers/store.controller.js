@@ -4,7 +4,8 @@ import { uploadToCloudinary, deleteFromCloudinary } from '../utils/cloudinary.co
 
 const createStore = async (req, res) => {
     try {
-        let { userId, name, description, category, addresses } = req.body;
+        let { name, description, category, addresses } = req.body;
+        const userId = req.user._id;
 
         const storeExists = await Store.findOne({ userId });
         if (storeExists) {
@@ -61,7 +62,8 @@ const createStore = async (req, res) => {
 
 const updateStore = async (req, res) => {
     try {
-        let { storeId, name, description, category, addresses, img } = req.body;
+        let { name, description, category, addresses, img } = req.body;
+        const { storeId } = req.params;
 
         const store = await Store.findById(storeId);
         if (!store) {
@@ -132,7 +134,8 @@ const updateStore = async (req, res) => {
 
 const addDeliveryZone = async (req, res) => {
     try {
-        const { storeId, deliveryArea, areaName, deliveryCharge } = req.body;
+        const { deliveryArea, areaName, deliveryCharge } = req.body;
+        const { storeId } = req.params;
 
         const store = await Store.findById(storeId);
         if (!store) {
@@ -157,10 +160,10 @@ const addDeliveryZone = async (req, res) => {
 
 const updateDeliveryZone = async (req, res) => {
     try {
-        const { id, deliveryArea, areaName, deliveryCharge } = req.body;
-
+        const { deliveryArea, areaName, deliveryCharge } = req.body;
+        const { zoneId } = req.params;
         const updatedZone = await DeliveryZone.findByIdAndUpdate(
-            id,
+            zoneId,
             { $set: { deliveryArea, areaName, deliveryCharge } },
             { new: true }
         );
@@ -178,10 +181,10 @@ const updateDeliveryZone = async (req, res) => {
 
 const removeDeliveryZone = async (req, res) => {
     try {
-        const { id } = req.body;
-        const result = await DeliveryZone.deleteOne({ _id: id });
+        const { zoneId } = req.params;
+        const result = await DeliveryZone.findByIdAndDelete(zoneId );
 
-        if (result.deletedCount === 0) {
+        if (!result) {
             return res.status(404).json({ success: false, message: 'Delivery Zone not found' });
         }
 

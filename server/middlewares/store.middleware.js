@@ -2,7 +2,8 @@ import User from "../models/user.model.js";
 
 const handleCreateStore = async (req, res, next) => {
     try {
-        let { userId, name, description, category, addresses } = req.body;
+        let { name, description, category, addresses } = req.body;
+        const userId = req.user._id;
 
         if (addresses) {
             try {
@@ -54,7 +55,8 @@ const handleCreateStore = async (req, res, next) => {
 
 const handleUpdateStore = async (req, res, next) => {
     try {
-        let { storeId, name, description, category, addresses } = req.body;
+        let { name, description, category, addresses } = req.body;
+        const { storeId } = req.params;
 
         if (addresses) {
             try {
@@ -102,7 +104,8 @@ const handleUpdateStore = async (req, res, next) => {
 
 const handleDeliveryZone = async (req, res, next) => {
     try {
-        const { storeId, deliveryArea, areaName, deliveryCharge } = req.body;
+        const { deliveryArea, areaName, deliveryCharge } = req.body;
+        const { storeId } = req.params;
 
         if (!storeId || !deliveryArea || !areaName) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
@@ -121,13 +124,14 @@ const handleDeliveryZone = async (req, res, next) => {
 
 const handleUpdateDeliveryZone = async (req, res, next) => {
     try {
-        const { id, deliveryArea, areaName, deliveryCharge } = req.body;
+        const { deliveryArea, areaName, deliveryCharge } = req.body;
+        const { zoneId } = req.params;
 
-        if (!id || !deliveryArea || !areaName) {
+        if (!zoneId || !deliveryArea || !areaName) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
-        if (typeof (id) !== 'string' || typeof (deliveryArea) !== 'string' || typeof (areaName) !== 'string' || typeof (deliveryCharge) !== 'number') {
+        if (typeof (zoneId) !== 'string' || typeof (deliveryArea) !== 'string' || typeof (areaName) !== 'string' || typeof (deliveryCharge) !== 'number') {
             return res.status(400).json({ success: false, message: 'Invalid input format' });
         }
 

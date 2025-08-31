@@ -39,7 +39,7 @@ const DeliveryForm = () => {
     if (editId) {
       startLoading("updateZone");
       try {
-        const result = await updateDeliveryZone({ ...correctData, id: editId });
+        const result = await updateDeliveryZone({ ...correctData, zoneId: editId });
         updateZone(result.data._id, {
           deliveryArea: result.data.deliveryArea,
           areaName: result.data.areaName,

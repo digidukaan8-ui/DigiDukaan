@@ -4,7 +4,6 @@ import logoutHelper from '../utils/logoutHelper';
 const addProduct = async (data) => {
     try {
         const formData = new FormData();
-        formData.append('storeId', data.storeId);
         formData.append('title', data.title);
         formData.append('description', data.description);
         formData.append('category', data.category);
@@ -24,7 +23,7 @@ const addProduct = async (data) => {
         formData.append('brand', data.brand);
         formData.append('tags', JSON.stringify(data.tags));
         formData.append('deliveryCharge', data.deliveryCharge);
-        const response = await fetch("http://localhost:3000/api/seller/addProduct", {
+        const response = await fetch(`http://localhost:3000/api/sellers/stores/${data.storeId}/products`, {
             method: "POST",
             credentials: "include",
             body: formData,
@@ -47,7 +46,7 @@ const addProduct = async (data) => {
 
 const getProduct = async (id) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/seller/${id}/products`, {
+        const response = await fetch(`http://localhost:3000/api/sellers/${id}/products`, {
             method: "GET",
             credentials: "include"
         });
