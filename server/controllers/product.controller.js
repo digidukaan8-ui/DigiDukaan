@@ -4,7 +4,7 @@ import { uploadToCloudinary } from "../utils/cloudinary.config.js";
 
 const addProduct = async (req, res) => {
     try {
-        const { storeId, title, description, category, subCategory, price, stock, brand, } = req.body;
+        const { storeId, title, description, category, subCategory, price, stock, brand,deliveryCharge } = req.body;
         const attributes = req.body.attributes;
         const tags = req.body.tags;
         const discount = req.body.discount;
@@ -51,7 +51,8 @@ const addProduct = async (req, res) => {
             stock,
             attributes,
             brand,
-            tags
+            tags,
+            deliveryCharge
         });
 
         await product.save();
@@ -80,6 +81,15 @@ const getProduct = async (req, res) => {
         return res.status(200).json({ success: true, message: 'Product fetched successfully', data: products });
     } catch (error) {
         console.error('Error in Get Product controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
+const updateProduct = async (req,res) => {
+    try {
+        
+    } catch (error) {
+        console.error('Error in Update Product controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }

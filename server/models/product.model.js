@@ -120,6 +120,11 @@ const productSchema = new mongoose.Schema({
         default: []
     },
 
+    deliveryCharge: {
+        type: Number,
+        default: 0
+    },
+
     rating: {
         type: Number,
         default: 0

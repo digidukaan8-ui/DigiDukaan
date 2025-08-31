@@ -27,11 +27,12 @@ const DeliveryForm = () => {
     const correctData = {
       storeId: store._id,
       deliveryArea: capitalizeFirst(data.deliveryArea),
-      areaName: capitalizeFirst(data.areaName.trim())
+      areaName: capitalizeFirst(data.areaName.trim()),
+      deliveryCharge: Number(data.deliveryCharge) || 0
     };
 
     if (!correctData.deliveryArea || !correctData.areaName) {
-      toast.error("Both fields are required");
+      toast.error("All fields are required");
       return;
     }
 
@@ -39,7 +40,11 @@ const DeliveryForm = () => {
       startLoading("updateZone");
       try {
         const result = await updateDeliveryZone({ ...correctData, id: editId });
-        updateZone(result.data._id, { deliveryArea: result.data.deliveryArea, areaName: result.data.areaName });
+        updateZone(result.data._id, {
+          deliveryArea: result.data.deliveryArea,
+          areaName: result.data.areaName,
+          deliveryCharge: result.data.deliveryCharge
+        });
         setEditId(null);
         toast.success("Delivery Zone updated successfully");
       } finally {
@@ -56,12 +61,13 @@ const DeliveryForm = () => {
       }
     }
 
-    reset({ deliveryArea: "city", areaName: "" });
+    reset({ deliveryArea: "city", areaName: "", deliveryCharge: "" });
   };
 
   const handleEdit = (zone) => {
     setValue("deliveryArea", zone.deliveryArea.toLowerCase());
     setValue("areaName", zone.areaName);
+    setValue("deliveryCharge", zone.deliveryCharge || "");
     setEditId(zone._id);
   };
 
@@ -81,7 +87,7 @@ const DeliveryForm = () => {
   }
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center bg-gray-100 pt-40 dark:bg-neutral-950 dark:text-gray-100 p-6">
+    <div className="w-full min-h-screen flex flex-col items-center bg-gray-100 pt-40 pb-20 dark:bg-neutral-950 dark:text-gray-100 p-6">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-[300px] bg-white dark:bg-neutral-900 p-5 rounded-md border border-black dark:border-white shadow-md space-y-4"
@@ -89,10 +95,7 @@ const DeliveryForm = () => {
         <h2 className="text-3xl font-bold mb-6 text-center"> Zone Form</h2>
 
         <div className="space-y-1">
-          <label
-            htmlFor="deliveryArea"
-            className="block text-sm font-medium"
-          >
+          <label htmlFor="deliveryArea" className="block text-sm font-medium">
             Select Delivery Area
           </label>
           <select
@@ -109,10 +112,7 @@ const DeliveryForm = () => {
         </div>
 
         <div className="space-y-1">
-          <label
-            htmlFor="areaName"
-            className="block text-sm font-medium"
-          >
+          <label htmlFor="areaName" className="block text-sm font-medium">
             Area Name
           </label>
           <input
@@ -124,6 +124,22 @@ const DeliveryForm = () => {
             className="w-full rounded-md p-3 bg-gray-100 dark:bg-neutral-950 border border-black dark:border-white"
           />
         </div>
+
+        <div className="space-y-1">
+          <label htmlFor="deliveryCharge" className="block text-sm font-medium">
+            Delivery Charge
+          </label>
+          <input
+            id="deliveryCharge"
+            type="number"
+            {...register("deliveryCharge", { required: true })}
+            placeholder="Enter delivery charge"
+            className="w-full rounded-md p-3 bg-gray-100 dark:bg-neutral-950 border border-black dark:border-white"
+          />
+        </div>
+        <p className="text-xs text-gray-600 dark:text-gray-400 text-center">
+          This delivery charge will be applied to every product delivered in this zone.
+        </p>
 
         <button
           type="submit"
@@ -155,6 +171,9 @@ const DeliveryForm = () => {
                   </span>
                   <span className="text-lg px-2 mt-1 capitalize">
                     {zone.areaName}
+                  </span>
+                  <span className="text-base px-2 mt-1 text-green-600 dark:text-green-400 font-medium">
+                    ₹{zone.deliveryCharge || 0}
                   </span>
                 </div>
 

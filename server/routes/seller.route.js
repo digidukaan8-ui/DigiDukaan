@@ -13,6 +13,8 @@ sellerRouter.patch('/updateStore', authMiddleware('seller'), uploadProductMedia,
 
 sellerRouter.get('/:storeId/products', authMiddleware('seller'), getProduct);
 sellerRouter.post('/addProduct', authMiddleware('seller'), uploadProductMedia, validateFileSizes, handleAddProduct, addProduct);
+sellerRouter.patch('/updateProduct', authMiddleware('seller'), uploadProductMedia, validateFileSizes, handleAddProduct, addProduct);
+sellerRouter.delete('/deleteProduct', authMiddleware('seller'), addProduct);
 
 sellerRouter.post('/addDeliveryZone', authMiddleware('seller'), handleDeliveryZone, addDeliveryZone);
 sellerRouter.patch('/updateDeliveryZone', authMiddleware('seller'), handleUpdateDeliveryZone, updateDeliveryZone);

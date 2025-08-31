@@ -114,13 +114,13 @@ export default function StorePage() {
 
             <div className="flex flex-wrap justify-center sm:justify-normal items-center sm:justify-items-normal gap-4">
               <button
-                onClick={() => navigate("/seller/add-new-product")}
+                onClick={() => navigate("/seller/new-product")}
                 className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg shadow border border-black dark:border-white cursor-pointer"
               >
                 Add New Product
               </button>
               <button
-                onClick={() => navigate("/seller/add-used-product")}
+                onClick={() => navigate("/seller/used-product")}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow border border-black dark:border-white cursor-pointer"
               >
                 Add Used Product

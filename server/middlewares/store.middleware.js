@@ -102,13 +102,13 @@ const handleUpdateStore = async (req, res, next) => {
 
 const handleDeliveryZone = async (req, res, next) => {
     try {
-        const { storeId, deliveryArea, areaName } = req.body;
+        const { storeId, deliveryArea, areaName, deliveryCharge } = req.body;
 
         if (!storeId || !deliveryArea || !areaName) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
-        if (typeof (storeId) !== 'string' || typeof (deliveryArea) !== 'string' || typeof (areaName) !== 'string') {
+        if (typeof (storeId) !== 'string' || typeof (deliveryArea) !== 'string' || typeof (areaName) !== 'string' || typeof (deliveryCharge) !== 'number') {
             return res.status(400).json({ success: false, message: 'Invalid input format' });
         }
 
@@ -121,13 +121,13 @@ const handleDeliveryZone = async (req, res, next) => {
 
 const handleUpdateDeliveryZone = async (req, res, next) => {
     try {
-        const { id, deliveryArea, areaName } = req.body;
+        const { id, deliveryArea, areaName, deliveryCharge } = req.body;
 
         if (!id || !deliveryArea || !areaName) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
-        if (typeof (id) !== 'string' || typeof (deliveryArea) !== 'string' || typeof (areaName) !== 'string') {
+        if (typeof (id) !== 'string' || typeof (deliveryArea) !== 'string' || typeof (areaName) !== 'string' || typeof (deliveryCharge) !== 'number') {
             return res.status(400).json({ success: false, message: 'Invalid input format' });
         }
 

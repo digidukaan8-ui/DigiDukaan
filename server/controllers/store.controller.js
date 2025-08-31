@@ -51,17 +51,8 @@ const createStore = async (req, res) => {
 
         await store.save();
 
-        const data = {
-            _id: store._id,
-            userId,
-            name,
-            description,
-            category,
-            addresses,
-            img: imgData,
-        }
 
-        return res.status(201).json({ success: true, message: 'Store created successfully', data });
+        return res.status(201).json({ success: true, message: 'Store created successfully', data: store });
     } catch (error) {
         console.error('Error in createStore controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
@@ -141,7 +132,7 @@ const updateStore = async (req, res) => {
 
 const addDeliveryZone = async (req, res) => {
     try {
-        const { storeId, deliveryArea, areaName } = req.body;
+        const { storeId, deliveryArea, areaName, deliveryCharge } = req.body;
 
         const store = await Store.findById(storeId);
         if (!store) {
@@ -151,19 +142,13 @@ const addDeliveryZone = async (req, res) => {
         const newDeliveryZone = new DeliveryZone({
             storeId,
             deliveryArea,
-            areaName
+            areaName,
+            deliveryCharge
         });
 
         await newDeliveryZone.save();
 
-        const data = {
-            _id: newDeliveryZone._id,
-            storeId,
-            deliveryArea,
-            areaName
-        };
-
-        return res.status(201).json({ success: true, message: 'Delivery Zone added successfully', data });
+        return res.status(201).json({ success: true, message: 'Delivery Zone added successfully', data: newDeliveryZone });
     } catch (error) {
         console.error('Error in Delivery Zone controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
@@ -172,11 +157,11 @@ const addDeliveryZone = async (req, res) => {
 
 const updateDeliveryZone = async (req, res) => {
     try {
-        const { id, deliveryArea, areaName } = req.body;
+        const { id, deliveryArea, areaName, deliveryCharge } = req.body;
 
         const updatedZone = await DeliveryZone.findByIdAndUpdate(
             id,
-            { $set: { deliveryArea, areaName } },
+            { $set: { deliveryArea, areaName, deliveryCharge } },
             { new: true }
         );
 

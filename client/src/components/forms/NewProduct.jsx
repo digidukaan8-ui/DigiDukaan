@@ -99,7 +99,8 @@ export default function NewProductForm() {
       attributes: data.attributes.filter(
         (attr) => attr.key.trim() && attr.value.trim()
       ),
-      tags: cleanTags(data.tags)
+      tags: cleanTags(data.tags),
+      deliveryCharge: Number(data.deliveryCharge) || 0
     };
     if (!initialData || Object.keys(initialData).length === 0) {
       startLoading("product");
@@ -218,36 +219,6 @@ export default function NewProductForm() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="stock" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-                Stock
-              </label>
-              <input
-                id="stock"
-                autoComplete="off"
-                {...register("stock", { required: "Stock is required" })}
-                placeholder="Enter stock"
-                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-              />
-              {errors.stock && <p className="text-red-500 text-sm mt-1">{errors.stock.message}</p>}
-            </div>
-            <div>
-              <label htmlFor="price" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-                Price
-              </label>
-              <input
-                id="price"
-                type="number"
-                autoComplete="off"
-                {...register("price", { required: "Price is required" })}
-                placeholder="Enter price"
-                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-              />
-              {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
               <label htmlFor="discount" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
                 Discount
               </label>
@@ -281,6 +252,55 @@ export default function NewProductForm() {
                 placeholder="Comma separated tags"
                 className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label htmlFor="stock" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Stock
+              </label>
+              <input
+                id="stock"
+                autoComplete="off"
+                {...register("stock", { required: "Stock is required" })}
+                placeholder="Enter stock"
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              />
+              {errors.stock && <p className="text-red-500 text-sm mt-1">{errors.stock.message}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="price" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Price
+              </label>
+              <input
+                id="price"
+                type="number"
+                autoComplete="off"
+                {...register("price", { required: "Price is required" })}
+                placeholder="Enter price"
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              />
+              {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="deliveryCharge" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Delivery Charge
+              </label>
+              <input
+                id="deliveryCharge"
+                type="number"
+                autoComplete="off"
+                {...register("deliveryCharge")}
+                placeholder="Enter delivery charge"
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              />
+              {errors.deliveryCharge && <p className="text-red-500 text-sm mt-1">{errors.deliveryCharge.message}</p>}
+              <p className="pl-0.5 text-xs text-gray-600 dark:text-gray-400 mt-1">
+                Charged per product.
+              </p>
             </div>
           </div>
 
@@ -392,14 +412,14 @@ export default function NewProductForm() {
                     <input
                       id={`attr-key-${index}`}
                       autoComplete="off"
-                      {...register(`attributes.${index}.key`, { required: "Key is required" })}
+                      {...register(`attributes.${index}.key`)}
                       placeholder="Attribute Key (e.g. Color)"
                       className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white focus:ring-2 focus:ring-sky-500"
                     />
                     <input
                       id={`attr-value-${index}`}
                       autoComplete="off"
-                      {...register(`attributes.${index}.value`, { required: "Value is required" })}
+                      {...register(`attributes.${index}.value`)}
                       placeholder="Attribute Value (e.g. Red)"
                       className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white focus:ring-2 focus:ring-sky-500"
                     />

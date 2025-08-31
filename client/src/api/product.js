@@ -23,6 +23,7 @@ const addProduct = async (data) => {
         formData.append('attributes', JSON.stringify(data.attributes));
         formData.append('brand', data.brand);
         formData.append('tags', JSON.stringify(data.tags));
+        formData.append('deliveryCharge', data.deliveryCharge);
         const response = await fetch("http://localhost:3000/api/seller/addProduct", {
             method: "POST",
             credentials: "include",

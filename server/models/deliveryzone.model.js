@@ -41,6 +41,10 @@ const deliveryZoneSchema = new mongoose.Schema(
       trim: true,
       set: capitalizeFirst,
     },
+    deliveryCharge: {
+      type: Number,
+      default: 0
+    }
   },
   { timestamps: true }
 );
