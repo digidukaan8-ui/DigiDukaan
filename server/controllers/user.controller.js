@@ -84,7 +84,7 @@ const loginUser = async (req, res) => {
                 description: storeData.description,
                 category: storeData.category,
                 addresses: storeData.addresses,
-                img: storeData.img?.url || "",
+                img: storeData.img || "",
             };
 
             const deliveryZoneData = await DeliveryZone.find({ storeId: storeData?._id });

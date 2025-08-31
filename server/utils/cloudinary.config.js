@@ -1,5 +1,5 @@
-import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs';
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -12,10 +12,10 @@ const uploadToCloudinary = async (filePath) => {
     if (!filePath) return null;
 
     const response = await cloudinary.uploader.upload(filePath, {
-      resource_type: 'auto'
+      resource_type: "auto",
     });
 
-    console.log('File uploaded Successfully');
+    console.log("File uploaded Successfully");
     fs.existsSync(filePath) && fs.unlinkSync(filePath);
 
     return response;
@@ -32,6 +32,20 @@ const uploadToCloudinary = async (filePath) => {
 
     return null;
   }
-}
+};
 
-export default uploadToCloudinary;
+const deleteFromCloudinary = async (publicId) => {
+  try {
+    if (!publicId) return null;
+
+    const response = await cloudinary.uploader.destroy(publicId);
+    console.log("File deleted Successfully from Cloudinary");
+
+    return response;
+  } catch (error) {
+    console.error("Cloudinary delete failed:", error.message);
+    return null;
+  }
+};
+
+export { uploadToCloudinary, deleteFromCloudinary };

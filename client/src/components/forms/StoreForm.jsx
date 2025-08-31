@@ -2,7 +2,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { FiTrash2, FiPlus, FiX } from "react-icons/fi";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { createStore } from "../../api/store";
+import { createStore, updateStore } from "../../api/store";
 import useLoaderStore from "../../store/loader";
 import useAuthStore from "../../store/auth";
 import useStore from "../../store/store";
@@ -12,12 +12,16 @@ import { useNavigate, useLocation } from "react-router-dom";
 export default function StoreForm() {
   const location = useLocation();
   const { initialData } = location.state || {};
-  const [imagePreview, setImagePreview] = useState(initialData?.img || "");
+  const [imagePreview, setImagePreview] = useState(initialData?.img?.url || "");
   const { startLoading, stopLoading } = useLoaderStore();
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const { store } = useStore();
+  const [hide, setHide] = useState(() => {
+    return Object.keys(initialData || {}).length > 0;
+  });
 
-  const { register, control, handleSubmit, reset, setValue } = useForm({
+  const { register, control, handleSubmit, reset, setValue, formState } = useForm({
     defaultValues: {
       name: initialData?.name || "",
       description: initialData?.description || "",
@@ -50,13 +54,15 @@ export default function StoreForm() {
         return;
       }
       setImagePreview(URL.createObjectURL(file));
-      setValue("img", file);
+      setHide(true);
+      setValue("img", file, { shouldDirty: true });
     }
   };
 
   const removeImage = () => {
     setImagePreview("");
     setValue("img", "");
+    setHide(false);
   };
 
   const cleanCategory = (raw) => {
@@ -67,13 +73,19 @@ export default function StoreForm() {
   };
 
   const onFormSubmit = async (data) => {
-    const storeData = {
-      ...data,
-      category: cleanCategory(data.category),
-      userId: user._id,
-    };
+    let imgData = data.img;
+
+    if (initialData && !data.img?.name) {
+      imgData = initialData.img;
+    }
 
     if (!initialData || Object.keys(initialData).length === 0) {
+      const storeData = {
+        ...data,
+        img: imgData,
+        category: cleanCategory(data.category),
+        userId: user._id,
+      };
       startLoading("store");
       try {
         const result = await createStore(storeData);
@@ -88,6 +100,25 @@ export default function StoreForm() {
         stopLoading();
       }
     } else {
+      const storeData = {
+        ...data,
+        img: imgData,
+        category: cleanCategory(data.category),
+        storeId: store._id,
+      };
+      startLoading("updateStore");
+      try {
+        const result = await updateStore(storeData);
+        if (result.data.userId === user._id) {
+          useStore.getState().updateStoreDetails(result.data);
+          toast.success("Store updated successfully");
+          navigate('/seller/store');
+        }
+        setImagePreview("");
+        reset();
+      } finally {
+        stopLoading();
+      }
     }
   };
 
@@ -158,15 +189,18 @@ export default function StoreForm() {
             >
               Store Image
             </label>
+
+            <input
+              id="img"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className={`w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white ${hide ? "hidden" : ""}`}
+              required={!initialData}
+            />
+
             {!imagePreview ? (
-              <input
-                id="img"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
-                required={!initialData}
-              />
+              <p className="text-sm text-gray-500">No image selected</p>
             ) : (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -176,7 +210,7 @@ export default function StoreForm() {
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="w-40 h-40 object-cover rounded border"
+                  className="w-40 h-40 object-cover rounded-lg border"
                 />
                 <button
                   type="button"
@@ -280,7 +314,9 @@ export default function StoreForm() {
               whileTap={{ scale: 0.95 }}
               whileHover={{ scale: 1.05 }}
               type="submit"
-              className="w-fit bg-sky-600 text-white py-3 px-6 border rounded font-medium text-sm hover:bg-sky-700 transition"
+              disabled={!formState.isDirty || formState.isSubmitting}
+              className={`w-fit py-3 px-6 border rounded font-medium text-sm transition
+              ${!formState.isDirty ? "bg-gray-400 cursor-not-allowed" : "bg-sky-600 text-white hover:bg-sky-700"}`}
             >
               {initialData ? "Update Details" : "Save Details"}
             </motion.button>

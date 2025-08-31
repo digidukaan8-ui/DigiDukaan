@@ -1,6 +1,6 @@
 import DeliveryZone from '../models/deliveryzone.model.js';
 import Store from '../models/store.model.js';
-import uploadToCloudinary from '../utils/cloudinary.config.js';
+import { uploadToCloudinary, deleteFromCloudinary } from '../utils/cloudinary.config.js';
 
 const createStore = async (req, res) => {
     try {
@@ -58,15 +58,86 @@ const createStore = async (req, res) => {
             description,
             category,
             addresses,
-            img: imgData.url,
+            img: imgData,
         }
 
-        return res.status(201).json({ success: true, data: data });
+        return res.status(201).json({ success: true, message: 'Store created successfully', data });
     } catch (error) {
         console.error('Error in createStore controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
+
+const updateStore = async (req, res) => {
+    try {
+        let { storeId, name, description, category, addresses, img } = req.body;
+
+        const store = await Store.findById(storeId);
+        if (!store) {
+            return res.status(404).json({ success: false, message: "Store not found" });
+        }
+
+        if (typeof category === "string") {
+            try {
+                category = JSON.parse(category);
+            } catch {
+                return res.status(400).json({ success: false, message: "Invalid category format" });
+            }
+        }
+
+        if (typeof addresses === "string") {
+            try {
+                addresses = JSON.parse(addresses);
+            } catch {
+                return res.status(400).json({ success: false, message: "Invalid addresses format" });
+            }
+        }
+
+        let updatedImg = store.img;
+
+        if (req.files?.img && req.files.img.length > 0) {
+            const filePath = req.files.img[0].path;
+
+            if (store.img?.publicId) {
+                await deleteFromCloudinary(store.img.publicId);
+            }
+
+            const result = await uploadToCloudinary(filePath);
+            if (!result) {
+                return res.status(501).json({ success: false, message: "Failed to upload image" });
+            }
+
+            updatedImg = {
+                url: result.secure_url,
+                publicId: result.public_id,
+            };
+        }
+        else if (img) {
+            try {
+                updatedImg = typeof img === "string" ? JSON.parse(img) : img;
+            } catch {
+                return res.status(400).json({ success: false, message: "Invalid image format" });
+            }
+        }
+
+        store.name = name;
+        store.description = description;
+        store.category = category;
+        store.addresses = addresses;
+        store.img = updatedImg;
+
+        await store.save();
+
+        return res.json({
+            success: true,
+            message: "Store updated successfully",
+            data: store,
+        });
+    } catch (error) {
+        console.error("Error in Update Store controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
 
 const addDeliveryZone = async (req, res) => {
     try {
@@ -136,4 +207,4 @@ const removeDeliveryZone = async (req, res) => {
     }
 };
 
-export { createStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone };
+export { createStore, updateStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone };

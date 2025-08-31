@@ -64,10 +64,10 @@ export default function StorePage() {
         </div>
 
         <div className="flex flex-col md:flex-row gap-6 px-6 pb-6">
-          <div className="flex-shrink-0 w-full md:w-[400px] h-[350px] rounded-lg overflow-hidden shadow-lg">
+          <div className="flex-shrink-0 w-60 h-60 rounded-lg overflow-hidden shadow-lg">
             {store.img && (
               <img
-                src={store.img}
+                src={store.img?.url}
                 alt={store.name}
                 className="w-full h-full object-cover"
               />
