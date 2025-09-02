@@ -9,5 +9,6 @@ import NewProductForm from "./forms/NewProduct";
 import UsedProductForm from "./forms/UsedProducts";
 import ReviewForm from "./forms/ReviewForm";
 import DeliveryForm from "./forms/DeliveryForm";
+import ProductDetails from "./ProductDetails";
 
-export { Header, Footer, Card, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm };
+export { Header, Footer, Card, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, ProductDetails };

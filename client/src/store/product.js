@@ -12,13 +12,13 @@ const useProductStore = create(
             updateProduct: (updatedProduct) =>
                 set((state) => ({
                     products: state.products.map((p) =>
-                        p.id === updatedProduct.id ? { ...p, ...updatedProduct } : p
+                        p._id === updatedProduct._id ? updatedProduct : p
                     ),
                 })),
 
             removeProduct: (productId) =>
                 set((state) => ({
-                    products: state.products.filter((p) => p.id !== productId),
+                    products: state.products.filter((p) => p._id !== productId),
                 })),
 
             clearProducts: () => set({ products: [] }),

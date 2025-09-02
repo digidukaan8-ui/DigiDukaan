@@ -1,6 +1,6 @@
 import Store from "../models/store.model.js";
 import Product from "../models/product.model.js";
-import { uploadToCloudinary } from "../utils/cloudinary.config.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.config.js";
 
 const addProduct = async (req, res) => {
     try {
@@ -89,12 +89,127 @@ const getProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { productId } = req.params;
+        let { title, description, category, subCategory, price, stock, brand, deliveryCharge, attributes, tags, discount, img, removedImg,keptImg, video } = req.body;
 
+        if (attributes && typeof attributes === "string") {
+            try { attributes = JSON.parse(attributes); }
+            catch { return res.status(400).json({ success: false, message: "Invalid attributes format" }); }
+        }
+
+        if (tags && typeof tags === "string") {
+            try { tags = JSON.parse(tags); }
+            catch { return res.status(400).json({ success: false, message: "Invalid tags format" }); }
+        }
+
+        if (discount && typeof discount === "string") {
+            try { discount = JSON.parse(discount); }
+            catch { return res.status(400).json({ success: false, message: "Invalid discount format" }); }
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found" });
+        }
+
+        if (removedImg) {
+            try {
+                const toDelete = typeof removedImg === "string" ? JSON.parse(removedImg) : removedImg;
+                for (const del of Array.isArray(toDelete) ? toDelete : []) {
+                    if (del?.publicId) {
+                        await deleteFromCloudinary(del.publicId);
+                    }
+                }
+            } catch {
+                return res.status(400).json({ success: false, message: "Invalid removedImg format" });
+            }
+        }
+
+        let keptImages = [];
+        if (keptImg) {
+            try {
+                const parsed = typeof keptImg === "string" ? JSON.parse(keptImg) : keptImg;
+                keptImages = (Array.isArray(parsed) ? parsed : []).filter(
+                    (im) => im?.url && im?.publicId
+                );
+            } catch {
+                return res.status(400).json({ success: false, message: "Invalid images format" });
+            }
+        }
+
+        const newImages = [];
+        if (req.files?.img && req.files.img.length > 0) {
+            for (const file of req.files.img) {
+                const result = await uploadToCloudinary(file.path);
+                if (!result) {
+                    return res.status(501).json({ success: false, message: "Failed to upload image" });
+                }
+                newImages.push({
+                    url: result.secure_url,
+                    publicId: result.public_id,
+                });
+            }
+        }
+
+        const updatedImages = [...keptImages, ...newImages];
+
+        if (updatedImages.length < 1) {
+            return res.status(400).json({ success: false, message: "At least 1 image is required" });
+        }
+        if (updatedImages.length > 5) {
+            return res.status(400).json({ success: false, message: "Maximum 5 images allowed" });
+        }
+
+        let updatedVideo = product.video || null;
+
+        if (req.files?.video && req.files.video[0]) {
+            if (product.video?.publicId) {
+                await deleteFromCloudinary(product.video.publicId);
+            }
+
+            const result = await uploadToCloudinary(req.files.video[0].path, "video");
+            if (!result) {
+                return res.status(501).json({ success: false, message: "Failed to upload video" });
+            }
+
+            updatedVideo = {
+                url: result.secure_url,
+                publicId: result.public_id
+            };
+        } else if (video) {
+            try {
+                updatedVideo = typeof video === "string" ? JSON.parse(video) : video;
+            } catch {
+                return res.status(400).json({ success: false, message: "Invalid video format" });
+            }
+        }
+
+        product.title = title || product.title;
+        product.slug = title ? title.toLowerCase().replace(/\s+/g, "-") : product.slug;
+        product.description = description || product.description;
+        product.category = category ? { name: category, slug: category.toLowerCase().replace(/\s+/g, "-") } : product.category;
+        product.subCategory = subCategory ? { name: subCategory, slug: subCategory.toLowerCase().replace(/\s+/g, "-") } : product.subCategory;
+        product.img = updatedImages;
+        product.video = updatedVideo;
+        product.price = price || product.price;
+        product.discount = discount || product.discount;
+        product.stock = stock || product.stock;
+        product.attributes = attributes || product.attributes;
+        product.brand = brand || product.brand;
+        product.tags = tags || product.tags;
+        product.deliveryCharge = deliveryCharge || product.deliveryCharge;
+
+        await product.save();
+
+        return res.json({
+            success: true,
+            message: "Product updated successfully",
+            data: product,
+        });
     } catch (error) {
-        console.error('Error in Update Product controller: ', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        console.error("Error in Update Product controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
-}
+};
 
 const removeProduct = async (req, res) => {
     try {

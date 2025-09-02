@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { FiMapPin, FiHome, FiEdit3 } from "react-icons/fi";
 import Card from "../../components/Card";
 import { useEffect } from "react";
-import { getProduct } from "../../api/product";
+import { getProduct, removeProduct } from "../../api/product";
 import useLoaderStore from "../../store/loader";
 import useProductStore from "../../store/product";
 import { toast } from "react-hot-toast";
+import NewProductForm from "../../components/forms/NewProduct";
 
 export default function StorePage() {
   const { store } = useStore();
@@ -146,7 +147,7 @@ export default function StorePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {products.map((product) => (
-              <Card key={product._id} product={product} showCart={false} />
+              <Card key={product._id} product={product} onEdit={NewProductForm} onDelete={removeProduct} userRole={"seller"} showCart={false} />
             ))}
           </div>
         )}

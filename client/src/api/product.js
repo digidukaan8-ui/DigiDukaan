@@ -16,13 +16,13 @@ const addProduct = async (data) => {
         if (data.video) {
             formData.append("video", data.video);
         }
-        formData.append('price', data.price);
+        formData.append('price', Number(data.price));
         formData.append('discount', JSON.stringify(data.discount));
-        formData.append('stock', data.stock);
+        formData.append('stock', Number(data.stock));
         formData.append('attributes', JSON.stringify(data.attributes));
         formData.append('brand', data.brand);
         formData.append('tags', JSON.stringify(data.tags));
-        formData.append('deliveryCharge', data.deliveryCharge);
+        formData.append('deliveryCharge', Number(data.deliveryCharge));
         const response = await fetch(`http://localhost:3000/api/sellers/stores/${data.storeId}/products`, {
             method: "POST",
             credentials: "include",
@@ -44,9 +44,9 @@ const addProduct = async (data) => {
     }
 }
 
-const getProduct = async (id) => {
+const getProduct = async (storeId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/sellers/${id}/products`, {
+        const response = await fetch(`http://localhost:3000/api/sellers/stores/${storeId}/products`, {
             method: "GET",
             credentials: "include"
         });
@@ -60,9 +60,112 @@ const getProduct = async (id) => {
 
         return result.data;
     } catch (error) {
-        console.error("Error in fetching Product: ", error);
+        console.error("Error in Fetching Product: ", error);
         throw error;
     }
 }
 
-export { addProduct, getProduct };
+const updateProduct = async (data) => {
+    try {
+        let body;
+        let headers = { "Content-Type": "application/json" };
+
+        if ((data.img && data.img[0] instanceof File) || data.video instanceof File) {
+            const formData = new FormData();
+            formData.append('title', data.title);
+            formData.append('description', data.description);
+            formData.append('category', data.category);
+            formData.append('subCategory', data.subCategory);
+
+            if (data.img) {
+                data.img.forEach((file) => {
+                    if (file instanceof File) {
+                        formData.append("img", file);
+                    }
+                });
+            }
+
+            if (data.video) {
+                formData.append("video", data.video);
+            }
+
+            formData.append('price', Number(data.price));
+            formData.append('discount', JSON.stringify(data.discount));
+            formData.append('stock', Number(data.stock));
+            formData.append('attributes', JSON.stringify(data.attributes));
+            formData.append('brand', data.brand);
+            formData.append('tags', JSON.stringify(data.tags));
+            formData.append('deliveryCharge', Number(data.deliveryCharge));
+            formData.append('removedImg', JSON.stringify(data.removedImg));
+            formData.append('keptImg', JSON.stringify(data.keptImg));
+
+            body = formData;
+            headers = {};
+        } else {
+            body = JSON.stringify({
+                title: data.title,
+                description: data.description,
+                category: data.category,
+                subCategory: data.subCategory,
+                img: data.img,
+                video: data.video,
+                price: Number(data.price),
+                discount: JSON.stringify(data.discount),
+                stock: Number(data.stock),
+                attributes: JSON.stringify(data.attributes),
+                brand: data.brand,
+                tags: JSON.stringify(data.tags),
+                deliveryCharge: Number(data.deliveryCharge),
+                removedImg: JSON.stringify(data.removedImg),
+                keptImg: JSON.stringify(data.keptImg),
+            });
+        }
+
+        const response = await fetch(`http://localhost:3000/api/sellers/products/${data.productId}`, {
+            method: "PATCH",
+            credentials: "include",
+            headers,
+            body,
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to update product");
+            throw new Error(result.message || "Failed to update product");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in Updating Product: ", error);
+        throw error;
+    }
+};
+
+const removeProduct = async (productId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/sellers/products/${productId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to remove product");
+            throw new Error(result.message || "Failed to remove product");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in Removing Product: ", error);
+        throw error;
+    }
+}
+
+export { addProduct, getProduct, updateProduct, removeProduct };

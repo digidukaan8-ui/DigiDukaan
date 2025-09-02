@@ -113,11 +113,11 @@ const updateStore = async (req, res) => {
             }
         }
 
-        store.name = name;
-        store.description = description;
-        store.category = category;
-        store.addresses = addresses;
-        store.img = updatedImg;
+        store.name = name || store.name;
+        store.description = description || store.description;
+        store.category = category || store.category;
+        store.addresses = addresses || store.addresses;
+        store.img = updatedImg || store.img;
 
         await store.save();
 

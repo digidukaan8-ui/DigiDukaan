@@ -1,13 +1,14 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { FiTrash2, FiPlus, FiX } from "react-icons/fi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { addProduct } from "../../api/product";
+import { addProduct, updateProduct } from "../../api/product";
 import { useLocation, useNavigate } from "react-router-dom";
-import useStore from '../../store/store';
+import useStore from "../../store/store";
 import useLoaderStore from "../../store/loader";
 import useProductStore from "../../store/product";
 import toast from "react-hot-toast";
+import { categories, getSubCategories } from "../../utils/category";
 
 export default function NewProductForm() {
   const location = useLocation();
@@ -15,24 +16,73 @@ export default function NewProductForm() {
   const { startLoading, stopLoading } = useLoaderStore();
   const { store } = useStore();
   const navigate = useNavigate();
-  const [imagePreviews, setImagePreviews] = useState(initialData?.images || []);
-  const [videoPreview, setVideoPreview] = useState(initialData?.video || "");
+  const [imagePreviews, setImagePreviews] = useState(
+    initialData?.img || []
+  );
+  const [videoPreview, setVideoPreview] = useState(initialData?.video?.url || "");
   const [imgFile, setImgFile] = useState([]);
+  const [removedImg, setRemovedImg] = useState([]);
+  const [videoFile, setVideoFile] = useState(initialData?.video?.url || null);
+  const [canUpdate, setCanUpdate] = useState(false);
+  const defaultCategory = initialData?.category?.name || categories[0]?.name || "";
+  const defaultSubCategories = getSubCategories(defaultCategory) || [];
+  const defaultSubCategory = initialData?.subCategory?.name || defaultSubCategories[0]?.name || "";
+  const [subCategories, setSubCategories] = useState(getSubCategories(defaultCategory) || []);
 
-  const { register, control, handleSubmit, reset, formState: { errors } } = useForm({
+  const { register, control, handleSubmit, setValue, reset, watch, formState: { errors, isDirty } } = useForm({
     defaultValues: {
       title: initialData?.title || "",
       description: initialData?.description || "",
-      category: initialData?.category || "",
-      subCategory: initialData?.subCategory || "",
+      category: defaultCategory,
+      subCategory: defaultSubCategory,
       brand: initialData?.brand || "",
       price: initialData?.price || "",
-      discount: initialData?.discount || { type: "percentage", value: "" },
+      discount: initialData?.discount
+        ? initialData.discount.percentage !== null
+          ? { type: "percentage", value: initialData.discount.percentage }
+          : { type: "amount", value: initialData.discount.amount }
+        : { type: "percentage", value: "" },
       tags: initialData?.tags || "",
       attributes: initialData?.attributes || [{ key: "", value: "" }],
       stock: initialData?.stock || "",
+      keptImg: initialData?.img || [],
+      video: initialData?.video?.url || "",
     },
   });
+
+  const watchedValues = watch();
+  const watchedCategory = watch("category");
+
+  useEffect(() => {
+    const subs = getSubCategories(watchedCategory) || [];
+    setSubCategories(subs);
+
+    const currentSub = watch("subCategory");
+    if (!subs.includes(currentSub)) {
+      setValue("subCategory", subs[0] || "");
+    }
+  }, [watchedCategory, setValue, watch]);
+
+  useEffect(() => {
+    let changed = false;
+    if (isDirty) changed = true;
+
+    const initialImgCount = initialData?.img?.length || 0;
+    if (
+      imagePreviews.length !== initialImgCount ||
+      removedImg.length > 0 ||
+      imgFile.length > 0
+    ) {
+      changed = true;
+    }
+
+    const initialVideo = initialData?.video?.url || "";
+    if (videoPreview !== initialVideo) {
+      changed = true;
+    }
+
+    setCanUpdate(changed);
+  }, [watchedValues, isDirty, imagePreviews, removedImg, imgFile, videoPreview, initialData]);
 
   const { fields: attributeFields, append: appendAttribute, remove: removeAttribute } =
     useFieldArray({
@@ -42,6 +92,12 @@ export default function NewProductForm() {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
+
+    if (imagePreviews.length + files.length > 5) {
+      toast.error("You can upload a maximum of 5 images");
+      return;
+    }
+
     const validFiles = [];
 
     files.forEach((file) => {
@@ -50,9 +106,13 @@ export default function NewProductForm() {
 
         const reader = new FileReader();
         reader.onloadend = () => {
-          setImagePreviews((prev) =>
-            [...prev, reader.result].slice(0, 5)
-          );
+          setImagePreviews((prev) => [
+            ...prev,
+            {
+              name: file.name,
+              url: reader.result,
+            },
+          ]);
         };
         reader.readAsDataURL(file);
       } else {
@@ -64,21 +124,34 @@ export default function NewProductForm() {
     e.target.value = "";
   };
 
-  const removeImage = (index) => {
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
-    setImgFile((prev) => prev.filter((_, i) => i !== index));
+  const removeImage = (img, id) => {
+    setImagePreviews((prev) => prev.filter((item) => item !== img));
+
+    if (id) {
+      setRemovedImg((old) => [...old, img]);
+    }
+
+    setImgFile((prev) => prev.filter((item) => item.name !== img.name));
   };
+
 
   const handleVideoChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.size <= 20 * 1024 * 1024) {
-      const reader = new FileReader();
-      reader.onloadend = () => setVideoPreview(reader.result);
-      reader.readAsDataURL(file);
-    } else {
+    if (!file) return;
+    if (file.size > 20 * 1024 * 1024) {
       toast.error("Video size should not exceed 20MB");
       e.target.value = "";
+      return;
     }
+    const reader = new FileReader();
+    reader.onloadend = () => setVideoPreview(reader.result);
+    reader.readAsDataURL(file);
+    setVideoFile(file);
+  };
+
+  const removeVideo = () => {
+    setVideoPreview("");
+    setVideoFile(null);
   };
 
   const cleanTags = (raw) => {
@@ -88,37 +161,83 @@ export default function NewProductForm() {
       .filter((s) => s.length > 0);
   };
 
-  const removeVideo = () => setVideoPreview("");
-
   const onFormSubmit = async (data) => {
-    const productData = {
-      ...data,
-      storeId: store._id,
-      img: imgFile,
-      video: videoPreview,
-      attributes: data.attributes.filter(
-        (attr) => attr.key.trim() && attr.value.trim()
-      ),
-      tags: cleanTags(data.tags),
-      deliveryCharge: Number(data.deliveryCharge) || 0
-    };
+    if (imagePreviews.length < 1) {
+      toast.error("At least one image is required");
+      return;
+    }
     if (!initialData || Object.keys(initialData).length === 0) {
+      const productData = {
+        ...data,
+        storeId: store._id,
+        img: imgFile,
+        video: videoFile,
+        attributes: data.attributes.filter(
+          (attr) => attr.key.trim() && attr.value.trim()
+        ),
+        tags: cleanTags(data.tags),
+        deliveryCharge: Number(data.deliveryCharge) || 0,
+      };
       startLoading("product");
       try {
         const result = await addProduct(productData);
         if (result.data.storeId === store._id) {
           useProductStore.getState().addProduct(result.data);
           toast.success("Product added successfully");
-          navigate('/seller/store');
+          navigate("/seller/store");
+          reset();
+          setImagePreviews([]);
+          setVideoPreview("");
         }
       } finally {
         stopLoading();
       }
     } else {
+      if (!Array.isArray(data.tags)) {
+        data.tags = cleanTags(data.tags);
+      }
+      const discount = {
+        percentage: data.discount.type === "percentage" ? Number(data.discount.value) : null,
+        amount: data.discount.type === "amount" ? Number(data.discount.value) : null,
+      };
+
+      const keepImg = data.keptImg.filter(
+        (img) =>
+          !removedImg.some(
+            (removed) =>
+              removed.url === img.url || removed.publicId === img.publicId
+          )
+      );
+
+      const productData = {
+        ...data,
+        productId: initialData?._id,
+        img: imgFile,
+        video: videoFile,
+        attributes: data.attributes.filter(
+          (attr) => attr.key.trim() && attr.value.trim()
+        ),
+        tags: data.tags,
+        deliveryCharge: Number(data.deliveryCharge) || 0,
+        discount,
+        removedImg,
+        keptImg: keepImg,
+      };
+      startLoading("updateProduct");
+      try {
+        const result = await updateProduct(productData);
+        if (result.data.storeId === store._id) {
+          useProductStore.getState().updateProduct(result.data);
+          toast.success("Product Updated successfully");
+          navigate("/seller/store");
+          reset();
+          setImagePreviews([]);
+          setVideoPreview("");
+        }
+      } finally {
+        stopLoading();
+      }
     }
-    reset();
-    setImagePreviews([]);
-    setVideoPreview("");
   };
 
   return (
@@ -194,32 +313,54 @@ export default function NewProductForm() {
               <label htmlFor="category" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
                 Category
               </label>
-              <input
+              <select
                 id="category"
-                autoComplete="off"
                 {...register("category", { required: "Category is required" })}
-                placeholder="Enter category"
                 className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-              />
+              >
+                {categories.map((cat, index) => (
+                  <option key={`${cat.name}-${index}`} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
               {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
             </div>
+
             <div>
-              <label htmlFor="subCategory" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="subCategory"
+                className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
+              >
                 Sub Category
               </label>
-              <input
-                id="subCategory"
-                autoComplete="off"
-                {...register("subCategory")}
-                placeholder="Enter sub category"
-                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-              />
+              {subCategories.length > 0 ? (
+                <select
+                  id="subCategory"
+                  {...register("subCategory", { required: "Sub Category is required" })}
+                  className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+                >
+                  {subCategories.map((sub, index) => (
+                    <option key={`${sub}-${index}`} value={sub}>
+                      {sub}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400">No subcategories available for this category</p>
+              )}
+              {errors.subCategory && (
+                <p className="text-red-500 text-sm mt-1">{errors.subCategory.message}</p>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="discount" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="discount"
+                className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
+              >
                 Discount
               </label>
               <div className="flex gap-2">
@@ -228,19 +369,19 @@ export default function NewProductForm() {
                   className="border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
                 >
                   <option value="percentage">%</option>
-                  <option value="flat">₹</option>
+                  <option value="amount">₹</option>
                 </select>
+
                 <input
                   id="discount"
                   type="number"
-                  autoComplete="off"
+                  step="any"
                   {...register("discount.value")}
                   placeholder="Value"
                   className="w-0 flex-1 border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
                 />
               </div>
             </div>
-
             <div>
               <label htmlFor="tags" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
                 Tags
@@ -306,7 +447,7 @@ export default function NewProductForm() {
 
           <div>
             <label htmlFor="img" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-              Product Images (Max 5, 2MB each)
+              Product Images (Min 1, Max 5, 2MB each)
             </label>
             <input
               id="img"
@@ -328,13 +469,13 @@ export default function NewProductForm() {
                     className="relative"
                   >
                     <img
-                      src={img}
+                      src={img.url}
                       alt="Preview"
                       className="w-24 h-24 object-cover rounded border"
                     />
                     <button
                       type="button"
-                      onClick={() => removeImage(index)}
+                      onClick={() => removeImage(img, img._id)}
                       className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full"
                     >
                       <FiX size={14} />
@@ -347,7 +488,7 @@ export default function NewProductForm() {
 
           <div>
             <label htmlFor="video" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-              Product Video (Max 20MB)
+              Product Video (Optional, Max 1, 20MB)
             </label>
             {!videoPreview ? (
               <input
@@ -410,14 +551,14 @@ export default function NewProductForm() {
 
                   <div className="flex justify-center items-center gap-5">
                     <input
-                      id={`attr-key-${index}`}
+                      id={`attr-key-${field.id}`}
                       autoComplete="off"
                       {...register(`attributes.${index}.key`)}
                       placeholder="Attribute Key (e.g. Color)"
                       className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white focus:ring-2 focus:ring-sky-500"
                     />
                     <input
-                      id={`attr-value-${index}`}
+                      id={`attr-value-${field.id}`}
                       autoComplete="off"
                       {...register(`attributes.${index}.value`)}
                       placeholder="Attribute Value (e.g. Red)"
@@ -446,15 +587,19 @@ export default function NewProductForm() {
           <div className="flex justify-center items-center">
             <motion.button
               whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: canUpdate ? 1.05 : 1 }}
               type="submit"
-              className="w-fit bg-sky-600 text-white py-2 px-4 border rounded font-medium text-sm hover:bg-sky-700 transition"
+              disabled={!canUpdate}
+              className={`w-fit py-2 px-4 border rounded font-medium text-sm transition
+              ${canUpdate
+                  ? "bg-sky-600 text-white hover:bg-sky-700"
+                  : "bg-gray-400 text-gray-200 cursor-not-allowed"}`}
             >
               {initialData ? "Update Product" : "Save Product"}
             </motion.button>
           </div>
         </form>
       </motion.div>
-    </div>
+    </div >
   );
 }
