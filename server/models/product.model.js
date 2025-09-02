@@ -1,5 +1,10 @@
 import mongoose from 'mongoose';
 
+function capitalizeFirst(str) {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
 const productSchema = new mongoose.Schema({
     storeId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -13,12 +18,6 @@ const productSchema = new mongoose.Schema({
         trim: true
     },
 
-    slug: {
-        type: String,
-        lowercase: true,
-        trim: true
-    },
-
     description: {
         type: String,
         required: true,
@@ -29,7 +28,8 @@ const productSchema = new mongoose.Schema({
         name: {
             type: String,
             required: true,
-            trim: true
+            trim: true,
+            set: capitalizeFirst
         },
         slug: {
             type: String,
@@ -42,7 +42,8 @@ const productSchema = new mongoose.Schema({
         name: {
             type: String,
             required: true,
-            trim: true
+            trim: true,
+            set: capitalizeFirst
         },
         slug: {
             type: String,

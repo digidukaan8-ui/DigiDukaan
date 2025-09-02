@@ -1,5 +1,6 @@
 import Store from "../models/store.model.js";
 import Product from "../models/product.model.js";
+import UsedProduct from "../models/usedProduct.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.config.js";
 
 const addProduct = async (req, res) => {
@@ -41,7 +42,6 @@ const addProduct = async (req, res) => {
         const product = new Product({
             storeId,
             title,
-            slug: title.toLowerCase().replace(/\s+/g, '-'),
             description,
             category: { name: category, slug: category.toLowerCase().replace(/\s+/g, '-') },
             subCategory: { name: subCategory, slug: subCategory.toLowerCase().replace(/\s+/g, '-') },
@@ -58,7 +58,7 @@ const addProduct = async (req, res) => {
 
         await product.save();
 
-        return res.status(201).json({ success: true, data: product });
+        return res.status(201).json({ success: true, message: 'Product added successfully', data: product });
     } catch (error) {
         console.error('Error in Add Product controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
@@ -89,7 +89,7 @@ const getProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { productId } = req.params;
-        let { title, description, category, subCategory, price, stock, brand, deliveryCharge, attributes, tags, discount, img, removedImg,keptImg, video } = req.body;
+        let { title, description, category, subCategory, price, stock, brand, deliveryCharge, attributes, tags, discount, removedImg, keptImg, video } = req.body;
 
         if (attributes && typeof attributes === "string") {
             try { attributes = JSON.parse(attributes); }
@@ -184,7 +184,6 @@ const updateProduct = async (req, res) => {
         }
 
         product.title = title || product.title;
-        product.slug = title ? title.toLowerCase().replace(/\s+/g, "-") : product.slug;
         product.description = description || product.description;
         product.category = category ? { name: category, slug: category.toLowerCase().replace(/\s+/g, "-") } : product.category;
         product.subCategory = subCategory ? { name: subCategory, slug: subCategory.toLowerCase().replace(/\s+/g, "-") } : product.subCategory;
@@ -227,4 +226,223 @@ const removeProduct = async (req, res) => {
     }
 }
 
-export { addProduct, getProduct, updateProduct, removeProduct };
+const addUsedProduct = async (req, res) => {
+    try {
+        let { title, description, category, subCategory, price, condition, brand, delivery, isNegotiable, billAvailable, attributes, tags, discount } = req.body;
+        const { storeId } = req.params;
+
+        if (typeof attributes === "string") attributes = JSON.parse(attributes);
+        if (typeof tags === "string") tags = JSON.parse(tags);
+        if (typeof discount === "string") discount = JSON.parse(discount);
+        if (typeof delivery === "string") delivery = JSON.parse(delivery);
+
+        const imgFiles = req.files.img || [];
+        const uploadedImages = [];
+
+        for (let file of imgFiles) {
+            const result = await uploadToCloudinary(file.path);
+            if (result) {
+                uploadedImages.push({
+                    url: result.secure_url,
+                    publicId: result.public_id
+                });
+            } else {
+                return res.status(501).json({ success: false, message: 'Failed to upload image' });
+            }
+        }
+
+        let videoData = null;
+        if (req.files.video && req.files.video[0]) {
+            const result = await uploadToCloudinary(req.files.video[0].path, 'video');
+            if (result) {
+                videoData = {
+                    url: result.secure_url,
+                    publicId: result.public_id
+                };
+            } else {
+                return res.status(501).json({ success: false, message: 'Failed to upload video' });
+            }
+        }
+
+        const product = new UsedProduct({
+            storeId,
+            title,
+            description,
+            category: { name: category, slug: category.toLowerCase().replace(/\s+/g, '-') },
+            subCategory: { name: subCategory, slug: subCategory.toLowerCase().replace(/\s+/g, '-') },
+            img: uploadedImages,
+            video: videoData,
+            price,
+            discount,
+            attributes,
+            brand,
+            tags,
+            delivery,
+            isNegotiable,
+            billAvailable,
+            condition
+        });
+
+        await product.save();
+
+        return res.status(201).json({ success: true, message: 'Used product added successfully', data: product });
+    } catch (error) {
+        console.error('Error in Add Used Product controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
+const getUsedProduct = async (req, res) => {
+    try {
+        const { storeId } = req.params;
+
+        const storeExist = await Store.findById(storeId);
+        if (!storeExist) {
+            return res.status(404).json({ success: false, message: 'Store not found' });
+        }
+
+        const products = await UsedProduct.find({ storeId });
+        if (products.length === 0) {
+            return res.status(200).json({ success: true, message: 'No products found for this store', data: [] });
+        }
+
+        return res.status(200).json({ success: true, message: 'Product fetched successfully', data: products });
+    } catch (error) {
+        console.error('Error in Get Used Product controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
+const updateUsedProduct = async (req, res) => {
+    try {
+        const { usedProductId } = req.params;
+        let { title, description, category, subCategory, price, condition, brand, delivery, attributes, tags, discount, removedImg, keptImg, video, isNegotiable, billAvailable } = req.body;
+
+        if (typeof attributes === "string") attributes = JSON.parse(attributes);
+        if (typeof tags === "string") tags = JSON.parse(tags);
+        if (typeof discount === "string") discount = JSON.parse(discount);
+        if (typeof delivery === "string") delivery = JSON.parse(delivery);
+
+        const product = await UsedProduct.findById(usedProductId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found" });
+        }
+
+        if (removedImg) {
+            try {
+                const toDelete = typeof removedImg === "string" ? JSON.parse(removedImg) : removedImg;
+                for (const del of Array.isArray(toDelete) ? toDelete : []) {
+                    if (del?.publicId) {
+                        await deleteFromCloudinary(del.publicId);
+                    }
+                }
+            } catch {
+                return res.status(400).json({ success: false, message: "Invalid removedImg format" });
+            }
+        }
+
+        let keptImages = [];
+        if (keptImg) {
+            try {
+                const parsed = typeof keptImg === "string" ? JSON.parse(keptImg) : keptImg;
+                keptImages = (Array.isArray(parsed) ? parsed : []).filter(
+                    (im) => im?.url && im?.publicId
+                );
+            } catch {
+                return res.status(400).json({ success: false, message: "Invalid images format" });
+            }
+        }
+
+        const newImages = [];
+        if (req.files?.img && req.files.img.length > 0) {
+            for (const file of req.files.img) {
+                const result = await uploadToCloudinary(file.path);
+                if (!result) {
+                    return res.status(501).json({ success: false, message: "Failed to upload image" });
+                }
+                newImages.push({
+                    url: result.secure_url,
+                    publicId: result.public_id,
+                });
+            }
+        }
+
+        const updatedImages = [...keptImages, ...newImages];
+
+        if (updatedImages.length < 1) {
+            return res.status(400).json({ success: false, message: "At least 1 image is required" });
+        }
+        if (updatedImages.length > 5) {
+            return res.status(400).json({ success: false, message: "Maximum 5 images allowed" });
+        }
+
+        let updatedVideo = product.video || null;
+
+        if (req.files?.video && req.files.video[0]) {
+            if (product.video?.publicId) {
+                await deleteFromCloudinary(product.video.publicId);
+            }
+
+            const result = await uploadToCloudinary(req.files.video[0].path, "video");
+            if (!result) {
+                return res.status(501).json({ success: false, message: "Failed to upload video" });
+            }
+
+            updatedVideo = {
+                url: result.secure_url,
+                publicId: result.public_id
+            };
+        } else if (video) {
+            try {
+                updatedVideo = typeof video === "string" ? JSON.parse(video) : video;
+            } catch {
+                return res.status(400).json({ success: false, message: "Invalid video format" });
+            }
+        }
+
+        product.title = title || product.title;
+        product.description = description || product.description;
+        product.category = category ? { name: category, slug: category.toLowerCase().replace(/\s+/g, "-") } : product.category;
+        product.subCategory = subCategory ? { name: subCategory, slug: subCategory.toLowerCase().replace(/\s+/g, "-") } : product.subCategory;
+        product.img = updatedImages;
+        product.video = updatedVideo;
+        product.price = price || product.price;
+        product.discount = discount || product.discount;
+        product.condition = condition || product.condition;
+        product.attributes = attributes || product.attributes;
+        product.brand = brand || product.brand;
+        product.tags = tags || product.tags;
+        product.delivery = delivery || product.delivery;
+        product.isNegotiable = isNegotiable || product.isNegotiable;
+        product.billAvailable = billAvailable || product.billAvailable;
+
+        await product.save();
+
+        return res.json({
+            success: true,
+            message: "Used Product updated successfully",
+            data: product,
+        });
+    } catch (error) {
+        console.error('Error in Update Used Product controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
+const removeUsedProduct = async (req, res) => {
+    try {
+        const { usedProductId } = req.params;
+        const result = await UsedProduct.findByIdAndDelete(usedProductId);
+
+        if (!result) {
+            return res.status(404).json({ success: false, message: 'Used Product not found' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Used Product removed successfully' });
+    } catch (error) {
+        console.error('Error in Remove Used Product controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
+export { addProduct, getProduct, updateProduct, removeProduct, addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct };

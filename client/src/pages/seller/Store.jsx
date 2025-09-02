@@ -2,37 +2,55 @@ import useStore from "../../store/store";
 import { useNavigate } from "react-router-dom";
 import { FiMapPin, FiHome, FiEdit3 } from "react-icons/fi";
 import Card from "../../components/Card";
-import { useEffect } from "react";
-import { getProduct, removeProduct } from "../../api/product";
+import UsedProductCard from "../../components/UsedProductCard";
+import { useEffect, useState } from "react";
+import { getProduct, getUsedProduct } from "../../api/product";
 import useLoaderStore from "../../store/loader";
 import useProductStore from "../../store/product";
+import useUsedProductStore from "../../store/usedProduct";
 import { toast } from "react-hot-toast";
-import NewProductForm from "../../components/forms/NewProduct";
 
 export default function StorePage() {
   const { store } = useStore();
   const { startLoading, stopLoading } = useLoaderStore();
   const navigate = useNavigate();
   const { products } = useProductStore();
+  const { usedProducts } = useUsedProductStore();
+  const [show, setShow] = useState("new");
 
   useEffect(() => {
-    if (store && products.length === 0) {
-      const fetchProducts = async () => {
-        startLoading("fetching");
-        try {
-          const data = await getProduct(store._id);
-          if (data.length > 0) {
-            for (const product of data) {
-              useProductStore.getState().addProduct(product);
+    if (store) {
+      if (products.length === 0) {
+        const fetchNewProducts = async () => {
+          startLoading("fetching");
+          try {
+            const data = await getProduct(store._id);
+            if (data.length > 0) {
+              data.forEach(product => useProductStore.getState().addProduct(product));
+              toast.success("Products fetched successfully");
             }
-            toast.success("Products fetched successfully");
+          } finally {
+            stopLoading();
           }
-        } finally {
-          stopLoading();
-        }
-      };
+        };
+        fetchNewProducts();
+      }
 
-      fetchProducts();
+      if (usedProducts.length === 0) {
+        const fetchUsedProducts = async () => {
+          startLoading("fetching");
+          try {
+            const data = await getUsedProduct(store._id);
+            if (data.length > 0) {
+              data.forEach(product => useUsedProductStore.getState().addUsedProduct(product));
+              toast.success("Used products fetched successfully");
+            }
+          } finally {
+            stopLoading();
+          }
+        };
+        fetchUsedProducts();
+      }
     }
   }, []);
 
@@ -53,9 +71,7 @@ export default function StorePage() {
     <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pb-20 pt-40 px-4">
       <div className="max-w-7xl mx-auto bg-white dark:bg-neutral-900 rounded-lg shadow-lg overflow-hidden border border-black dark:border-white">
         <div className="flex justify-between items-start p-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {store.name}
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{store.name}</h1>
           <button
             onClick={() => navigate("/seller/store-details", { state: { initialData: store } })}
             className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-neutral-700 transition"
@@ -66,30 +82,21 @@ export default function StorePage() {
 
         <div className="flex flex-col md:flex-row gap-6 px-6 pb-6">
           <div className="flex-shrink-0 w-60 h-60 rounded-lg overflow-hidden shadow-lg">
-            {store.img && (
-              <img
-                src={store.img?.url}
-                alt={store.name}
-                className="w-full h-full object-cover"
-              />
-            )}
+            {store.img && <img src={store.img.url} alt={store.name} className="w-full h-full object-cover" />}
           </div>
 
           <div className="flex flex-col gap-6 flex-1">
-            <div className="space-y-3">
-              <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base line-clamp-3">
-                {store.description}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {store.category.map((cat, idx) => (
-                  <span
-                    key={idx}
-                    className="bg-sky-500 text-white px-3 py-1 rounded border border-black dark:border-white text-sm font-medium"
-                  >
-                    {cat}
-                  </span>
-                ))}
-              </div>
+            <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base line-clamp-3">{store.description}</p>
+
+            <div className="flex flex-wrap gap-2">
+              {store.category.map((cat, idx) => (
+                <span
+                  key={idx}
+                  className="bg-sky-500 text-white px-3 py-1 rounded border border-black dark:border-white text-sm font-medium"
+                >
+                  {cat}
+                </span>
+              ))}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -99,13 +106,10 @@ export default function StorePage() {
                   className="p-4 bg-gray-100 dark:bg-neutral-950 border border-black dark:border-white rounded-2xl shadow-sm hover:shadow-md transition duration-300"
                 >
                   <p className="font-semibold text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-2">
-                    <FiHome className="text-sky-500" />
-                    Address {index + 1}
+                    <FiHome className="text-sky-500" /> Address {index + 1}
                   </p>
                   <p className="text-gray-700 dark:text-gray-300">{addr.addressLine1}</p>
-                  {addr.addressLine2 && (
-                    <p className="text-gray-700 dark:text-gray-300">{addr.addressLine2}</p>
-                  )}
+                  {addr.addressLine2 && <p className="text-gray-700 dark:text-gray-300">{addr.addressLine2}</p>}
                   <p className="flex items-center text-gray-600 dark:text-gray-400 mt-1 gap-1">
                     <FiMapPin className="text-sky-500" /> {addr.city}, {addr.state} - {addr.pincode}
                   </p>
@@ -113,7 +117,7 @@ export default function StorePage() {
               ))}
             </div>
 
-            <div className="flex flex-wrap justify-center sm:justify-normal items-center sm:justify-items-normal gap-4">
+            <div className="flex flex-wrap justify-center sm:justify-normal items-center gap-4 mt-4">
               <button
                 onClick={() => navigate("/seller/new-product")}
                 className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg shadow border border-black dark:border-white cursor-pointer"
@@ -132,25 +136,55 @@ export default function StorePage() {
               >
                 Manage Delivery Zone
               </button>
-              
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto mt-8">
-        <h2 className="text-2xl text-center font-bold mb-4 text-gray-900 dark:text-gray-100">
-          Products
-        </h2>
-        {products.length === 0 ? (
-          <p className="text-gray-600 dark:text-gray-400">No products yet.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {products.map((product) => (
-              <Card key={product._id} product={product} onEdit={NewProductForm} onDelete={removeProduct} userRole={"seller"} showCart={false} />
-            ))}
-          </div>
-        )}
+        <div className="flex justify-center gap-4 mb-4">
+          <button
+            onClick={() => setShow("new")}
+            className={`px-4 py-2 rounded-lg cursor-pointer font-semibold ${show === "new" ? "bg-sky-600 text-white" : "bg-gray-200 dark:bg-neutral-800 text-gray-700 dark:text-gray-300"}`}
+          >
+            New Products
+          </button>
+          <button
+            onClick={() => setShow("old")}
+            className={`px-4 py-2 rounded-lg cursor-pointer font-semibold ${show === "old" ? "bg-emerald-600 text-white" : "bg-gray-200 dark:bg-neutral-800 text-gray-700 dark:text-gray-300"}`}
+          >
+            Used Products
+          </button>
+        </div>
+        <div className="flex flex-wrap justify-around items-center gap-5 mt-10">
+          {show === "new" ? (
+            products.length === 0 ? (
+              <p className="text-gray-600 dark:text-gray-400 text-center">No new products yet.</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {products.map((product) => (
+                  <Card
+                    key={product._id}
+                    product={product}
+                    userRole="seller"
+                  />
+                ))}
+              </div>
+            )
+          ) : usedProducts.length === 0 ? (
+            <p className="text-gray-600 dark:text-gray-400 text-center">No used products yet.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {usedProducts.map((product) => (
+                <UsedProductCard
+                  key={product._id}
+                  product={product}
+                  userRole="seller"
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

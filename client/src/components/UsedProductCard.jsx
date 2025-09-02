@@ -1,15 +1,12 @@
-import { ShoppingCart, Star, Edit2, Trash2, Eye, Heart, Truck, Tag } from "lucide-react";
+import { Heart, Truck, MessageCircle, Edit2, Trash2, Eye } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { removeProduct } from "../api/product";
+import { removeUsedProduct } from "../api/product";
 import useLoaderStore from "../store/loader";
 import { toast } from "react-hot-toast";
-import useProductStore from "../store/product";
+import useUsedProductStore from "../store/usedProduct";
 
-export default function Card({
-  product,
-  userRole = "buyer"
-}) {
+export default function UsedProductCard({ product, userRole = "buyer" }) {
   const navigate = useNavigate();
   const { startLoading, stopLoading } = useLoaderStore();
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -23,43 +20,41 @@ export default function Card({
       : product.price - product.discount.amount
     : product.price;
 
-  const rating = product.rating || 0;
   const discountValue = product.discount?.percentage || product.discount?.amount;
   const discountType = product.discount?.percentage ? "%" : "₹";
 
-  const handleCardClick = (product) => {
-    navigate("/product-detail", { state: { product } });
-  };
+  const handleCardClick = () => navigate("/used-product-detail", { state: { product } });
 
   const handleWishlistToggle = (e) => {
     e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
-    console.log(isWishlisted ? "Removed from wishlist" : "Added to wishlist");
+    if (userRole === "buyer") {
+      setIsWishlisted(!isWishlisted);
+      console.log(isWishlisted ? "Removed from wishlist" : "Added to wishlist");
+    }
   };
 
-  const handleAddToCart = (e) => {
+  const handleChatSeller = (e) => {
     e.stopPropagation();
-    console.log("Added to cart");
+    if (userRole === "buyer") alert("Open chat modal here!");
   };
 
-  const handleEdit = (e, product) => {
+  const handleEditClick = (e) => {
     e.stopPropagation();
-    navigate("/seller/new-product", { state: { initialData: product } });
+    navigate("/seller/used-product", { state: { initialData: product } });
   };
 
-  const handleDelete = async (e, id) => {
+  const handleDeleteClick = async (e) => {
     e.stopPropagation();
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      startLoading("removeProduct");
-      try {
-        const result = await removeProduct(id);
-        if (result.success) {
-          useProductStore.getState().removeProduct(id);
-          toast.success("Product removed successfully");
-        }
-      } finally {
-        stopLoading();
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
+    startLoading("removeUsedProduct");
+    try {
+      const result = await removeUsedProduct(product._id);
+      if (result.success) {
+        useUsedProductStore.getState().removeUsedProduct(product._id);
+        toast.success("Used product removed successfully");
       }
+    } finally {
+      stopLoading();
     }
   };
 
@@ -73,7 +68,7 @@ export default function Card({
       className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden flex flex-col w-full max-w-[320px] relative border border-gray-100 dark:border-neutral-800 transition-all duration-300 cursor-pointer group transform hover:-translate-y-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => handleCardClick(product)}
+      onClick={handleCardClick}
     >
       <div className="relative w-full h-64 overflow-hidden">
         <div className="relative w-full h-full">
@@ -91,42 +86,39 @@ export default function Card({
             </div>
           )}
 
-          <div className="absolute top-4 left-4 flex flex-col gap-2">
+          <div className="absolute top-4 left-4">
             {hasDiscount && (
               <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
                 -{discountValue}{discountType} OFF
               </span>
             )}
-            {product.stock <= 0 && (
-              <span className="bg-gray-800 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                Out of Stock
-              </span>
-            )}
-            {product.isAvailable && product.stock > 0 && product.stock <= 5 && (
-              <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-bounce">
-                Only {product.stock} left
-              </span>
-            )}
           </div>
 
-          {userRole === "buyer" && <div className="absolute top-4 right-4">
-            <button
-              onClick={handleWishlistToggle}
-              className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${isWishlisted
-                ? 'bg-red-500 text-white'
-                : 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'
+          {userRole === "buyer" && (
+            <div className="absolute top-4 right-4">
+              <button
+                onClick={handleWishlistToggle}
+                className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${
+                  isWishlisted
+                    ? 'bg-red-500 text-white'
+                    : 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'
                 }`}
-            >
-              <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`} />
-            </button>
-          </div>}
+              >
+                <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`} />
+              </button>
+            </div>
+          )}
 
           <div
-            className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end justify-center pb-6 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end justify-center pb-6 transition-opacity duration-300 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            }`}
           >
             <button
               onClick={handleQuickView}
-              className={`bg-white/95 text-gray-800 px-4 py-2 rounded-full shadow-lg hover:bg-white transition-all duration-300 font-medium text-sm flex items-center gap-2 transform ${isHovered ? 'translate-y-0' : 'translate-y-5'}`}
+              className={`bg-white/95 text-gray-800 px-4 py-2 rounded-full shadow-lg hover:bg-white transition-all duration-300 font-medium text-sm flex items-center gap-2 transform ${
+                isHovered ? 'translate-y-0' : 'translate-y-5'
+              }`}
             >
               <Eye size={16} />
               Quick View
@@ -146,45 +138,30 @@ export default function Card({
 
       <div className="flex flex-col flex-grow p-5">
         <div className="mb-3">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-full">
-              {product.brand}
-            </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {product.category.name}
-            </span>
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            {product.condition && (
+              <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-full">
+                {product.condition}
+              </span>
+            )}
+            {product.isNegotiable && (
+              <span className="text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded-full">
+                Negotiable
+              </span>
+            )}
+            {product.billAvailable && (
+              <span className="text-xs font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30 px-2 py-1 rounded-full">
+                Bill Available
+              </span>
+            )}
           </div>
+          
           <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
             {product.title}
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mt-1 leading-relaxed">
             {product.description}
           </p>
-        </div>
-
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-1">
-            <div className="flex">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-4 w-4 ${i < Math.floor(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300 dark:text-gray-600"}`}
-                />
-              ))}
-            </div>
-            <span className="ml-1 text-sm text-gray-600 dark:text-gray-400 font-medium">
-              {rating > 0 ? rating.toFixed(1) : 'New'}
-            </span>
-          </div>
-
-          {product.tags?.length > 0 && (
-            <div className="flex items-center gap-1">
-              <Tag size={12} className="text-gray-400" />
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                {product.tags[0]}
-              </span>
-            </div>
-          )}
         </div>
 
         <div className="mt-auto">
@@ -213,26 +190,25 @@ export default function Card({
 
           {userRole === "buyer" && (
             <button
-              onClick={handleAddToCart}
-              disabled={product.stock <= 0}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
+              onClick={handleChatSeller}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
             >
-              <ShoppingCart className="h-5 w-5" />
-              {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+              <MessageCircle className="h-5 w-5" />
+              Chat with Seller
             </button>
           )}
 
           {userRole === "seller" && (
             <div className="flex items-center gap-3">
               <button
-                onClick={(e) => handleEdit(e, product)}
+                onClick={handleEditClick}
                 className="flex cursor-pointer items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95"
               >
                 <Edit2 className="h-4 w-4" />
                 Edit
               </button>
               <button
-                onClick={(e) => handleDelete(e, product._id)}
+                onClick={handleDeleteClick}
                 className="flex cursor-pointer items-center gap-2 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95"
               >
                 <Trash2 className="h-4 w-4" />
@@ -242,12 +218,6 @@ export default function Card({
           )}
         </div>
       </div>
-
-      {product.stock > 0 && product.stock <= 10 && (
-        <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-12 animate-pulse">
-          {product.stock <= 5 ? 'Almost Gone!' : 'Limited Stock'}
-        </div>
-      )}
     </div>
   );
 }

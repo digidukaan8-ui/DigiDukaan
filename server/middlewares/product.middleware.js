@@ -1,5 +1,5 @@
 import Store from "../models/store.model.js";
-import { categories, isValidCategory, isValidSubCategory } from "../utils/category.util.js";
+import { isValidCategory, isValidSubCategory, isValidUsedProductCategory, isValidUsedProductSubCategory } from "../utils/category.util.js";
 
 const handleAddProduct = async (req, res, next) => {
     try {
@@ -193,4 +193,188 @@ const handleUpdateProduct = async (req, res, next) => {
     }
 };
 
-export { handleAddProduct, handleUpdateProduct };
+const handleAddUsedProduct = async (req, res, next) => {
+    try {
+        let { title, description, category, subCategory, price, condition, attributes, brand, tags, isNegotiable, billAvailable, delivery, discount } = req.body;
+        const { storeId } = req.params;
+        if (typeof attributes === "string") attributes = JSON.parse(attributes);
+        if (typeof tags === "string") tags = JSON.parse(tags);
+        if (typeof discount === "string") discount = JSON.parse(discount);
+        if (typeof delivery === "string") delivery = JSON.parse(delivery);
+
+        if (!title || !description || !category || !subCategory || !price || !condition || !attributes) {
+            return res.status(400).json({ success: false, message: "Missing required fields" });
+        }
+
+        isNegotiable = Boolean(isNegotiable);
+        billAvailable = Boolean(billAvailable);
+        if (
+            typeof title !== "string" ||
+            typeof description !== "string" ||
+            typeof category !== "string" ||
+            typeof subCategory !== "string" ||
+            typeof condition !== "string" ||
+            typeof isNegotiable !== "boolean" ||
+            typeof billAvailable !== "boolean"
+        ) {
+            return res.status(400).json({ success: false, message: "Invalid types for required fields" });
+        }
+
+        if (!isValidUsedProductCategory(category)) return res.status(400).json({ success: false, message: "Invalid category" });
+        if (!isValidUsedProductSubCategory(category, subCategory)) return res.status(400).json({ success: false, message: "Invalid subcategory" });
+
+        if (brand && typeof brand !== "string") return res.status(400).json({ success: false, message: "Invalid brand format" });
+        if (tags && !Array.isArray(tags)) return res.status(400).json({ success: false, message: "Tags must be an array" });
+
+        if (!Array.isArray(attributes) || attributes.some(a => !a.key || !a.value)) {
+            return res.status(400).json({ success: false, message: "Invalid attributes format" });
+        }
+
+        if (discount) {
+            if (discount.percentage != null && (typeof discount.percentage !== "number" || discount.percentage < 0 || discount.percentage > 100)) {
+                return res.status(400).json({ success: false, message: "Invalid discount percentage" });
+            }
+            if (discount.amount != null && (typeof discount.amount !== "number" || discount.amount < 0)) {
+                return res.status(400).json({ success: false, message: "Invalid discount amount" });
+            }
+        }
+
+        if (delivery) {
+            const { type, pickupLocation, shippingLocations } = delivery;
+
+            if (!type || typeof type !== "string") return res.status(400).json({ success: false, message: "Invalid delivery type" });
+
+            if (!pickupLocation || typeof pickupLocation !== "object") {
+                return res.status(400).json({ success: false, message: "Invalid pickupLocation" });
+            }
+
+            const { address, city, state, pincode } = pickupLocation;
+            if (!address || !city || !state || !pincode) {
+                return res.status(400).json({ success: false, message: "Invalid pickupLocation details" });
+            }
+
+            if (!Array.isArray(shippingLocations)) {
+                return res.status(400).json({ success: false, message: "Invalid shippingLocations" });
+            }
+
+            for (const loc of shippingLocations) {
+                if (
+                    !loc.shippingArea || typeof loc.shippingArea !== "string" ||
+                    !loc.areaName || typeof loc.areaName !== "string" ||
+                    loc.shippingCharge == null || isNaN(Number(loc.shippingCharge))
+                ) {
+                    return res.status(400).json({ success: false, message: "Invalid shipping location details" });
+                }
+                loc.shippingCharge = Number(loc.shippingCharge);
+            }
+        }
+
+        if (isNaN(Number(price))) return res.status(400).json({ success: false, message: "Price must be a number" });
+        price = Number(price);
+
+        const store = await Store.findById(storeId);
+        if (!store) return res.status(400).json({ success: false, message: "Store not found" });
+
+        if (!req.files?.img || req.files.img.length < 1) {
+            return res.status(400).json({ success: false, message: "At least one image is required" });
+        }
+        if (req.files?.video && req.files.video.length > 1) {
+            return res.status(400).json({ success: false, message: "Only one video allowed" });
+        }
+
+        return next();
+    } catch (error) {
+        console.error("Error in Adding Used Product middleware: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
+
+const handleUpdateUsedProduct = async (req, res, next) => {
+    try {
+        let { title, description, category, subCategory, price, discount, attributes, brand, tags, condition, isNegotiable, billAvailable, delivery } = req.body;
+        const { usedProductId } = req.params;
+
+        if (typeof attributes === "string") attributes = JSON.parse(attributes);
+        if (typeof tags === "string") tags = JSON.parse(tags);
+        if (typeof discount === "string") discount = JSON.parse(discount);
+        if (typeof delivery === "string") delivery = JSON.parse(delivery);
+
+        if (!usedProductId || !title || !description || !category || !subCategory || !price || !condition || !attributes) {
+            return res.status(400).json({ success: false, message: "Missing required fields" });
+        }
+
+        isNegotiable = Boolean(isNegotiable);
+        billAvailable = Boolean(billAvailable);
+        if (
+            typeof title !== "string" ||
+            typeof usedProductId !== "string" ||
+            typeof description !== "string" ||
+            typeof category !== "string" ||
+            typeof subCategory !== "string" ||
+            typeof condition !== "string" ||
+            typeof isNegotiable !== "boolean" ||
+            typeof billAvailable !== "boolean"
+        ) {
+            return res.status(400).json({ success: false, message: "Invalid types for required fields" });
+        }
+
+        if (!isValidUsedProductCategory(category)) return res.status(400).json({ success: false, message: "Invalid category" });
+        if (!isValidUsedProductSubCategory(category, subCategory)) return res.status(400).json({ success: false, message: "Invalid subcategory" });
+
+        if (brand && typeof brand !== "string") return res.status(400).json({ success: false, message: "Invalid brand format" });
+        if (tags && !Array.isArray(tags)) return res.status(400).json({ success: false, message: "Tags must be an array" });
+
+        if (!Array.isArray(attributes) || attributes.some(a => !a.key || !a.value)) {
+            return res.status(400).json({ success: false, message: "Invalid attributes format" });
+        }
+
+        if (discount) {
+            if (discount.percentage != null && (typeof discount.percentage !== "number" || discount.percentage < 0 || discount.percentage > 100)) {
+                return res.status(400).json({ success: false, message: "Invalid discount percentage" });
+            }
+            if (discount.amount != null && (typeof discount.amount !== "number" || discount.amount < 0)) {
+                return res.status(400).json({ success: false, message: "Invalid discount amount" });
+            }
+        }
+
+        if (delivery) {
+            const { type, pickupLocation, shippingLocations } = delivery;
+
+            if (!type || typeof type !== "string") return res.status(400).json({ success: false, message: "Invalid delivery type" });
+
+            if (!pickupLocation || typeof pickupLocation !== "object") {
+                return res.status(400).json({ success: false, message: "Invalid pickupLocation" });
+            }
+
+            const { address, city, state, pincode } = pickupLocation;
+            if (!address || !city || !state || !pincode) {
+                return res.status(400).json({ success: false, message: "Invalid pickupLocation details" });
+            }
+
+            if (!Array.isArray(shippingLocations)) {
+                return res.status(400).json({ success: false, message: "Invalid shippingLocations" });
+            }
+
+            for (const loc of shippingLocations) {
+                if (
+                    !loc.shippingArea || typeof loc.shippingArea !== "string" ||
+                    !loc.areaName || typeof loc.areaName !== "string" ||
+                    loc.shippingCharge == null || isNaN(Number(loc.shippingCharge))
+                ) {
+                    return res.status(400).json({ success: false, message: "Invalid shipping location details" });
+                }
+                loc.shippingCharge = Number(loc.shippingCharge);
+            }
+        }
+
+        if (isNaN(Number(price))) return res.status(400).json({ success: false, message: "Price must be a number" });
+        price = Number(price);
+
+        return next();
+    } catch (error) {
+        console.error("Error in Updating Used Product middleware: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
+
+export { handleAddProduct, handleUpdateProduct, handleAddUsedProduct, handleUpdateUsedProduct };

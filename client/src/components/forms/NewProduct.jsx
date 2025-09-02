@@ -85,10 +85,7 @@ export default function NewProductForm() {
   }, [watchedValues, isDirty, imagePreviews, removedImg, imgFile, videoPreview, initialData]);
 
   const { fields: attributeFields, append: appendAttribute, remove: removeAttribute } =
-    useFieldArray({
-      control,
-      name: "attributes",
-    });
+    useFieldArray({ control, name: "attributes", });
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -549,7 +546,7 @@ export default function NewProductForm() {
                     )}
                   </div>
 
-                  <div className="flex justify-center items-center gap-5">
+                  <div className="flex flex-col sm:flex-row justify-center items-center gap-5">
                     <input
                       id={`attr-key-${field.id}`}
                       autoComplete="off"
@@ -590,12 +587,12 @@ export default function NewProductForm() {
               whileHover={{ scale: canUpdate ? 1.05 : 1 }}
               type="submit"
               disabled={!canUpdate}
-              className={`w-fit py-2 px-4 border rounded font-medium text-sm transition
+              className={`w-fit py-2 px-4 border border-black dark:border-white rounded font-medium text-sm transition
               ${canUpdate
                   ? "bg-sky-600 text-white hover:bg-sky-700"
                   : "bg-gray-400 text-gray-200 cursor-not-allowed"}`}
             >
-              {initialData ? "Update Product" : "Save Product"}
+              {initialData ? "Update" : "Save"}
             </motion.button>
           </div>
         </form>

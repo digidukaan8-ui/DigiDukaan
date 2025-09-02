@@ -1,298 +1,710 @@
 import { useForm, useFieldArray } from "react-hook-form";
-import { useState } from "react";
-import { FiPlus, FiX } from "react-icons/fi";
+import { FiTrash2, FiPlus, FiX } from "react-icons/fi";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { addUsedProduct, updateUsedProduct } from "../../api/product";
+import { useLocation, useNavigate } from "react-router-dom";
+import useStore from "../../store/store";
+import useLoaderStore from "../../store/loader";
+import useProductStore from "../../store/usedProduct";
+import toast from "react-hot-toast";
+import { usedProductCategories, getUsedProductSubCategories } from "../../utils/category";
 
 export default function UsedProductForm() {
-  const { register, handleSubmit, control, reset } = useForm({
+  const location = useLocation();
+  const { initialData } = location.state || {};
+  const { startLoading, stopLoading } = useLoaderStore();
+  const { store } = useStore();
+  const navigate = useNavigate();
+  const [imagePreviews, setImagePreviews] = useState(initialData?.img || []);
+  const [videoPreview, setVideoPreview] = useState(initialData?.video?.url || "");
+  const [imgFile, setImgFile] = useState([]);
+  const [removedImg, setRemovedImg] = useState([]);
+  const [videoFile, setVideoFile] = useState(initialData?.video?.url || null);
+  const [canUpdate, setCanUpdate] = useState(false);
+
+  const defaultCategory = initialData?.category?.name || usedProductCategories[0]?.name || "";
+  const defaultSubCategories = getUsedProductSubCategories(defaultCategory) || [];
+  const defaultSubCategory = initialData?.subCategory?.name || defaultSubCategories[0]?.name || "";
+  const [subCategories, setSubCategories] = useState(defaultSubCategories);
+
+  const { register, control, handleSubmit, setValue, reset, watch, formState: { errors, isDirty } } = useForm({
     defaultValues: {
-      title: "",
-      slug: "",
-      description: "",
-      category: "",
-      subCategory: "",
-      condition: "",
-      price: "",
-      isNegotiable: false,
-      brand: "",
-      attributes: [{ key: "", value: "" }],
-      billAvailable: false,
-      img: [],
-      video: "",
+      title: initialData?.title || "",
+      description: initialData?.description || "",
+      category: defaultCategory,
+      subCategory: defaultSubCategory,
+      brand: initialData?.brand || "",
+      price: initialData?.price || "",
+      condition: initialData?.condition || "used",
+      discount: initialData?.discount
+        ? initialData.discount.percentage !== null
+          ? { type: "percentage", value: initialData.discount.percentage }
+          : { type: "amount", value: initialData.discount.amount }
+        : { type: "percentage", value: "" },
+      tags: initialData?.tags || "",
+      attributes: initialData?.attributes || [{ key: "", value: "" }],
+      deliveryType: initialData?.delivery?.type || "pickup",
+      pickupLocation: initialData?.delivery?.pickupLocation || { address: "", city: "", state: "", pincode: "" },
+      shippingCharge: initialData?.delivery?.shippingCharge || 0,
+      shippingLocations: initialData?.delivery?.shippingLocations || [{ shippingArea: "City", areaName: "", shippingCharge: 0 }],
+      keptImg: initialData?.img || [],
+      video: initialData?.video?.url || "",
+      isNegotiable: initialData?.isNegotiable || false,
+      billAvailable: initialData?.billAvailable || false,
     },
   });
 
-  const {
-    fields: attributeFields,
-    append: appendAttribute,
-    remove: removeAttribute,
-  } = useFieldArray({ control, name: "attributes" });
+  const { fields: shippingFields, append: appendShipping, remove: removeShipping } =
+    useFieldArray({ control, name: "shippingLocations" });
 
-  const {
-    fields: imageFields,
-    append: appendImage,
-    remove: removeImage,
-  } = useFieldArray({ control, name: "img" });
+  const watchedDeliveryType = watch("deliveryType");
+  const watchedValues = watch();
+  const watchedCategory = watch("category");
 
-  const [imagePreviews, setImagePreviews] = useState([]);
-  const [videoPreview, setVideoPreview] = useState("");
+  useEffect(() => {
+    const subs = getUsedProductSubCategories(watchedCategory) || [];
+    setSubCategories(subs);
+
+    const currentSub = watch("subCategory");
+    if (!subs.includes(currentSub)) {
+      setValue("subCategory", subs[0] || "");
+    }
+  }, [watchedCategory, setValue, watch]);
+
+  useEffect(() => {
+    let changed = false;
+    if (isDirty) changed = true;
+
+    const initialImgCount = initialData?.img?.length || 0;
+    if (
+      imagePreviews.length !== initialImgCount ||
+      removedImg.length > 0 ||
+      imgFile.length > 0
+    ) {
+      changed = true;
+    }
+
+    const initialVideo = initialData?.video?.url || "";
+    if (videoPreview !== initialVideo) {
+      changed = true;
+    }
+
+    setCanUpdate(changed);
+  }, [watchedValues, isDirty, imagePreviews, removedImg, imgFile, videoPreview, initialData]);
+
+  const { fields: attributeFields, append: appendAttribute, remove: removeAttribute } =
+    useFieldArray({ control, name: "attributes", });
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length + imageFields.length > 5) {
-      alert("Maximum 5 images allowed");
+
+    if (imagePreviews.length + files.length > 5) {
+      toast.error("You can upload a maximum of 5 images");
       return;
     }
 
-    files.forEach((file) => {
-      if (file.size > 2 * 1024 * 1024) {
-        alert(`${file.name} is larger than 2MB`);
-        return;
-      }
+    const validFiles = [];
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImagePreviews((prev) => [...prev, reader.result]);
-        appendImage({ url: reader.result, file });
-      };
-      reader.readAsDataURL(file);
+    files.forEach((file) => {
+      if (file.size <= 2 * 1024 * 1024) {
+        validFiles.push(file);
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviews((prev) => [
+            ...prev,
+            { name: file.name, url: reader.result },
+          ]);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        toast.error("Image size should not exceed 2MB");
+      }
     });
+
+    setImgFile((prev) => [...prev, ...validFiles].slice(0, 5));
+    e.target.value = "";
+  };
+
+  const removeImage = (img, id) => {
+    setImagePreviews((prev) => prev.filter((item) => item !== img));
+    if (id) setRemovedImg((old) => [...old, img]);
+    setImgFile((prev) => prev.filter((item) => item.name !== img.name));
   };
 
   const handleVideoChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 20 * 1024 * 1024) {
-      alert("Video size must be less than 20MB");
+      toast.error("Video size should not exceed 20MB");
+      e.target.value = "";
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => {
-      setVideoPreview(reader.result);
-    };
+    reader.onloadend = () => setVideoPreview(reader.result);
     reader.readAsDataURL(file);
+    setVideoFile(file);
   };
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    reset();
-    setImagePreviews([]);
+  const removeVideo = () => {
     setVideoPreview("");
+    setVideoFile(null);
+  };
+
+  const cleanTags = (raw) => raw.split(",").map(s => s.trim()).filter(s => s.length > 0);
+
+  const onFormSubmit = async (data) => {
+    if (imagePreviews.length < 1) {
+      toast.error("At least one image is required");
+      return;
+    }
+
+    const delivery = {
+      type: data.deliveryType,
+      pickupLocation: data.pickupLocation,
+      shippingLocations: data.shippingLocations || [],
+    };
+
+    const discount = {
+      percentage: data.discount.type === "percentage" ? Number(data.discount.value) : null,
+      amount: data.discount.type === "amount" ? Number(data.discount.value) : null,
+    };
+
+    const keepImg = data.keptImg.filter(
+      (img) =>
+        !removedImg.some(
+          (removed) => removed.url === img.url || removed.publicId === img.publicId
+        )
+    );
+
+    if (!Array.isArray(data.tags)) {
+      data.tags = cleanTags(data.tags);
+    }
+
+    const productData = {
+      ...data,
+      storeId: store._id,
+      img: imgFile,
+      video: videoFile,
+      attributes: data.attributes.filter(attr => attr.key.trim() && attr.value.trim()),
+      tags: data.tags,
+      discount,
+      delivery,
+      removedImg,
+      keptImg: keepImg,
+      usedProductId: initialData?._id
+    };
+
+    startLoading(initialData ? "updateUsedProduct" : "usedProduct");
+
+    try {
+      const result = initialData
+        ? await updateUsedProduct(productData)
+        : await addUsedProduct(productData);
+
+      if (result.data.storeId === store._id) {
+        if (initialData) {
+          useProductStore.getState().updateUsedProduct(result.data);
+          toast.success("Used product updated successfully");
+        } else {
+          useProductStore.getState().addUsedProduct(result.data);
+          toast.success("Used product added successfully");
+        }
+        navigate("/seller/store");
+        reset();
+        setImagePreviews([]);
+        setVideoPreview("");
+      }
+    } finally {
+      stopLoading();
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center p-4 sm:p-6">
-      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 sm:p-8">
-        <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 text-center mb-6">
-          Add Used Product
-        </h1>
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pb-20 px-4 pt-40">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-2xl mx-auto bg-white dark:bg-neutral-900 px-6 py-8 rounded-lg border border-black dark:border-white shadow-lg"
+      >
+        <h2 className="text-2xl font-bold mb-8 text-center text-gray-900 dark:text-gray-100">
+          {initialData ? "Edit Used Product" : "Add Used Product"}
+        </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Title + Brand + Description */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-gray-700 dark:text-gray-200 mb-1 text-sm font-medium">
-                  Title *
-                </label>
-                <input
-                  {...register("title", { required: true })}
-                  placeholder="Enter product title"
-                  className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 dark:text-gray-200 mb-1 text-sm font-medium">
-                  Brand
-                </label>
-                <input
-                  {...register("brand")}
-                  placeholder="Brand"
-                  className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+        <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="title" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Product Title
+              </label>
+              <input
+                id="title"
+                autoComplete="off"
+                {...register("title", {
+                  required: "Title is required",
+                  maxLength: {
+                    value: 70,
+                    message: "Title cannot exceed 70 characters",
+                  },
+                })}
+                placeholder="Enter product title"
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              />
+              {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
             </div>
 
             <div>
-              <label className="block text-gray-700 dark:text-gray-200 mb-1 text-sm font-medium">
-                Description * (Max 500 words)
+              <label htmlFor="brand" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Brand Name
               </label>
-              <textarea
-                {...register("description", { required: true, maxLength: 3000 })}
-                placeholder="Enter product description"
-                rows={4}
-                className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+              <input
+                id="brand"
+                autoComplete="off"
+                {...register("brand")}
+                placeholder="Enter brand name"
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
               />
             </div>
           </div>
 
-          {/* Category + Subcategory */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                Category *
-              </label>
-              <input
-                {...register("category", { required: true })}
-                placeholder="Category"
-                className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                Subcategory
-              </label>
-              <input
-                {...register("subCategory")}
-                placeholder="Subcategory"
-                className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          <div>
+            <label htmlFor="description" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+              Description
+            </label>
+            <textarea
+              id="description"
+              autoComplete="off"
+              {...register("description", {
+                required: "Description is required",
+                validate: (value) =>
+                  value.split(/\s+/).length <= 300 ||
+                  "Description cannot exceed 300 words",
+              })}
+              placeholder="Enter product description (max 300 words)"
+              rows="3"
+              className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+            ></textarea>
+            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
           </div>
 
-          {/* Condition + Price */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                Condition *
+              <label htmlFor="category" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Category
               </label>
               <select
-                {...register("condition", { required: true })}
-                className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+                id="category"
+                {...register("category", { required: "Category is required" })}
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
               >
-                <option value="">Select condition</option>
+                {usedProductCategories.map((cat, index) => (
+                  <option key={`${cat.name}-${index}`} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+              {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
+            </div>
+
+            <div>
+              <label
+                htmlFor="subCategory"
+                className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
+              >
+                Sub Category
+              </label>
+              {subCategories.length > 0 ? (
+                <select
+                  id="subCategory"
+                  {...register("subCategory", { required: "Sub Category is required" })}
+                  className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+                >
+                  {subCategories.map((sub, index) => (
+                    <option key={`${sub}-${index}`} value={sub}>
+                      {sub}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400">No subcategories available for this category</p>
+              )}
+              {errors.subCategory && (
+                <p className="text-red-500 text-sm mt-1">{errors.subCategory.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label
+                htmlFor="discount"
+                className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
+              >
+                Discount
+              </label>
+              <div className="flex gap-2">
+                <select
+                  {...register("discount.type")}
+                  className="border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
+                >
+                  <option value="percentage">%</option>
+                  <option value="amount">₹</option>
+                </select>
+
+                <input
+                  id="discount"
+                  type="number"
+                  step="any"
+                  {...register("discount.value")}
+                  placeholder="Value"
+                  className="w-0 flex-1 border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="tags" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Tags
+              </label>
+              <input
+                id="tags"
+                autoComplete="off"
+                {...register("tags")}
+                placeholder="Comma separated tags"
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="price" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Price
+              </label>
+              <input
+                id="price"
+                type="number"
+                autoComplete="off"
+                {...register("price", { required: "Price is required" })}
+                placeholder="Enter price"
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              />
+              {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="condition" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Condition
+              </label>
+              <select
+                id="condition"
+                {...register("condition")}
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              >
                 <option value="new">New</option>
                 <option value="like new">Like New</option>
                 <option value="used">Used</option>
                 <option value="refurbished">Refurbished</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                Price *
-              </label>
-              <input
-                type="number"
-                {...register("price", { required: true })}
-                placeholder="Price"
-                className="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
           </div>
 
-          {/* Attributes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Attributes
-            </label>
-            {attributeFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2 mb-2">
-                <input
-                  {...register(`attributes.${index}.key`, { required: true })}
-                  placeholder="Key"
-                  className="flex-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
-                />
-                <input
-                  {...register(`attributes.${index}.value`, { required: true })}
-                  placeholder="Value"
-                  className="flex-1 p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeAttribute(index)}
-                  className="p-2 bg-red-500 text-white rounded-lg"
-                >
-                  <FiX />
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() => appendAttribute({ key: "", value: "" })}
-              className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white rounded-lg text-sm"
-            >
-              <FiPlus size={16} /> Add Attribute
-            </button>
-          </div>
-
-          {/* Images */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Images (Max 5, 2MB each)
+            <label htmlFor="img" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+              Product Images (Min 1, Max 5, 2MB each)
             </label>
             <input
+              id="img"
               type="file"
               accept="image/*"
               multiple
               onChange={handleImageChange}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-500 file:text-white hover:file:bg-blue-600"
+              className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
             />
-            <div className="flex flex-wrap gap-2 mt-2">
-              {imagePreviews.map((img, i) => (
-                <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border">
-                  <img src={img} alt="preview" className="w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      removeImage(i);
-                      setImagePreviews(imagePreviews.filter((_, idx) => idx !== i));
-                    }}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+            <div className="flex gap-3 flex-wrap mt-3">
+              <AnimatePresence>
+                {imagePreviews.map((img, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3 }}
+                    className="relative"
                   >
-                    <FiX size={12} />
-                  </button>
-                </div>
-              ))}
+                    <img
+                      src={img.url}
+                      alt="Preview"
+                      className="w-24 h-24 object-cover rounded border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(img, img._id)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      <FiX size={14} />
+                    </button>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           </div>
 
-          {/* Video + Checkboxes */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                Video (Max 20MB)
-              </label>
+          <div>
+            <label htmlFor="video" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+              Product Video (Optional, Max 1, 20MB)
+            </label>
+            {!videoPreview ? (
               <input
+                id="video"
                 type="file"
                 accept="video/*"
                 onChange={handleVideoChange}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-green-500 file:text-white hover:file:bg-green-600"
+                className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
               />
-              {videoPreview && (
-                <video controls className="w-full max-h-48 mt-2 rounded-lg border">
-                  <source src={videoPreview} />
-                </video>
-              )}
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative mt-2"
+              >
+                <video
+                  src={videoPreview}
+                  controls
+                  className="w-60 h-40 rounded border"
+                />
+                <button
+                  type="button"
+                  onClick={removeVideo}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full"
+                >
+                  <FiX size={14} />
+                </button>
+              </motion.div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+            <div>
+              <label htmlFor="delivery-info" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Delivery Type
+              </label>
+              <select
+                {...register("deliveryType")}
+                id="delivery-info"
+                className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white focus:ring-2 focus:ring-sky-500"
+              >
+                <option value="pickup">Pickup</option>
+                <option value="shipping">Shipping</option>
+                <option value="both">Both</option>
+              </select>
             </div>
 
-            <div className="space-y-4">
-              <label className="flex items-center gap-2">
+            <div className="flex justify-around items-center w-full border border-black dark:border-white p-3 rounded bg-gray-100 dark:bg-neutral-950">
+              <motion.label
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-1 sm:gap-2 text-gray-700 dark:text-gray-300 cursor-pointer text-sm sm:text-base"
+              >
                 <input
                   type="checkbox"
                   {...register("isNegotiable")}
-                  className="w-4 h-4 accent-green-500"
+                  className="rounded-lg border-gray-300 dark:border-gray-600 accent-sky-500"
                 />
-                <span className="text-gray-700 dark:text-gray-200">Negotiable</span>
-              </label>
-              <label className="flex items-center gap-2">
+                Negotiable
+              </motion.label>
+
+              <motion.label
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-1 sm:gap-2 text-gray-700 dark:text-gray-300 cursor-pointer text-sm sm:text-base"
+              >
                 <input
                   type="checkbox"
                   {...register("billAvailable")}
-                  className="w-4 h-4 accent-green-500"
+                  className="rounded-lg border-gray-300 dark:border-gray-600 accent-sky-500"
                 />
-                <span className="text-gray-700 dark:text-gray-200">Bill Available</span>
-              </label>
+                Bill Available
+              </motion.label>
             </div>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
-          >
-            Submit
-          </button>
+          {watchedDeliveryType !== "shipping" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+              <input
+                type="text"
+                placeholder="Pickup Address"
+                {...register("pickupLocation.address")}
+                className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              />
+              <input
+                type="text"
+                placeholder="City"
+                {...register("pickupLocation.city")}
+                className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              />
+              <input
+                type="text"
+                placeholder="State"
+                {...register("pickupLocation.state")}
+                className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              />
+              <input
+                type="text"
+                placeholder="Pincode"
+                {...register("pickupLocation.pincode")}
+                className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              />
+            </div>
+          )}
+
+          {watchedDeliveryType !== "pickup" && (
+            <div className="mt-4">
+              <h4 className="mb-2 font-medium text-center text-lg text-gray-700 dark:text-gray-300">Shipping Locations</h4>
+
+              {shippingFields.map((field, index) => (
+                <motion.div
+                  key={field.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="p-3 mb-3 border border-black dark:border-white rounded-lg bg-gray-100 dark:bg-neutral-950/40 relative"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium text-sm text-gray-700 dark:text-gray-200">
+                      Shipping Location {index + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeShipping(index)}
+                      className="text-red-500 hover:text-red-600"
+                    >
+                      <FiTrash2 size={18} />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <select
+                      {...register(`shippingLocations.${index}.shippingArea`)}
+                      className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
+                    >
+                      {[
+                        "Country", "State", "District", "City", "Town", "Village", "Suburb",
+                        "Area", "Taluka", "Tehsil", "Locality", "Street", "Landmark", "Pincode"
+                      ].map((area) => (
+                        <option key={area} value={area}>{area}</option>
+                      ))}
+                    </select>
+
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      {...register(`shippingLocations.${index}.areaName`)}
+                      className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
+                    />
+
+                    <input
+                      type="number"
+                      placeholder="Shipping Charge"
+                      {...register(`shippingLocations.${index}.shippingCharge`)}
+                      className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
+                    />
+                  </div>
+                </motion.div>
+              ))}
+
+              <button
+                type="button"
+                onClick={() => appendShipping({ shippingArea: "City", areaName: "", shippingCharge: 0 })}
+                className="mt-2 text-sky-500 font-medium hover:underline flex items-center gap-1"
+              >
+                <FiPlus /> Add Shipping Location
+              </button>
+            </div>
+          )}
+
+          <div>
+            <h3 className="text-lg text-center font-semibold mb-3 text-gray-900 dark:text-gray-200">
+              Attributes
+            </h3>
+            <AnimatePresence>
+              {attributeFields.map((field, index) => (
+                <motion.div
+                  key={field.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="p-4 mb-4 border border-black dark:border-white rounded-lg relative bg-gray-100 dark:bg-neutral-950/40"
+                >
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="font-medium text-sm text-gray-700 dark:text-gray-200">
+                      Attribute {index + 1}
+                    </span>
+                    {attributeFields.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeAttribute(index)}
+                        className="text-red-500 hover:text-red-600"
+                      >
+                        <FiTrash2 size={18} />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row justify-center items-center gap-5">
+                    <input
+                      id={`attr-key-${field.id}`}
+                      autoComplete="off"
+                      {...register(`attributes.${index}.key`)}
+                      placeholder="Attribute Key (e.g. Color)"
+                      className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white focus:ring-2 focus:ring-sky-500"
+                    />
+                    <input
+                      id={`attr-value-${field.id}`}
+                      autoComplete="off"
+                      {...register(`attributes.${index}.value`)}
+                      placeholder="Attribute Value (e.g. Red)"
+                      className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                  {errors.attributes?.[index]?.key && (
+                    <p className="text-red-500 text-sm mt-1">{errors.attributes[index].key.message}</p>
+                  )}
+                  {errors.attributes?.[index]?.value && (
+                    <p className="text-red-500 text-sm mt-1">{errors.attributes[index].value.message}</p>
+                  )}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+
+            <button
+              type="button"
+              onClick={() => appendAttribute({ key: "", value: "" })}
+              className="flex items-center gap-2 text-sky-500 font-medium text-sm hover:underline mt-2"
+            >
+              <FiPlus /> Add Attribute
+            </button>
+          </div>
+
+          <div className="flex justify-center items-center">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: canUpdate ? 1.05 : 1 }}
+              type="submit"
+              disabled={!canUpdate}
+              className={`w-fit py-2 px-4 border border-black dark:border-white rounded font-medium text-sm transition
+              ${canUpdate
+                  ? "bg-sky-600 text-white hover:bg-sky-700"
+                  : "bg-gray-400 text-gray-200 cursor-not-allowed"}`}
+            >
+              {initialData ? "Update" : "Save"}
+            </motion.button>
+          </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }

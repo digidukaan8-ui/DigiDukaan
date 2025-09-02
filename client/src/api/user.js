@@ -3,6 +3,7 @@ import useAuthStore from '../store/auth';
 import useStore from '../store/store';
 import useProductStore from '../store/product';
 import useDeliveryStore from '../store/deliveryZone';
+import useUsedProductStore from '../store/usedProduct';
 
 const registerUser = async (data) => {
     try {
@@ -74,6 +75,7 @@ const logoutUser = async () => {
             useStore.getState().clearStore();
             useProductStore.getState().clearProducts();
             useDeliveryStore.getState().clearZones();
+            useUsedProductStore.getState().clearUsedProducts();
         }
 
         return result;

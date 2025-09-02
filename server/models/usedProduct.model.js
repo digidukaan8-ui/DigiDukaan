@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 
+function capitalizeFirst(str) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
 const usedProductSchema = new mongoose.Schema({
   storeId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -13,13 +18,6 @@ const usedProductSchema = new mongoose.Schema({
     trim: true
   },
 
-  slug: {
-    type: String,
-    unique: true,
-    lowercase: true,
-    trim: true
-  },
-
   description: {
     type: String,
     required: true,
@@ -27,14 +25,13 @@ const usedProductSchema = new mongoose.Schema({
   },
 
   category: {
-    type: String,
-    required: true,
-    trim: true
+    name: { type: String, required: true, trim: true, set: capitalizeFirst },
+    slug: { type: String, required: true, trim: true }
   },
 
   subCategory: {
-    type: String,
-    trim: true
+    name: { type: String, required: true, trim: true, set: capitalizeFirst },
+    slug: { type: String, required: true, trim: true }
   },
 
   condition: {
@@ -65,27 +62,76 @@ const usedProductSchema = new mongoose.Schema({
     publicId: { type: String }
   },
 
-  brand: {
-    type: String,
-    trim: true
-  },
+  brand: { type: String, trim: true },
 
   attributes: [
     {
-      key: { type: String, required: true },   
-      value: { type: String, required: true } 
+      key: { type: String, required: true },
+      value: { type: String, required: true }
     }
   ],
 
-  billAvailable: {
-    type: Boolean,
-    default: false
+  billAvailable: { type: Boolean, default: false },
+
+  isSold: { type: Boolean, default: false },
+
+  discount: {
+    percentage: { type: Number, min: 0, max: 100, default: null },
+    amount: { type: Number, min: 0, default: null }
   },
 
-  isSold: {
-    type: Boolean,
-    default: false
-  }
+  delivery: {
+    type: {
+      type: String,
+      enum: ["pickup", "shipping", "both"],
+      default: "pickup"
+    },
+    pickupLocation: {
+      address: { type: String },
+      city: { type: String },
+      state: { type: String },
+      pincode: { type: String }
+    },
+    shippingLocations: [
+      {
+        shippingArea: {
+          type: String,
+          required: true,
+          enum: [
+            "Country",
+            "State",
+            "District",
+            "City",
+            "Town",
+            "Village",
+            "Suburb",
+            "Area",
+            "Taluka",
+            "Tehsil",
+            "Locality",
+            "Street",
+            "Landmark",
+            "Pincode",
+          ],
+          trim: true,
+          required: true,
+          set: capitalizeFirst,
+        },
+        areaName: {
+          type: String,
+          required: true,
+          trim: true,
+          set: capitalizeFirst,
+        },
+        shippingCharge: {
+          type: Number,
+          default: 0
+        }
+      }
+    ]
+  },
+
+  tags: { type: [String], default: [] }
 }, { timestamps: true });
 
 const UsedProduct = mongoose.model("UsedProduct", usedProductSchema);

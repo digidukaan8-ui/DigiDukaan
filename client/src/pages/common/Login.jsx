@@ -47,10 +47,8 @@ export default function Login() {
             toast.success('Login successfully!');
           }, 500);
         } else {
-          setTimeout(() => {
             navigate('/')
             toast.success('Login successfully!');
-          }, 500);
         }
       }
     } finally {
