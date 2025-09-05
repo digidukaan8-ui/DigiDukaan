@@ -9,6 +9,7 @@ import useLoaderStore from "../../store/loader";
 import useProductStore from "../../store/product";
 import useUsedProductStore from "../../store/usedProduct";
 import { toast } from "react-hot-toast";
+import { QuickView } from "../../components";
 
 export default function StorePage() {
   const { store } = useStore();
@@ -17,6 +18,7 @@ export default function StorePage() {
   const { products } = useProductStore();
   const { usedProducts } = useUsedProductStore();
   const [show, setShow] = useState("new");
+  const [quickViewProduct, setQuickViewProduct] = useState(null);
 
   useEffect(() => {
     if (store) {
@@ -68,8 +70,8 @@ export default function StorePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pb-20 pt-40 px-4">
-      <div className="max-w-7xl mx-auto bg-white dark:bg-neutral-900 rounded-lg shadow-lg overflow-hidden border border-black dark:border-white">
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pb-20 pt-30">
+      <div className="max-w-[calc(100%-2rem)] mx-auto bg-white dark:bg-neutral-900 rounded-lg shadow-lg overflow-hidden border border-black dark:border-white">
         <div className="flex justify-between items-start p-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{store.name}</h1>
           <button
@@ -145,13 +147,13 @@ export default function StorePage() {
         <div className="flex justify-center gap-4 mb-4">
           <button
             onClick={() => setShow("new")}
-            className={`px-4 py-2 rounded-lg cursor-pointer font-semibold ${show === "new" ? "bg-sky-600 text-white" : "bg-gray-200 dark:bg-neutral-800 text-gray-700 dark:text-gray-300"}`}
+            className={`px-4 py-2 rounded-lg cursor-pointer border border-black dark:border-white hover:scale-105 transition-all font-semibold ${show === "new" ? "bg-sky-600 text-white" : "bg-gray-200 dark:bg-neutral-800 text-gray-700 dark:text-gray-300"}`}
           >
             New Products
           </button>
           <button
             onClick={() => setShow("old")}
-            className={`px-4 py-2 rounded-lg cursor-pointer font-semibold ${show === "old" ? "bg-emerald-600 text-white" : "bg-gray-200 dark:bg-neutral-800 text-gray-700 dark:text-gray-300"}`}
+            className={`px-4 py-2 rounded-lg cursor-pointer border border-black dark:border-white hover:scale-105 transition-all font-semibold ${show === "old" ? "bg-emerald-600 text-white" : "bg-gray-200 dark:bg-neutral-800 text-gray-700 dark:text-gray-300"}`}
           >
             Used Products
           </button>
@@ -167,6 +169,7 @@ export default function StorePage() {
                     key={product._id}
                     product={product}
                     userRole="seller"
+                    onQuickView={() => setQuickViewProduct(product)}
                   />
                 ))}
               </div>
@@ -180,11 +183,17 @@ export default function StorePage() {
                   key={product._id}
                   product={product}
                   userRole="seller"
+                  onQuickView={() => setQuickViewProduct(product)}
                 />
               ))}
             </div>
           )}
         </div>
+        <QuickView
+          product={quickViewProduct}
+          isOpen={!!quickViewProduct}
+          onClose={() => setQuickViewProduct(null)}
+        />
       </div>
     </div>
   );

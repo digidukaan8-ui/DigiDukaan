@@ -6,7 +6,7 @@ import useLoaderStore from "../store/loader";
 import { toast } from "react-hot-toast";
 import useUsedProductStore from "../store/usedProduct";
 
-export default function UsedProductCard({ product, userRole = "buyer" }) {
+export default function UsedProductCard({ product, userRole = "buyer", onQuickView }) {
   const navigate = useNavigate();
   const { startLoading, stopLoading } = useLoaderStore();
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -60,17 +60,17 @@ export default function UsedProductCard({ product, userRole = "buyer" }) {
 
   const handleQuickView = (e) => {
     e.stopPropagation();
-    console.log("Quick view for:", product.title);
+    onQuickView();
   };
 
   return (
     <div
-      className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden flex flex-col w-full max-w-[320px] relative border border-gray-100 dark:border-neutral-800 transition-all duration-300 cursor-pointer group transform hover:-translate-y-2"
+      className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden flex flex-col w-full max-w-[320px] relative border border-black dark:border-white transition-all duration-300 cursor-pointer group transform hover:-translate-y-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleCardClick}
     >
-      <div className="relative w-full h-64 overflow-hidden">
+      <div className="relative w-full h-64 overflow-hidden border-b border-b-black dark:border-b-white">
         <div className="relative w-full h-full">
           <img
             src={product.img?.[0]?.url}
@@ -98,11 +98,10 @@ export default function UsedProductCard({ product, userRole = "buyer" }) {
             <div className="absolute top-4 right-4">
               <button
                 onClick={handleWishlistToggle}
-                className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${
-                  isWishlisted
+                className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${isWishlisted
                     ? 'bg-red-500 text-white'
                     : 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'
-                }`}
+                  }`}
               >
                 <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`} />
               </button>
@@ -110,15 +109,13 @@ export default function UsedProductCard({ product, userRole = "buyer" }) {
           )}
 
           <div
-            className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end justify-center pb-6 transition-opacity duration-300 ${
-              isHovered ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end justify-center pb-6 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'
+              }`}
           >
             <button
               onClick={handleQuickView}
-              className={`bg-white/95 text-gray-800 px-4 py-2 rounded-full shadow-lg hover:bg-white transition-all duration-300 font-medium text-sm flex items-center gap-2 transform ${
-                isHovered ? 'translate-y-0' : 'translate-y-5'
-              }`}
+              className={`bg-white/95 text-gray-800 px-4 py-2 rounded-full shadow-lg hover:bg-white transition-all duration-300 font-medium text-sm flex items-center gap-2 transform ${isHovered ? 'translate-y-0' : 'translate-y-5'
+                }`}
             >
               <Eye size={16} />
               Quick View
@@ -155,7 +152,7 @@ export default function UsedProductCard({ product, userRole = "buyer" }) {
               </span>
             )}
           </div>
-          
+
           <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
             {product.title}
           </h3>
@@ -202,14 +199,14 @@ export default function UsedProductCard({ product, userRole = "buyer" }) {
             <div className="flex items-center gap-3">
               <button
                 onClick={handleEditClick}
-                className="flex cursor-pointer items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95"
+                className="flex cursor-pointer items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95 border"
               >
                 <Edit2 className="h-4 w-4" />
                 Edit
               </button>
               <button
                 onClick={handleDeleteClick}
-                className="flex cursor-pointer items-center gap-2 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95"
+                className="flex cursor-pointer items-center gap-2 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95 border"
               >
                 <Trash2 className="h-4 w-4" />
                 Delete

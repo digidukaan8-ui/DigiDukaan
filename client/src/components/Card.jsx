@@ -6,7 +6,7 @@ import useLoaderStore from "../store/loader";
 import { toast } from "react-hot-toast";
 import useProductStore from "../store/product";
 
-export default function Card({ product, userRole = "buyer" }) {
+export default function Card({ product, userRole = "buyer", onQuickView }) {
   const navigate = useNavigate();
   const { startLoading, stopLoading } = useLoaderStore();
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -79,16 +79,17 @@ export default function Card({ product, userRole = "buyer" }) {
 
   const handleQuickView = (e) => {
     e.stopPropagation();
+    onQuickView();
   };
 
   return (
     <div
-      className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden flex flex-col w-[300px] relative border border-gray-100 dark:border-neutral-800 transition-all duration-300 cursor-pointer group transform hover:-translate-y-2"
+      className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden flex flex-col w-[300px] relative border border-black dark:border-white transition-all duration-300 cursor-pointer group transform hover:-translate-y-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => handleCardClick(product)}
     >
-      <div className="relative w-full h-64 overflow-hidden">
+      <div className="relative w-full h-64 overflow-hidden border-b border-b-black dark:border-b-white">
         <div className="relative w-full h-full">
           <img
             src={product.img?.[0]?.url}
@@ -215,16 +216,16 @@ export default function Card({ product, userRole = "buyer" }) {
           {userRole === "seller" && (
             <div className="flex flex-col gap-2">
               <div className="flex w-full justify-around items-center gap-3">
-                <span className="px-3 py-1.5 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 shadow-sm border border-emerald-200 dark:border-emerald-800">
+                <span className="w-full cursor-auto text-center px-4 py-2.5 text-sm font-semibold rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 shadow-sm border border-emerald-200 dark:border-emerald-800">
                   Stock: {product.stock}
                 </span>
 
                 <span
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-full shadow-sm border 
+                  className={`w-full cursor-auto text-center px-4 py-2.5 text-sm font-semibold rounded-md shadow-sm border 
                   ${product.isAvailable
-                                  ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 border-green-200 dark:border-green-800"
-                                  : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800"
-                                }`}
+                      ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 border-green-200 dark:border-green-800"
+                      : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800"
+                    }`}
                 >
                   {product.isAvailable ? "Available" : "Not Available"}
                 </span>
@@ -248,7 +249,7 @@ export default function Card({ product, userRole = "buyer" }) {
               <div className="flex items-center gap-3">
                 <button
                   onClick={(e) => toggleAvailability(e, product._id, !product.isAvailable)}
-                  className={`flex items-center gap-2 px-4 py-2.5 border rounded-xl text-[11px] font-medium flex-1 justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 ${product.isAvailable
+                  className={`flex cursor-pointer items-center gap-2 px-4 py-2.5 border rounded-xl text-[11px] font-medium flex-1 justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 ${product.isAvailable
                     ? "bg-yellow-100 dark:bg-yellow-900/30 hover:bg-yellow-200 dark:hover:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400"
                     : "bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-700 dark:text-green-400"
                     }`}
@@ -257,7 +258,7 @@ export default function Card({ product, userRole = "buyer" }) {
                 </button>
                 <button
                   onClick={(e) => manageVariants(e, product)}
-                  className="flex items-center gap-2 bg-sky-100 dark:bg-sky-900/30 text-[11px] hover:bg-sky-200 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95 border"
+                  className="flex cursor-pointer items-center gap-2 bg-sky-100 dark:bg-sky-900/30 text-[11px] hover:bg-sky-200 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95 border"
                 >
                   Manage Variants
                 </button>

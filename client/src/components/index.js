@@ -10,5 +10,6 @@ import UsedProductForm from "./forms/UsedProducts";
 import ReviewForm from "./forms/ReviewForm";
 import DeliveryForm from "./forms/DeliveryForm";
 import ProductDetails from "./ProductDetails";
+import QuickView from "./QuickView";
 
-export { Header, Footer, Card, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, ProductDetails };
+export { Header, Footer, Card, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, ProductDetails, QuickView };
