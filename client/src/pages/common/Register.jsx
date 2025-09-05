@@ -29,12 +29,12 @@ const Register = () => {
     const result = await registerUser(finalData);
     if (result.success) {
       reset();
-      stopLoading();
       setTimeout(() => {
         navigate('/login')
         toast.success('Registered successfully!');
       }, 500);
     }
+    stopLoading();
   }
 
   return (

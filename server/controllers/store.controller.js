@@ -29,21 +29,18 @@ const createStore = async (req, res) => {
         }
 
         let imgData = null;
-        if (req.files && req.files.length > 0) {
-            const file = req.files[0];
+        if (req.files?.img && req.files.img.length > 0) {
+            const filePath = req.files.img[0].path;
 
-            const result = await uploadToCloudinary(file.path);
-            if (result) {
-                imgData = {
-                    url: result.secure_url,
-                    publicId: result.public_id
-                };
-            } else {
-                return res.status(501).json({
-                    success: false,
-                    message: 'Failed to upload Image'
-                });
+            const result = await uploadToCloudinary(filePath);
+            if (!result) {
+                return res.status(501).json({ success: false, message: "Failed to upload image" });
             }
+
+            imgData = {
+                url: result.secure_url,
+                publicId: result.public_id,
+            };
         }
 
         const store = new Store({
