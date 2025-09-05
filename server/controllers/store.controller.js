@@ -29,15 +29,20 @@ const createStore = async (req, res) => {
         }
 
         let imgData = null;
-        if (req.file) {
-            const result = await uploadToCloudinary(req.file.path);
+        if (req.files && req.files.length > 0) {
+            const file = req.files[0];
+
+            const result = await uploadToCloudinary(file.path);
             if (result) {
                 imgData = {
                     url: result.secure_url,
                     publicId: result.public_id
                 };
             } else {
-                return res.status(501).json({ success: false, message: 'Failed to upload Image' });
+                return res.status(501).json({
+                    success: false,
+                    message: 'Failed to upload Image'
+                });
             }
         }
 
@@ -182,7 +187,7 @@ const updateDeliveryZone = async (req, res) => {
 const removeDeliveryZone = async (req, res) => {
     try {
         const { zoneId } = req.params;
-        const result = await DeliveryZone.findByIdAndDelete(zoneId );
+        const result = await DeliveryZone.findByIdAndDelete(zoneId);
 
         if (!result) {
             return res.status(404).json({ success: false, message: 'Delivery Zone not found' });

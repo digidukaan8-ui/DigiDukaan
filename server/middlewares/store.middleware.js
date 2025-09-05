@@ -42,7 +42,7 @@ const handleCreateStore = async (req, res, next) => {
             return res.status(400).json({ success: false, message: "Addresses must be a non-empty array" });
         }
 
-        if (!req.file) {
+        if (!req.files?.img || req.files.img.length === 0) {
             return res.status(400).json({ success: false, message: "Image is required" });
         }
 
