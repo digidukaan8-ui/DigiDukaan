@@ -8,6 +8,9 @@ export default function Loader() {
 
   const messages = {
     login: "Logging in...",
+    sendOTP: "Sending OTP...",
+    verifyOTP: "Verifying OTP...",
+    resetPassword: "Reseting Password...",
     logout: "Logging out...",
     register: "Creating your account...",
     store: "Creating your store...",
@@ -29,6 +32,9 @@ export default function Loader() {
 
   const colors = {
     login: "text-blue-500",
+    sendOTP: "text-blue-500",
+    verifyOTP: "text-blue-500",
+    resetPassword: "text-blue-500",
     logout: "text-cyan-500",
     register: "text-green-500",
     store: "text-cyan-500",

@@ -85,9 +85,9 @@ const logoutUser = async () => {
     }
 }
 
-const getOtp = async (email) => {
+const sendOtp = async (email) => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/getotp', {
+        const response = await fetch('http://localhost:3000/api/users/send-otp', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -101,14 +101,14 @@ const getOtp = async (email) => {
         }
         return data;
     } catch (error) {
-        console.error("Error get otp: ", error);
+        console.error("Error in get otp: ", error);
         throw error;
     }
 }
 
 const verifyOtp = async (data) => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/verifyotp', {
+        const response = await fetch('http://localhost:3000/api/users/verify-otp', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -122,14 +122,14 @@ const verifyOtp = async (data) => {
         }
         return result;
     } catch (error) {
-        console.error("Error verify otp: ", error);
+        console.error("Error in verify otp: ", error);
         throw error;
     }
 }
 
-const setNewPass = async (data) => {
+const resetPassword = async (data) => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/setnewpass', {
+        const response = await fetch('http://localhost:3000/api/users/reset-password', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -148,4 +148,4 @@ const setNewPass = async (data) => {
     }
 }
 
-export { registerUser, loginUser, logoutUser, getOtp, verifyOtp, setNewPass };
+export { registerUser, loginUser, logoutUser, sendOtp, verifyOtp, resetPassword };
