@@ -168,6 +168,32 @@ const removeProduct = async (productId) => {
     }
 }
 
+const changeAvailability = async (productId, available) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/sellers/products/${productId}/availability`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ isAvailable: available })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            logoutHelper(data.message);
+            toast.error(data.message || "Failed to change availability");
+            throw new Error(data.message || "Failed to change availability");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error in Changing Availability: ", error);
+        throw error;
+    }
+}
+
 const addUsedProduct = async (data) => {
     try {
         const formData = new FormData();
@@ -340,4 +366,4 @@ const removeUsedProduct = async (productId) => {
     }
 }
 
-export { addProduct, getProduct, updateProduct, removeProduct, addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct };
+export { addProduct, getProduct, updateProduct, removeProduct, changeAvailability, addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct };

@@ -226,6 +226,28 @@ const removeProduct = async (req, res) => {
     }
 }
 
+const changeAvailability = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const { isAvailable } = req.body;
+
+    const product = await Product.findByIdAndUpdate(
+      productId,
+      { isAvailable },
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    return res.status(200).json({ success: true, message: 'Product availability updated successfully', data: product });
+  } catch (error) {
+    console.error('Error in changing availability: ', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
 const addUsedProduct = async (req, res) => {
     try {
         let { title, description, category, subCategory, price, condition, brand, delivery, isNegotiable, billAvailable, attributes, tags, discount } = req.body;
@@ -445,4 +467,4 @@ const removeUsedProduct = async (req, res) => {
     }
 }
 
-export { addProduct, getProduct, updateProduct, removeProduct, addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct };
+export { addProduct, getProduct, updateProduct, removeProduct, changeAvailability, addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct };
