@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 const useProductStore = create(
     persist(
-        (set) => ({
+        (set, get) => ({
             products: [],
 
             addProduct: (product) =>
@@ -15,6 +15,10 @@ const useProductStore = create(
                         p._id === updatedProduct._id ? updatedProduct : p
                     ),
                 })),
+
+            getProduct: (id) => {
+                return get().products.find((p) => p._id === id);
+            },
 
             removeProduct: (productId) =>
                 set((state) => ({

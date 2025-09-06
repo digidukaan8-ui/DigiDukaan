@@ -23,7 +23,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
   const discountValue = product.discount?.percentage || product.discount?.amount;
   const discountType = product.discount?.percentage ? "%" : "₹";
 
-  const handleCardClick = () => navigate("/used-product-detail", { state: { product } });
+  const handleCardClick = () => navigate(`/used-product?productId=${product._id}`);
 
   const handleWishlistToggle = (e) => {
     e.stopPropagation();
@@ -88,8 +88,9 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
           <div className="absolute top-4 left-4">
             {hasDiscount && (
-              <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
-                -{discountValue}{discountType} OFF
+              <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
+                -{discountType === "₹" && "₹"}{discountValue}
+                {discountType === "%" && "%"} OFF
               </span>
             )}
           </div>
@@ -99,8 +100,8 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
               <button
                 onClick={handleWishlistToggle}
                 className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${isWishlisted
-                    ? 'bg-red-500 text-white'
-                    : 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'
+                  ? 'bg-red-500 text-white'
+                  : 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'
                   }`}
               >
                 <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`} />

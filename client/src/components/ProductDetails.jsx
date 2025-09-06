@@ -1,29 +1,35 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Share2, Star, ShoppingCart, ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import { Heart, Share2, Star, ShoppingCart, ChevronLeft, ChevronRight, Play, Edit, Trash2 } from 'lucide-react';
+import useAuthStore from '../store/auth';
+import useProductStore from '../store/product';
+import { useNavigate } from 'react-router-dom';
+import useLoaderStore from '../store/loader';
+import { removeProduct, changeAvailability } from '../api/product';
+import { toast } from 'react-hot-toast';
 
-export default function ProductDetail({ product }) {
+const ProductDetail = ({ id }) => {
+  const navigate = useNavigate();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isLiked, setIsLiked] = useState(false);
-  const [addedToCart, setAddedToCart] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const { user } = useAuthStore();
+  const { startLoading, stopLoading } = useLoaderStore();
+  const product = useProductStore.getState().getProduct(id);
 
-  // Fallback if no product is passed
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-neutral-900">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-neutral-950">
+        <div className="text-center p-6">
+          <div className="w-16 h-16 bg-red-500 rounded-full mx-auto mb-4 flex items-center justify-center">
             <ShoppingCart className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-xl font-bold text-gray-700 dark:text-gray-300 mb-2">Product Not Found</h2>
-          <p className="text-gray-500 dark:text-gray-400">The product you're looking for doesn't exist.</p>
-        </motion.div>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+            Product Not Found
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400">
+            The product you're looking for doesn't exist.
+          </p>
+        </div>
       </div>
     );
   }
@@ -40,398 +46,352 @@ export default function ProductDetail({ product }) {
     video,
     tags,
     deliveryCharge,
+    category,
+    subCategory,
+    rating,
+    isAvailable,
   } = product;
 
-  const finalPrice = discount?.type === "percentage"
-    ? price - (price * discount.value) / 100
-    : discount?.type === "amount"
-    ? price - discount.value
+  const hasDiscount = discount?.percentage || discount?.amount;
+  const finalPrice = hasDiscount
+    ? discount?.percentage
+      ? price - (price * discount.percentage) / 100
+      : price - discount.amount
     : price;
+  const discountValue = product.discount?.percentage || product.discount?.amount;
+  const discountType = product.discount?.percentage ? "%" : "₹";
 
-  const savings = price - finalPrice;
-
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePosition({
-      x: (e.clientX - rect.left) / rect.width,
-      y: (e.clientY - rect.top) / rect.height
-    });
-  };
-
-  const nextImage = () => {
-    if (img && img.length > 0) {
-      setSelectedImageIndex((prev) => (prev + 1) % img.length);
-    }
-  };
-
-  const prevImage = () => {
-    if (img && img.length > 0) {
-      setSelectedImageIndex((prev) => (prev - 1 + img.length) % img.length);
-    }
-  };
+  const nextImage = () => setSelectedImageIndex((prev) => (prev + 1) % img.length);
+  const prevImage = () => setSelectedImageIndex((prev) => (prev - 1 + img.length) % img.length);
 
   const handleAddToCart = () => {
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
+    if (stock === 0) {
+      alert("Out of stock!");
+      return;
+    }
+    alert("Added to cart!");
+  };
+
+  const handleUpdateDetails = (product) => {
+    navigate("/seller/new-product", { state: { initialData: product } });
+  };
+
+  const handleToggleAvailability = async (id, available) => {
+    startLoading("changeAval");
+    try {
+      const result = await changeAvailability(id, available);
+      if (result.success) {
+        useProductStore.getState().updateProduct(result.data);
+        toast.success("Availability changed successfully");
+      }
+    } finally {
+      stopLoading();
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (confirm("Are you sure you want to delete this product?")) {
+      startLoading("removeProduct");
+      try {
+        const result = await removeProduct(id);
+        if (result.success) {
+          useProductStore.getState().removeProduct(id);
+          toast.success("Product removed successfully");
+        }
+      } finally {
+        stopLoading();
+      }
+    }
+  };
+
+  const handleManageVariant = () => {
+    alert("Add new variant");
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-neutral-900 pt-20">
-      <div className="fixed inset-0 bg-gradient-to-br from-gray-100/30 to-blue-50/20 dark:from-neutral-800/20 dark:to-neutral-700/10 pointer-events-none"></div>
-      
-      <div className="relative z-10 pt-16 pb-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-12"
-          >
-            <div className="space-y-4">
-              <div className="relative group">
-                <motion.div
-                  className="relative bg-gray-100 dark:bg-neutral-800 rounded-2xl shadow-lg border border-gray-200/50 dark:border-neutral-700/50 overflow-hidden"
-                  onMouseMove={handleMouseMove}
-                  whileHover={{ scale: 1.01 }}
-                  transition={{ type: "spring", stiffness: 400 }}
-                  style={{
-                    width: '100%',
-                  }}
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-30 pb-10">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10">
+          <div className="flex flex-col">
+            <div className="relative w-full max-w-2xl mx-auto rounded-lg overflow-hidden shadow-md mb-4 flex items-center justify-center">
+              {video ? (
+                <video
+                  src={typeof video === 'string' ? video : video.url}
+                  controls
+                  className="w-full h-auto object-contain max-h-[70vh]"
+                />
+              ) : (
+                <img
+                  src={img?.[selectedImageIndex]?.url}
+                  alt={title}
+                  className="w-full h-auto object-contain max-h-[70vh]"
+                />
+              )}
+
+              {img && img.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/70 dark:bg-neutral-900/70 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-colors z-10"
+                  >
+                    <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/70 dark:bg-neutral-900/70 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-colors z-10"
+                  >
+                    <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            <div className="flex justify-start w-full max-w-2xl mx-auto overflow-x-auto gap-2 px-2">
+              {img?.map((image, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedImageIndex(idx)}
+                  className={`w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-md overflow-hidden border-2 transition-transform hover:scale-105 ${selectedImageIndex === idx
+                    ? 'border-sky-500 ring-2 ring-sky-500'
+                    : 'border-gray-300 dark:border-neutral-700'
+                    }`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5 z-10"></div>
-                  
-                  {video ? (
-                    <video
-                      src={typeof video === "string" ? video : video.url}
-                      controls
-                      className="w-full h-full object-contain relative z-20"
-                      style={{
-                        transform: `translate(${mousePosition.x * 3}px, ${mousePosition.y * 3}px)`
-                      }}
-                    />
-                  ) : (
-                    <motion.img
-                      key={selectedImageIndex}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.4 }}
-                      src={img?.[selectedImageIndex]?.url}
-                      alt={title}
-                      className="w-full h-full object-contain relative z-20"
-                      style={{
-                        transform: `translate(${mousePosition.x * 5}px, ${mousePosition.y * 5}px)`
-                      }}
-                    />
-                  )}
-
-                  {img && img.length > 1 && (
-                    <>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={prevImage}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 dark:bg-neutral-700/90 rounded-full shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30"
-                      >
-                        <ChevronLeft className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={nextImage}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 dark:bg-neutral-700/90 rounded-full shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30"
-                      >
-                        <ChevronRight className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-                      </motion.button>
-                    </>
-                  )}
-
-                  {discount?.value && (
-                    <motion.div
-                      initial={{ scale: 0, rotate: -90 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-                      className="absolute top-4 right-4 z-30"
-                    >
-                      <div className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
-                        {discount.type === "percentage" ? `${discount.value}% OFF` : `₹${discount.value} OFF`}
-                      </div>
-                    </motion.div>
-                  )}
-                </motion.div>
-
-                <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
-                  {img?.map((image, idx) => (
-                    <motion.button
-                      key={idx}
-                      whileHover={{ scale: 1.03, y: -1 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setSelectedImageIndex(idx)}
-                      className={`flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
-                        selectedImageIndex === idx 
-                          ? 'border-blue-500 shadow-md' 
-                          : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300'
-                      }`}
-                      style={{
-                        width: '64px',
-                        height: '64px'
-                      }}
-                    >
-                      <img
-                        src={image?.url}
-                        alt={`Preview ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </motion.button>
-                  ))}
-                  {video && (
-                    <motion.div 
-                      whileHover={{ scale: 1.03, y: -1 }}
-                      className="flex-shrink-0 bg-black flex items-center justify-center border-2 border-gray-200 dark:border-neutral-700 cursor-pointer rounded-lg"
-                      style={{
-                        width: '64px',
-                        height: '64px'
-                      }}
-                    >
-                      <Play className="w-4 h-4 text-white" />
-                    </motion.div>
-                  )}
+                  <img
+                    src={image?.url}
+                    alt={`Preview ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+              {video && (
+                <div
+                  className="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 bg-white dark:bg-neutral-900 flex items-center justify-center rounded-md border-2 border-gray-300 dark:border-neutral-700 cursor-pointer transition-transform hover:scale-105"
+                  onClick={() => setSelectedImageIndex(-1)}
+                >
+                  <Play className="w-5 h-5 md:w-6 md:h-6 text-gray-500" />
                 </div>
+              )}
+            </div>
+          </div>
+
+          <div className="lg:pr-10 space-y-5">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-1">
+                {title}
+              </h1>
+
+              <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 md:w-5 md:h-5 ${i < Math.round(rating || 0)
+                        ? 'text-yellow-400 fill-yellow-400'
+                        : 'text-gray-300 dark:text-neutral-600'
+                        }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm text-sky-600 dark:text-sky-400">
+                  {rating || '0'} ratings
+                </span>
+                {user.role === "seller" && (
+                  <>
+                    <span
+                      className={`px-2 py-0.5 text-xs font-semibold rounded-full border border-black dark:border-white ${stock > 10
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-200'
+                        : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200'
+                        }`}
+                    >
+                      Stock: {stock}
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 text-xs font-semibold rounded-full border border-black dark:border-white ${isAvailable
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-200'
+                        : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200'
+                        }`}
+                    >
+                      {isAvailable ? 'Available' : 'Not Available'}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="space-y-6"
-            >
-              <div>
-                <motion.div
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="flex items-center gap-3 mb-2"
-                >
-                  {brand && (
-                    <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-full border border-blue-200/50 dark:border-blue-700/50">
-                      {brand}
-                    </span>
-                  )}
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.3 + i * 0.05 }}
-                      >
-                        <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                      </motion.div>
-                    ))}
-                    <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">(4.8)</span>
-                  </div>
-                </motion.div>
-
-                <motion.h1
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.25 }}
-                  className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white leading-tight"
-                >
-                  {title}
-                </motion.h1>
-              </div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-gray-50 dark:bg-neutral-800 rounded-2xl p-6 border border-gray-200/50 dark:border-neutral-700/50"
-              >
-                <div className="flex items-end gap-3 mb-2">
-                  <span className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    ₹{finalPrice.toLocaleString()}
-                  </span>
-                  {finalPrice !== price && (
-                    <span className="text-xl text-gray-400 line-through">
-                      ₹{price.toLocaleString()}
-                    </span>
-                  )}
-                </div>
-                {savings > 0 && (
-                  <motion.p
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.4, type: "spring" }}
-                    className="text-green-600 dark:text-green-400 font-semibold mb-2 text-sm"
-                  >
-                    You save ₹{savings.toLocaleString()}!
-                  </motion.p>
-                )}
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  {deliveryCharge > 0 
-                    ? `+ Delivery ₹${deliveryCharge}` 
-                    : "🚚 Free Delivery"}
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-              >
-                <h3 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
-                  About this product
-                </h3>
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm">
-                  {description}
-                </p>
-              </motion.div>
-
-              {attributes && attributes.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <h3 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
-                    Specifications
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {attributes.map((attr, idx) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, x: -15 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.6 + idx * 0.05 }}
-                        className="flex justify-between items-center bg-gray-50 dark:bg-neutral-800 px-3 py-2 rounded-lg border border-gray-200/50 dark:border-neutral-700/50"
-                      >
-                        <span className="text-gray-600 dark:text-gray-400 text-xs">{attr.key}</span>
-                        <span className="font-semibold text-gray-900 dark:text-white text-xs">{attr.value}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
+            <div className="border-y border-gray-200 dark:border-neutral-800 py-4 space-y-4">
+              {hasDiscount && (
+                <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
+                  -{discountType === "₹" && "₹"}{discountValue}
+                  {discountType === "%" && "%"} OFF
+                </span>
               )}
+              <div className="flex items-baseline gap-2 mt-2">
+                <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">₹{finalPrice.toFixed(2)}</span>
+                {hasDiscount && (
+                  <span className="line-through text-gray-500 dark:text-gray-400 text-base">₹{price.toFixed(2)}</span>
+                )}
+                {hasDiscount && (
+                  <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">Save ₹{(price - finalPrice).toFixed(2)}</span>
+                )}
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {deliveryCharge > 0 ? `+ ₹${deliveryCharge.toLocaleString()} delivery charge` : 'Free Delivery'}
+              </p>
+            </div>
 
-              {tags && tags.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="flex flex-wrap gap-2"
-                >
-                  {tags.map((tag, idx) => (
-                    <motion.span
+            <div>
+              <h2 className="text-lg md:text-xl font-bold mb-2">About this item</h2>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                {description}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 mb-1 text-sm md:text-base text-white-600 dark:text-white">
+              {brand && <span className='bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-md px-4 py-2'>Brand: <span className="font-semibold text-gray-800 dark:text-gray-200">{brand}</span></span>}
+              {category?.name && <span className='bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-md px-4 py-2'>Category: <span className="font-semibold text-gray-800 dark:text-gray-200">{category.name}</span></span>}
+              {subCategory?.name && <span className='bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-md px-4 py-2'>Sub-Category: <span className="font-semibold text-gray-800 dark:text-gray-200">{subCategory.name}</span></span>}
+            </div>
+
+            {attributes && attributes.length > 0 && (
+              <div>
+                <h2 className="text-lg md:text-xl font-bold mb-2">Specifications</h2>
+                <div className="flex flex-wrap gap-2">
+                  {attributes.map((attr, idx) => (
+                    <div
                       key={idx}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.7 + idx * 0.05 }}
-                      className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs font-medium border border-blue-200/30 dark:border-blue-700/30"
+                      className="flex items-center gap-1 bg-white dark:bg-neutral-900 px-3 py-1.5 rounded-md border border-black dark:border-white"
+                    >
+                      <span className="text-xs text-gray-600 dark:text-gray-400">{attr.key}:</span>
+                      <span className="text-xs font-semibold">{attr.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {tags && tags.length > 0 && (
+              <div>
+                <h2 className="text-lg md:text-xl font-bold mb-2">Tags</h2>
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-1 bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300 rounded-full text-xs border border-black dark:border-white"
                     >
                       #{tag}
-                    </motion.span>
+                    </span>
                   ))}
-                </motion.div>
-              )}
+                </div>
+              </div>
+            )}
 
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className={`flex items-center gap-2 font-semibold text-sm ${
-                  stock > 0 ? "text-green-600" : "text-red-500"
-                }`}
-              >
-                <div className={`w-2 h-2 rounded-full ${stock > 0 ? "bg-green-500" : "bg-red-500"} animate-pulse`}></div>
-                {stock > 0 ? `In Stock (${stock} available)` : "Out of Stock"}
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-                className="space-y-4"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-700 dark:text-gray-300 font-medium text-sm">Quantity:</span>
+            {user.role === "buyer" && (
+              <div className="border-y border-gray-200 dark:border-neutral-800 py-4 space-y-4">
+                <div className="flex items-center justify-around w-[300px] gap-5">
+                  <span className="font-medium text-sm md:text-base">Quantity:</span>
                   <div className="flex items-center gap-2">
-                    <motion.button
-                      whileTap={{ scale: 0.9 }}
+                    <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-8 h-8 rounded-full bg-gray-100 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all text-sm"
+                      className="w-8 h-8 cursor-pointer rounded-full bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-300 flex items-center justify-center text-sm font-medium hover:bg-gray-300 dark:hover:bg-neutral-800 transition-colors border border-black dark:border-white"
                     >
                       -
-                    </motion.button>
-                    <span className="w-10 text-center font-semibold text-sm">{quantity}</span>
-                    <motion.button
-                      whileTap={{ scale: 0.9 }}
+                    </button>
+                    <span className="w-8 text-center text-sm font-semibold">{quantity}</span>
+                    <button
                       onClick={() => setQuantity(Math.min(stock, quantity + 1))}
-                      className="w-8 h-8 rounded-full bg-gray-100 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all text-sm"
+                      className="w-8 h-8 cursor-pointer rounded-full bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-300 flex items-center justify-center text-sm font-medium hover:bg-gray-300 dark:hover:bg-neutral-800 transition-colors border border-black dark:border-white"
                     >
                       +
-                    </motion.button>
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <motion.button
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleAddToCart}
-                    disabled={stock === 0}
-                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${
-                      addedToCart
-                        ? 'bg-green-500 text-white'
-                        : stock === 0
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-md hover:shadow-lg'
-                    }`}
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                    {addedToCart ? 'Added to Cart!' : 'Add to Cart'}
-                  </motion.button>
+                <div className="flex flex-col justify-center items-center sm:items-baseline gap-5">
+                  <div className='flex flex-col justify-between items-center gap-3 w-[300px]'>
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={stock === 0 || !isAvailable}
+                      className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
+                    ${stock === 0 || !isAvailable
+                          ? "bg-gray-400 text-gray-600 dark:bg-neutral-900 dark:text-gray-400 cursor-not-allowed"
+                          : "bg-sky-500 text-white hover:bg-sky-600"}`}
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      Add to Cart
+                    </button>
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={stock === 0 || !isAvailable}
+                      className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
+                    ${stock === 0 || !isAvailable
+                          ? "bg-gray-400 text-gray-600 dark:bg-neutral-900 dark:text-gray-400 cursor-not-allowed"
+                          : "bg-sky-500 text-white hover:bg-sky-600"}`}
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      Buy Now
+                    </button>
+                  </div>
 
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setIsLiked(!isLiked)}
-                    className={`p-3 rounded-xl border-2 transition-all duration-300 ${
-                      isLiked
-                        ? 'bg-red-50 border-red-200 text-red-500'
-                        : 'bg-gray-100 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-700'
-                    }`}
-                  >
-                    <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
-                  </motion.button>
+                  <div className='flex justify-center items-center gap-3 w-[300px]'>
+                    <button
+                      onClick={() => setIsLiked(!isLiked)}
+                      className={`w-10 h-10 flex items-center justify-center cursor-pointer rounded-full border border-black dark:border-white transition-colors
+                      ${isLiked
+                          ? "bg-red-100 text-red-500 dark:bg-red-900/20 dark:text-red-400"
+                          : "bg-gray-100 text-gray-600 dark:bg-neutral-900 dark:text-gray-300 hover:bg-white dark:hover:bg-neutral-900"
+                        }`}
+                    >
+                      <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
+                    </button>
 
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-3 rounded-xl bg-gray-100 dark:bg-neutral-800 border-2 border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </motion.button>
+                    <button
+                      className="w-10 h-10 flex items-center justify-center cursor-pointer rounded-full bg-gray-100 text-gray-600 dark:bg-neutral-900 border border-black dark:border-white dark:text-gray-300 hover:bg-white dark:hover:bg-neutral-900"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-              </motion.div>
-            </motion.div>
-          </motion.div>
+              </div>
+            )}
+
+            {user.role === "seller" && (
+              <div className="flex flex-wrap justify-center items-center gap-3 mt-4">
+                <button
+                  onClick={() => handleUpdateDetails(product)}
+                  className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-sky-600 text-white font-semibold text-sm transition-all hover:bg-sky-700 border border-black dark:border-white"
+                >
+                  <Edit className="w-4 h-4" />
+                  Edit Product
+                </button>
+                <button
+                  onClick={() => handleToggleAvailability(product._id, !product.isAvailable)}
+                  className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 font-semibold text-sm transition-all border border-black dark:border-white ${isAvailable
+                    ? 'bg-red-600 text-white hover:bg-red-700'
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                    }`}
+                >
+                  {isAvailable ? 'Mark Unavailable' : 'Mark Available'}
+                </button>
+                <button
+                  onClick={handleManageVariant}
+                  className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-purple-600 text-white font-semibold text-sm transition-all hover:bg-purple-700 border border-black dark:border-white"
+                >
+                  Manage Variant
+                </button>
+                <button
+                  onClick={() => handleDelete(product._id)}
+                  className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-red-600 text-white font-semibold text-sm transition-all hover:bg-red-700 border border-black dark:border-white"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete Product
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      <AnimatePresence>
-        {addedToCart && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 0.8 }}
-            className="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-2 rounded-xl shadow-lg flex items-center gap-2 font-semibold text-sm z-50"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            Added to Cart!
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
+
+export default ProductDetail;

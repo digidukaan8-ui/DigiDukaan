@@ -23,11 +23,11 @@ export default function QuickView({ product, isOpen, onClose }) {
         </button>
 
         <div className="grid md:grid-cols-2 gap-6 p-6">
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center h-60">
             <img
               src={product.img?.[0]?.url}
               alt={product.title}
-              className="w-full object-contain rounded-lg border border-black dark:border-white"
+              className="w-full h-50 object-cover rounded-lg border border-black dark:border-white"
             />
           </div>
 

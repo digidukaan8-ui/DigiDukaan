@@ -1,4 +1,4 @@
-import { ShoppingCart, Star, Edit2, Trash2, Eye, Heart, Truck, Tag, PlusCircle } from "lucide-react";
+import { ShoppingCart, Star, Edit2, Trash2, Eye, Heart, Truck, Tag } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { removeProduct, changeAvailability } from "../api/product";
@@ -25,7 +25,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
   const discountType = product.discount?.percentage ? "%" : "₹";
 
   const handleCardClick = (product) => {
-    navigate("/product-detail", { state: { product } });
+    navigate(`/product?productId=${product._id}`);
   };
 
   const handleWishlistToggle = (e) => {
@@ -105,9 +105,9 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
           )}
           <div className="absolute top-4 left-4 flex flex-col gap-2">
             {hasDiscount && (
-              <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
-                -{discountValue}
-                {discountType} OFF
+              <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
+                -{discountType === "₹" && "₹"}{discountValue}
+                {discountType === "%" && "%"} OFF
               </span>
             )}
             {product.stock <= 0 && (

@@ -10,7 +10,8 @@ import Support from "./common/Support";
 import Logout from "./common/Logout";
 import Store from "./seller/Store";
 import Product from "./common/Product";
+import UsedProduct from "./common/UsedProduct";
 
 export {
-    Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product
+    Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct
 };

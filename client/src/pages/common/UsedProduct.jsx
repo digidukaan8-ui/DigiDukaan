@@ -1,15 +1,15 @@
 import { useSearchParams } from "react-router-dom";
-import { ProductDetails } from "../../components";
+import { UsedProductDetails } from "../../components";
 
-function Product() {
+function UsedProduct() {
   const [searchParams] = useSearchParams();
   const productId = searchParams.get("productId");
 
   return (
     <>
-      <ProductDetails id={productId} />
+      <UsedProductDetails id={productId} />
     </>
   );
 }
 
-export default Product;
+export default UsedProduct;
