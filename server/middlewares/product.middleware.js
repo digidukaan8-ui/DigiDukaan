@@ -242,30 +242,38 @@ const handleAddUsedProduct = async (req, res, next) => {
         if (delivery) {
             const { type, pickupLocation, shippingLocations } = delivery;
 
-            if (!type || typeof type !== "string") return res.status(400).json({ success: false, message: "Invalid delivery type" });
-
-            if (!pickupLocation || typeof pickupLocation !== "object") {
-                return res.status(400).json({ success: false, message: "Invalid pickupLocation" });
+            if ((!shippingLocations || shippingLocations.length === 0) && !pickupLocation) {
+                return res.status(400).json({ success: false, message: "Either pickupLocation or shippingLocations is required" });
             }
 
-            const { address, city, state, pincode } = pickupLocation;
-            if (!address || !city || !state || !pincode) {
-                return res.status(400).json({ success: false, message: "Invalid pickupLocation details" });
+            if (!type || typeof type !== "string") {
+                return res.status(400).json({ success: false, message: "Invalid delivery type" });
             }
 
-            if (!Array.isArray(shippingLocations)) {
-                return res.status(400).json({ success: false, message: "Invalid shippingLocations" });
-            }
-
-            for (const loc of shippingLocations) {
-                if (
-                    !loc.shippingArea || typeof loc.shippingArea !== "string" ||
-                    !loc.areaName || typeof loc.areaName !== "string" ||
-                    loc.shippingCharge == null || isNaN(Number(loc.shippingCharge))
-                ) {
-                    return res.status(400).json({ success: false, message: "Invalid shipping location details" });
+            if (pickupLocation) {
+                if (typeof pickupLocation !== "object") {
+                    return res.status(400).json({ success: false, message: "Invalid pickupLocation" });
                 }
-                loc.shippingCharge = Number(loc.shippingCharge);
+
+                const { address, city, state, pincode } = pickupLocation;
+                if (!address || !city || !state || !pincode) {
+                    return res.status(400).json({ success: false, message: "Invalid pickupLocation details" });
+                }
+            }
+
+            if (shippingLocations && Array.isArray(shippingLocations)) {
+                for (const loc of shippingLocations) {
+                    if (
+                        !loc.shippingArea || typeof loc.shippingArea !== "string" ||
+                        !loc.areaName || typeof loc.areaName !== "string" ||
+                        loc.shippingCharge == null || isNaN(Number(loc.shippingCharge))
+                    ) {
+                        return res.status(400).json({ success: false, message: "Invalid shipping location details" });
+                    }
+                    loc.shippingCharge = Number(loc.shippingCharge);
+                }
+            } else if (shippingLocations) {
+                return res.status(400).json({ success: false, message: "Invalid shippingLocations format" });
             }
         }
 
@@ -340,30 +348,38 @@ const handleUpdateUsedProduct = async (req, res, next) => {
         if (delivery) {
             const { type, pickupLocation, shippingLocations } = delivery;
 
-            if (!type || typeof type !== "string") return res.status(400).json({ success: false, message: "Invalid delivery type" });
-
-            if (!pickupLocation || typeof pickupLocation !== "object") {
-                return res.status(400).json({ success: false, message: "Invalid pickupLocation" });
+            if ((!shippingLocations || shippingLocations.length === 0) && !pickupLocation) {
+                return res.status(400).json({ success: false, message: "Either pickupLocation or shippingLocations is required" });
             }
 
-            const { address, city, state, pincode } = pickupLocation;
-            if (!address || !city || !state || !pincode) {
-                return res.status(400).json({ success: false, message: "Invalid pickupLocation details" });
+            if (!type || typeof type !== "string") {
+                return res.status(400).json({ success: false, message: "Invalid delivery type" });
             }
 
-            if (!Array.isArray(shippingLocations)) {
-                return res.status(400).json({ success: false, message: "Invalid shippingLocations" });
-            }
-
-            for (const loc of shippingLocations) {
-                if (
-                    !loc.shippingArea || typeof loc.shippingArea !== "string" ||
-                    !loc.areaName || typeof loc.areaName !== "string" ||
-                    loc.shippingCharge == null || isNaN(Number(loc.shippingCharge))
-                ) {
-                    return res.status(400).json({ success: false, message: "Invalid shipping location details" });
+            if (pickupLocation) {
+                if (typeof pickupLocation !== "object") {
+                    return res.status(400).json({ success: false, message: "Invalid pickupLocation" });
                 }
-                loc.shippingCharge = Number(loc.shippingCharge);
+
+                const { address, city, state, pincode } = pickupLocation;
+                if (!address || !city || !state || !pincode) {
+                    return res.status(400).json({ success: false, message: "Invalid pickupLocation details" });
+                }
+            }
+
+            if (shippingLocations && Array.isArray(shippingLocations)) {
+                for (const loc of shippingLocations) {
+                    if (
+                        !loc.shippingArea || typeof loc.shippingArea !== "string" ||
+                        !loc.areaName || typeof loc.areaName !== "string" ||
+                        loc.shippingCharge == null || isNaN(Number(loc.shippingCharge))
+                    ) {
+                        return res.status(400).json({ success: false, message: "Invalid shipping location details" });
+                    }
+                    loc.shippingCharge = Number(loc.shippingCharge);
+                }
+            } else if (shippingLocations) {
+                return res.status(400).json({ success: false, message: "Invalid shippingLocations format" });
             }
         }
 

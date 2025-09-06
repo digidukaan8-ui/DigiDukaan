@@ -162,8 +162,8 @@ export default function UsedProductForm() {
 
     const delivery = {
       type: data.deliveryType,
-      pickupLocation: data.pickupLocation,
-      shippingLocations: data.shippingLocations || [],
+      pickupLocation: data.pickupLocation || null,
+      shippingLocations: (data.shippingLocations[0].areaName !== "" && data.shippingLocations[0].shippingCharge !== 0) ? data.shippingLocations : [],
     };
 
     const discount = {
