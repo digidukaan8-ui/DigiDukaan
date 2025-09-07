@@ -4,9 +4,12 @@ import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
 import useLoaderStore from '../../store/loader.js'
+import { Recaptcha } from '../../components/index.js'
+import { useState } from 'react'
 
 const Register = () => {
   const { startLoading, stopLoading } = useLoaderStore();
+  const [captchaToken, setCaptchaToken] = useState("");
   const navigate = useNavigate();
   const {
     register,
@@ -16,25 +19,37 @@ const Register = () => {
     formState: { errors }
   } = useForm()
 
-  const password = watch('password')
+  const password = watch('password');
+
+  const handleCaptchaVerify = (token) => {
+    setCaptchaToken(token);
+  };
 
   const onSubmit = async (data) => {
     startLoading('register');
     const { confirmPassword, ...cleanData } = data;
+    if (!captchaToken) {
+      toast.error("Please complete the captcha");
+      return;
+    }
 
     const finalData = {
       ...cleanData,
-      mobile: `+91${cleanData.mobile}`
+      mobile: `+91${cleanData.mobile}`,
+      captchaToken
     };
-    const result = await registerUser(finalData);
-    if (result.success) {
-      reset();
-      setTimeout(() => {
-        navigate('/login')
-        toast.success('Registered successfully!');
-      }, 500);
+    try {
+      const result = await registerUser(finalData);
+      if (result.success) {
+        reset();
+        setTimeout(() => {
+          navigate('/login')
+          toast.success('Registered successfully!');
+        }, 500);
+      }
+    } finally {
+      stopLoading();
     }
-    stopLoading();
   }
 
   return (
@@ -183,6 +198,10 @@ const Register = () => {
             />
           </div>
           {errors.mobile && <p className="text-red-500 text-sm">{errors.mobile.message}</p>}
+        </div>
+
+        <div className='flex justify-center items-center'>
+          <Recaptcha onVerify={handleCaptchaVerify} />
         </div>
 
         <button

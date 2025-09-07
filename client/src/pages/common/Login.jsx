@@ -7,6 +7,7 @@ import { loginUser, sendOtp, verifyOtp, resetPassword } from '../../api/user.js'
 import toast from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
 import useLoaderStore from '../../store/loader.js'
+import { Recaptcha } from '../../components/index.js'
 
 export default function Login() {
   const { startLoading, stopLoading } = useLoaderStore()
@@ -19,9 +20,14 @@ export default function Login() {
   const [showLoginPassword, setShowLoginPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState("");
 
-  const otpValue = watch('otp') || ''
-  const isOtpValidLength = otpValue.length === 6
+  const otpValue = watch('otp') || '';
+  const isOtpValidLength = otpValue.length === 6;
+
+  const handleCaptchaVerify = (token) => {
+    setCaptchaToken(token);
+  };
 
   useEffect(() => {
     let timer
@@ -53,9 +59,13 @@ export default function Login() {
   }
 
   const getOtp = async (data) => {
+    if (!captchaToken) {
+      toast.error("Please complete the captcha");
+      return;
+    }
     startLoading("sendOTP")
     try {
-      const result = await sendOtp({ email: data.email })
+      const result = await sendOtp({ email: data.email, captchaToken })
       if (result.success) {
         toast.success('OTP sent successfully!')
         setShowOtp(true)
@@ -153,7 +163,7 @@ export default function Login() {
                 <form onSubmit={handleSubmit(onLoginSubmit)} className="space-y-4">
                   <div>
                     <label htmlFor="email" className="block mb-1 text-sm">Email</label>
-                    <input id="email" type="email" placeholder="Enter your email" className="w-full px-4 py-2 border border-gray-400 rounded bg-gray-100 dark:bg-neutral-950" {...register('email', { required: 'Email is required' })} />
+                    <input id="email" type="email" placeholder="Enter your email" autoComplete='email' className="w-full px-4 py-2 border border-gray-400 rounded bg-gray-100 dark:bg-neutral-950" {...register('email', { required: 'Email is required' })} />
                     {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
                   </div>
                   <div className="relative">
@@ -179,8 +189,11 @@ export default function Login() {
                 <form onSubmit={handleSubmit(getOtp)} className="space-y-4">
                   <div>
                     <label htmlFor="forgotEmail" className="block mb-1 text-sm">Enter Registered Email</label>
-                    <input id="forgotEmail" type="email" placeholder="Enter your email" className="w-full px-4 py-2 border border-gray-400 rounded bg-gray-100 dark:bg-neutral-950" {...register('email', { required: 'Email is required' })} />
+                    <input id="forgotEmail" type="email" placeholder="Enter your email" autoComplete='email' className="w-full px-4 py-2 border border-gray-400 rounded bg-gray-100 dark:bg-neutral-950" {...register('email', { required: 'Email is required' })} />
                     {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+                  </div>
+                  <div className='flex justify-center items-center'>
+                    <Recaptcha onVerify={handleCaptchaVerify} />
                   </div>
                   <button type="submit" className="w-full py-2 px-4 border border-gray-600 bg-sky-500 text-white rounded hover:bg-sky-600">Send OTP</button>
                 </form>

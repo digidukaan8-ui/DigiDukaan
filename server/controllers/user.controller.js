@@ -6,6 +6,7 @@ import Store from '../models/store.model.js';
 import DeliveryZone from '../models/deliveryzone.model.js';
 import nodemailer from 'nodemailer';
 import OTP from '../models/otp.model.js';
+import Feedback from '../models/feedback.model.js';
 
 dotenv.config();
 
@@ -125,7 +126,24 @@ const logoutUser = async (req, res) => {
 
 const sendOTP = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email, captchaToken } = req.body;
+
+        if (!captchaToken) {
+            return res.status(400).json({ success: false, message: "Captcha token missing" });
+        }
+
+        const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `secret=${process.env.GOOGLE_RECAPTCHA_SECRET_KEY}&response=${captchaToken}`,
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            return res.status(400).json({ success: false, message: "Captcha verification failed" });
+        }
+
         if (!email) {
             return res.status(400).json({ success: false, message: "Email is required" });
         }
@@ -300,4 +318,15 @@ const resetPassword = async (req, res) => {
     }
 };
 
-export { registerUser, loginUser, logoutUser, sendOTP, verifyOTP, resetPassword };
+const message = async (req, res) => {
+    try {
+        const { name, email, message } = req.body;
+        await Feedback.create({ name, email, message });
+        return res.status(201).json({ success: true, message: 'Message sent successfullt' });
+    } catch (error) {
+        console.error("Error in message controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error", error });
+    }
+}
+
+export { registerUser, loginUser, logoutUser, sendOTP, verifyOTP, resetPassword, message };

@@ -19,7 +19,16 @@ function App() {
   return (
     <>
       <Header />
-      <Toaster position="top-center" reverseOrder={false} theme={isDark ? "dark" : "light"} />
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          style: {
+            background: isDark ? "#0a0a0a" : "#f3f4f6",
+            color: isDark ? "#ffffff" : "#000000",
+          },
+        }}
+      />
       <Loader />
       <Outlet />
       <Footer />

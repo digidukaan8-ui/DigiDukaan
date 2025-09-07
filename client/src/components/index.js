@@ -13,5 +13,6 @@ import ProductDetails from "./ProductDetails";
 import QuickView from "./QuickView";
 import UsedProductDetails from "./UsedProductDetails";
 import Location from "./Location";
+import Recaptcha from "./forms/Recaptcha";
 
-export { Header, Footer, Card, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, ProductDetails, QuickView, UsedProductDetails, Location };
+export { Header, Footer, Card, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, ProductDetails, QuickView, UsedProductDetails, Location,Recaptcha };

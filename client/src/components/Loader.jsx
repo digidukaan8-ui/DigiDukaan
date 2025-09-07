@@ -28,6 +28,7 @@ export default function Loader() {
     zone: "Adding new zone...",
     updateZone: "Updating delivery zone...",
     removeZone: "Removing delivery zone...",
+    message: "Sending your message...",
     orders: "Fetching your orders...",
     cart: "Updating cart...",
     default: "Loading...",
@@ -55,7 +56,8 @@ export default function Loader() {
     zone: "text-purple-500",
     updateZone: "text-purple-500",
     removeZone: "text-purple-500",
-    orders: "text-orange-500",
+    message: "text-sky-500",
+    orders: "text-sky-500",
     cart: "text-pink-500",
     default: "text-gray-500",
   };

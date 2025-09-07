@@ -2,7 +2,23 @@ import User from "../models/user.model.js";
 
 const handleRegister = async (req, res, next) => {
     try {
-        const { name, username, email, password, role, mobile } = req.body;
+        const { name, username, email, password, role, mobile, captchaToken } = req.body;
+
+        if (!captchaToken) {
+            return res.status(400).json({ success: false, message: "Captcha token missing" });
+        }
+
+        const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `secret=${process.env.GOOGLE_RECAPTCHA_SECRET_KEY}&response=${captchaToken}`,
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            return res.status(400).json({ success: false, message: "Captcha verification failed" });
+        }
 
         if (!name || !username || !email || !password || !role || !mobile) {
             return res.status(400).json({ success: false, message: 'All fields are required.' });
@@ -81,7 +97,7 @@ const handleRegister = async (req, res, next) => {
             });
         }
 
-        next();
+        return next();
     } catch (error) {
         console.error('Error in register middleware: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
@@ -105,11 +121,59 @@ const handleLogin = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Invalid credentials.' });
         }
 
-        next();
+        return next();
     } catch (error) {
         console.error('Error in login middleware: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
 
-export { handleRegister, handleLogin };
+const handleMessage = async (req, res, next) => {
+    try {
+        const { name, email, message, captchaToken } = req.body;
+
+        if (!captchaToken) {
+            return res.status(400).json({ success: false, message: "Captcha token missing" });
+        }
+
+        const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `secret=${process.env.GOOGLE_RECAPTCHA_SECRET_KEY}&response=${captchaToken}`,
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            return res.status(400).json({ success: false, message: "Captcha verification failed" });
+        }
+
+        if (!name || !email || !message) {
+            return res.status(400).json({ success: false, message: 'All fields are required.' });
+        }
+
+        if (typeof name !== 'string' || typeof email !== 'string' || typeof message !== 'string') {
+            return res.status(400).json({ success: false, message: 'Invalid input format.' });
+        }
+
+        if (name.length < 3 || name.length > 20) {
+            return res.status(400).json({ success: false, message: 'Name must be between 3 and 20 characters.' })
+        }
+        
+        if(message.length<5||message.length>1000){
+            return res.status(400).json({ success: false, message: 'Message must be between 5 and 1000 characters.' })
+        }
+
+        const emailRegex = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ success: false, message: 'Invalid email format.' });
+        }
+
+        return next();
+    } catch (error) {
+        console.error('Error in message middleware: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
+export { handleRegister, handleLogin, handleMessage };

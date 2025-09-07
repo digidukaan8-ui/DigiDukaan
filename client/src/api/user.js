@@ -85,20 +85,22 @@ const logoutUser = async () => {
     }
 }
 
-const sendOtp = async (email) => {
+const sendOtp = async (email, captchaToken) => {
     try {
         const response = await fetch('http://localhost:3000/api/users/send-otp', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(email)
+            body: JSON.stringify(email, captchaToken)
         });
+
         const data = await response.json();
         if (!data.success) {
             toast.error(result.message || 'Failed to send otp');
             throw new Error(result.message || 'Failed to send otp');
         }
+
         return data;
     } catch (error) {
         console.error("Error in get otp: ", error);
@@ -115,11 +117,13 @@ const verifyOtp = async (data) => {
             },
             body: JSON.stringify(data)
         });
+
         const result = await response.json();
         if (!result.success) {
             toast.error(result.message || 'Failed to verify otp');
             throw new Error(result.message || 'Failed to verify otp');
         }
+
         return result;
     } catch (error) {
         console.error("Error in verify otp: ", error);
@@ -136,16 +140,41 @@ const resetPassword = async (data) => {
             },
             body: JSON.stringify(data)
         });
+
         const result = await response.json();
         if (!result.success) {
             toast.error(result.message || 'Failed to verify otp');
             throw new Error(result.message || 'Failed to verify otp');
         }
+
         return result;
     } catch (error) {
-        console.error("Error new password: ", error);
+        console.error("Error in new password: ", error);
         throw error;
     }
 }
 
-export { registerUser, loginUser, logoutUser, sendOtp, verifyOtp, resetPassword };
+const sendMessage = async (message) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/users/contact', {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            body: JSON.stringify(message)
+        });
+
+        const data = await response.json();
+        if (!data.success) {
+            toast.error(data.message || 'Failed to send message');
+            throw new Error(data.message || 'Failed to send message');
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error in sending message: ", error);
+        throw error;
+    }
+}
+
+export { registerUser, loginUser, logoutUser, sendOtp, verifyOtp, resetPassword, sendMessage };
