@@ -1,20 +1,29 @@
 import { useState } from 'react';
-import { Heart, Share2, Star, ShoppingCart, ChevronLeft, ChevronRight, Play, Edit, Trash2 } from 'lucide-react';
+import { Heart, Share2, Star, ShoppingCart, ChevronLeft, ChevronRight, Play, Edit, Trash2, Plus, Minus } from 'lucide-react';
 import useAuthStore from '../store/auth';
 import useProductStore from '../store/product';
 import { useNavigate } from 'react-router-dom';
 import useLoaderStore from '../store/loader';
 import { removeProduct, changeAvailability } from '../api/product';
 import { toast } from 'react-hot-toast';
+import { useSearchParams } from "react-router-dom";
+import useCategoryProductStore from '../store/categoryProducts';
 
 const ProductDetail = ({ id }) => {
   const navigate = useNavigate();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isLiked, setIsLiked] = useState(false);
-  const { user } = useAuthStore();
+  let { user } = useAuthStore();
   const { startLoading, stopLoading } = useLoaderStore();
-  const product = useProductStore.getState().getProduct(id);
+  let product;
+  if (!id) {
+    const [searchParams] = useSearchParams();
+    const productId = searchParams.get("productId");
+    product = useCategoryProductStore.getState().getProductById(productId);
+  } else {
+    product = useProductStore.getState().getProduct(id);
+  }
 
   if (!product) {
     return (
@@ -107,6 +116,12 @@ const ProductDetail = ({ id }) => {
   const handleManageVariant = () => {
     alert("Add new variant");
   };
+
+  if (!user) {
+    user = { role: "buyer" };
+  } else if (!user.role) {
+    user.role = "buyer";
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-30 pb-10">
@@ -294,14 +309,14 @@ const ProductDetail = ({ id }) => {
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       className="w-8 h-8 cursor-pointer rounded-full bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-300 flex items-center justify-center text-sm font-medium hover:bg-gray-300 dark:hover:bg-neutral-800 transition-colors border border-black dark:border-white"
                     >
-                      -
+                    <Minus size={14}/>
                     </button>
                     <span className="w-8 text-center text-sm font-semibold">{quantity}</span>
                     <button
                       onClick={() => setQuantity(Math.min(stock, quantity + 1))}
                       className="w-8 h-8 cursor-pointer rounded-full bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-300 flex items-center justify-center text-sm font-medium hover:bg-gray-300 dark:hover:bg-neutral-800 transition-colors border border-black dark:border-white"
                     >
-                      +
+                      <Plus size={14}/>
                     </button>
                   </div>
                 </div>

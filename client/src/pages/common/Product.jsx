@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router-dom";
-import { ProductDetails } from "../../components";
+import { ProductDetails } from "../../components/index";
 
 function Product() {
   const [searchParams] = useSearchParams();

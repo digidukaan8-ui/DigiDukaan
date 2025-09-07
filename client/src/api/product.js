@@ -366,4 +366,32 @@ const removeUsedProduct = async (productId) => {
     }
 }
 
-export { addProduct, getProduct, updateProduct, removeProduct, changeAvailability, addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct };
+const getProducts = async (data) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/users/products', {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get products");
+            throw new Error(result.message || "Failed to get products");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in Get Products: ", error);
+        throw error;
+    }
+}
+
+export {
+    addProduct, getProduct, updateProduct, removeProduct, changeAvailability,
+    addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct,
+    getProducts
+};

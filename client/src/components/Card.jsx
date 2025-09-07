@@ -25,7 +25,11 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
   const discountType = product.discount?.percentage ? "%" : "₹";
 
   const handleCardClick = (product) => {
-    navigate(`/product?productId=${product._id}`);
+    if (userRole === "seller") {
+      navigate(`/product?productId=${product._id}`);
+    } else if (userRole === "buyer") {
+      navigate(`/product-details?productId=${product._id}`);
+    }
   };
 
   const handleWishlistToggle = (e) => {
@@ -104,7 +108,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
             </div>
           )}
           <div className="absolute top-4 left-4 flex flex-col gap-2">
-            {hasDiscount && (
+            {hasDiscount > 0 && (
               <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
                 -{discountType === "₹" && "₹"}{discountValue}
                 {discountType === "%" && "%"} OFF
@@ -138,7 +142,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
           >
             <button
               onClick={(e) => handleQuickView(e)}
-              className={`bg-white/95 text-gray-800 px-4 py-2 rounded-full shadow-lg hover:bg-white transition-all duration-300 font-medium text-sm flex items-center gap-2 transform ${isHovered ? "translate-y-0" : "translate-y-5"
+              className={`bg-white/95 text-gray-800 px-4 py-2 rounded-full shadow-lg hover:bg-white transition-all z-50 duration-300 font-medium text-sm flex items-center gap-2 transform ${isHovered ? "translate-y-0" : "translate-y-5"
                 }`}
             >
               <Eye size={16} />
@@ -190,10 +194,10 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
         <div className="mt-auto">
           <div className="flex items-baseline gap-2 mb-4">
             <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">₹{finalPrice.toFixed(2)}</span>
-            {hasDiscount && (
+            {hasDiscount > 0 && (
               <span className="line-through text-gray-500 dark:text-gray-400 text-base">₹{product.price.toFixed(2)}</span>
             )}
-            {hasDiscount && (
+            {hasDiscount > 0 && (
               <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">Save ₹{(product.price - finalPrice).toFixed(2)}</span>
             )}
           </div>

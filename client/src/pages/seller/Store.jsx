@@ -9,7 +9,7 @@ import useLoaderStore from "../../store/loader";
 import useProductStore from "../../store/product";
 import useUsedProductStore from "../../store/usedProduct";
 import { toast } from "react-hot-toast";
-import { QuickView } from "../../components";
+import { QuickView } from "../../components/index";
 
 export default function StorePage() {
   const { store } = useStore();

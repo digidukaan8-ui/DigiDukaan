@@ -134,6 +134,8 @@ const usedProductSchema = new mongoose.Schema({
   tags: { type: [String], default: [] }
 }, { timestamps: true });
 
+usedProductSchema.index({ storeId: 1, "category.slug": 1, "subCategory.slug": 1 });
+
 const UsedProduct = mongoose.model("UsedProduct", usedProductSchema);
 
 export default UsedProduct;

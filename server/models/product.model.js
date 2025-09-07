@@ -146,6 +146,8 @@ const productSchema = new mongoose.Schema({
     ]
 }, { timestamps: true });
 
+productSchema.index({ storeId: 1, "category.slug": 1, "subCategory.slug": 1 });
+
 const Product = mongoose.model('Product', productSchema);
 
 export default Product;

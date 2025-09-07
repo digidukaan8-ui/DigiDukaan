@@ -16,6 +16,9 @@ import {
     Home,
     Search
 } from 'lucide-react';
+import { getProducts } from '../api/product';
+import useStores from '../store/stores';
+import useCategoryProductStore from "../store/categoryProducts";
 
 export default function Location() {
     const { location, editedLocation, setLocation, setEditedLocation } = useLocationStore();
@@ -27,6 +30,11 @@ export default function Location() {
     const [activeField, setActiveField] = useState(null);
     const [locationMethod, setLocationMethod] = useState('');
     const formRef = useRef(null);
+
+    const locationToArray = (loc) => {
+        const keys = ["country", "state", "district", "city", "town", "village", "locality", "pincode"];
+        return keys.map(k => loc[k]).filter(Boolean);
+    };
 
     const fetchLocation = useCallback(async () => {
         if (Object.keys(location).length > 0 || isFetching) return;
@@ -50,6 +58,19 @@ export default function Location() {
                         setEditedLocation(result.data);
                         setLocationMethod('gps');
                         toast.success("Location fetched successfully via GPS");
+                        startLoading('fetching');
+                        try {
+                            const data = await getProducts(locationToArray(result.data));
+                            if (data.success) {
+                                toast.success("Product fetched successfully");
+                                useStores.getState().clearStores();
+                                useStores.getState().addStores(data.stores);
+                                useCategoryProductStore.getState().clearCategories();
+                                useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
+                            }
+                        } finally {
+                            stopLoading();
+                        }
                     }
                 }).catch(async () => {
                     startLoading('fetchLocIp');
@@ -59,6 +80,19 @@ export default function Location() {
                         setEditedLocation(result.data);
                         setLocationMethod('ip');
                         toast.success("Location fetched successfully via IP");
+                        startLoading('fetching');
+                        try {
+                            const data = await getProducts(locationToArray(result.data));
+                            if (data.success) {
+                                toast.success("Product fetched successfully");
+                                useStores.getState().clearStores();
+                                useStores.getState().addStores(data.stores);
+                                useCategoryProductStore.getState().clearCategories();
+                                useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
+                            }
+                        } finally {
+                            stopLoading();
+                        }
                     }
                 });
             } else {
@@ -69,6 +103,19 @@ export default function Location() {
                     setEditedLocation(result.data);
                     setLocationMethod('ip');
                     toast.success("Location fetched successfully via IP");
+                    startLoading('fetching');
+                    try {
+                        const data = await getProducts(locationToArray(result.data));
+                        if (data.success) {
+                            toast.success("Product fetched successfully");
+                            useStores.getState().clearStores();
+                            useStores.getState().addStores(data.stores);
+                            useCategoryProductStore.getState().clearCategories();
+                            useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
+                        }
+                    } finally {
+                        stopLoading();
+                    }
                 }
             }
         } catch (error) {
@@ -149,6 +196,19 @@ export default function Location() {
             setShowForm(false);
             setLocationMethod('manual');
             toast.success("Location updated successfully");
+            startLoading('fetching');
+            try {
+                const data = await getProducts(locationToArray(editedLocation));
+                if (data.success) {
+                    toast.success("Product fetched successfully");
+                    useStores.getState().clearStores();
+                    useStores.getState().addStores(data.stores);
+                    useCategoryProductStore.getState().clearCategories();
+                    useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
+                }
+            } finally {
+                stopLoading();
+            }
         }
         setIsEdited(false);
     };
@@ -176,7 +236,6 @@ export default function Location() {
         if (editedLocation.village) parts.push(`${editedLocation.village}`);
         if (editedLocation.locality) parts.push(`${editedLocation.locality}`);
         if (editedLocation.pincode) parts.push(`${editedLocation.pincode}`);
-
         return parts.join(", ");
     };
 
@@ -220,7 +279,7 @@ export default function Location() {
     };
 
     return (
-        <div className="w-full min-h-screen bg-gray-100 dark:bg-neutral-950 flex flex-col items-center pt-20">
+        <div className="w-full bg-gray-100 dark:bg-neutral-950 flex flex-col items-center pt-20">
             <div className="w-full max-w-7xl px-4 py-8">
                 <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white rounded-t-xl shadow-lg">
                     <div className="flex items-center">
