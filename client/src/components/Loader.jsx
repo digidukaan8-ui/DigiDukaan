@@ -1,10 +1,19 @@
 import { Loader2 } from "lucide-react";
 import useLoaderStore from "../store/loader";
+import { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Loader() {
   const { isLoading, variant } = useLoaderStore();
 
-  if (!isLoading) return null;
+  useEffect(() => {
+    if (isLoading) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => (document.body.style.overflow = "");
+  }, [isLoading]);
 
   const messages = {
     login: "Logging in...",
@@ -63,11 +72,28 @@ export default function Loader() {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
-      <div className={`flex items-center space-x-2 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg ${colors[variant]}`}>
-        <Loader2 className="animate-spin h-6 w-6" />
-        <span className="font-medium">{messages[variant]}</span>
-      </div>
-    </div>
+    <AnimatePresence>
+      {isLoading && (
+        <motion.div
+          className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className={`flex flex-col items-center space-y-3 p-6 rounded-2xl shadow-xl bg-white dark:bg-neutral-900 ${colors[variant]}`}
+          >
+            <Loader2 className="animate-spin h-10 w-10" />
+            <span className="font-medium text-base">
+              {messages[variant] || messages.default}
+            </span>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

@@ -32,6 +32,7 @@ export default function Location() {
         if (Object.keys(location).length > 0 || isFetching) return;
 
         setIsFetching(true);
+        startLoading('fetchLoc');
 
         try {
             if (navigator.geolocation) {
@@ -43,7 +44,6 @@ export default function Location() {
                     });
                 }).then(async (pos) => {
                     const { latitude, longitude } = pos.coords;
-                    startLoading('fetchLoc');
                     const result = await fetchLocationThroughGps(latitude, longitude);
                     if (result.success) {
                         setLocation(result.data);
@@ -116,7 +116,6 @@ export default function Location() {
 
         if (value.length > 2) {
             try {
-                // Placeholder for API call
                 const mockSuggestions = {
                     country: ["India", "United States", "United Kingdom"],
                     state: ["Maharashtra", "Karnataka", "Delhi"],
