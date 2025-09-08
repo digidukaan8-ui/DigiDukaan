@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import useLoaderStore from '../store/loader';
 import { removeProduct, changeAvailability } from '../api/product';
 import { toast } from 'react-hot-toast';
-import { useSearchParams } from "react-router-dom";
 import useCategoryProductStore from '../store/categoryProducts';
 
 const ProductDetail = ({ id }) => {
@@ -16,13 +15,9 @@ const ProductDetail = ({ id }) => {
   const [isLiked, setIsLiked] = useState(false);
   let { user } = useAuthStore();
   const { startLoading, stopLoading } = useLoaderStore();
-  let product;
-  if (!id) {
-    const [searchParams] = useSearchParams();
-    const productId = searchParams.get("productId");
-    product = useCategoryProductStore.getState().getProductById(productId);
-  } else {
-    product = useProductStore.getState().getProduct(id);
+  let product = useProductStore.getState().getProduct(id);
+  if (!product) {
+    product = useCategoryProductStore.getState().getProductById(id);
   }
 
   if (!product) {
@@ -309,14 +304,14 @@ const ProductDetail = ({ id }) => {
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       className="w-8 h-8 cursor-pointer rounded-full bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-300 flex items-center justify-center text-sm font-medium hover:bg-gray-300 dark:hover:bg-neutral-800 transition-colors border border-black dark:border-white"
                     >
-                    <Minus size={14}/>
+                      <Minus size={14} />
                     </button>
                     <span className="w-8 text-center text-sm font-semibold">{quantity}</span>
                     <button
                       onClick={() => setQuantity(Math.min(stock, quantity + 1))}
                       className="w-8 h-8 cursor-pointer rounded-full bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-300 flex items-center justify-center text-sm font-medium hover:bg-gray-300 dark:hover:bg-neutral-800 transition-colors border border-black dark:border-white"
                     >
-                      <Plus size={14}/>
+                      <Plus size={14} />
                     </button>
                   </div>
                 </div>

@@ -25,11 +25,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
   const discountType = product.discount?.percentage ? "%" : "₹";
 
   const handleCardClick = (product) => {
-    if (userRole === "seller") {
-      navigate(`/product?productId=${product._id}`);
-    } else if (userRole === "buyer") {
-      navigate(`/product-details?productId=${product._id}`);
-    }
+    navigate(`/product?productId=${product._id}`);
   };
 
   const handleWishlistToggle = (e) => {
@@ -184,12 +180,6 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
             </div>
             <span className="ml-1 text-sm text-gray-600 dark:text-gray-400 font-medium">{rating > 0 ? rating.toFixed(1) : "New"}</span>
           </div>
-          {product.tags?.length > 0 && (
-            <div className="flex items-center gap-1">
-              <Tag size={12} className="text-gray-400" />
-              <span className="text-xs text-gray-500 dark:text-gray-400">{product.tags[0]}</span>
-            </div>
-          )}
         </div>
         <div className="mt-auto">
           <div className="flex items-baseline gap-2 mb-4">
@@ -201,10 +191,15 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
               <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">Save ₹{(product.price - finalPrice).toFixed(2)}</span>
             )}
           </div>
-          {product.deliveryCharge > 0 && (
+          {product.deliveryCharge > 0 ? (
             <div className="flex items-center gap-2 mb-3 text-xs text-gray-600 dark:text-gray-400">
               <Truck size={14} className="text-sky-500" />
               <span>Delivery: ₹{product.deliveryCharge}</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 mb-3 text-xs text-gray-600 dark:text-gray-400">
+              <Truck size={14} className="text-sky-500" />
+              <span>Delivery: Free</span>
             </div>
           )}
           {userRole === "buyer" && (

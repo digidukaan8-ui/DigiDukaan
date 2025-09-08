@@ -3,19 +3,7 @@ import { fetchLocationThroughGps, fetchLocationThroughIp } from "../api/location
 import useLocationStore from "../store/location";
 import { toast } from 'react-hot-toast';
 import useLoaderStore from "../store/loader";
-import {
-    MapPin,
-    Edit,
-    X,
-    Navigation,
-    RefreshCw,
-    Globe,
-    Map,
-    LandPlot,
-    Building,
-    Home,
-    Search
-} from 'lucide-react';
+import { MapPin, Edit, X, RefreshCw, Globe, Map, LandPlot, Building, Home, Search, CircleHelp } from 'lucide-react';
 import { getProducts } from '../api/product';
 import useStores from '../store/stores';
 import useCategoryProductStore from "../store/categoryProducts";
@@ -26,9 +14,8 @@ export default function Location() {
     const [isFetching, setIsFetching] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const { startLoading, stopLoading } = useLoaderStore();
-    const [suggestions, setSuggestions] = useState([]);
-    const [activeField, setActiveField] = useState(null);
-    const [locationMethod, setLocationMethod] = useState('');
+    const [showTooltip, setShowTooltip] = useState('');
+    const [hoverTooltip, setHoverTooltip] = useState('');
     const formRef = useRef(null);
 
     const locationToArray = (loc) => {
@@ -56,7 +43,6 @@ export default function Location() {
                     if (result.success) {
                         setLocation(result.data);
                         setEditedLocation(result.data);
-                        setLocationMethod('gps');
                         toast.success("Location fetched successfully via GPS");
                         startLoading('fetching');
                         try {
@@ -78,7 +64,6 @@ export default function Location() {
                     if (result.success) {
                         setLocation(result.data);
                         setEditedLocation(result.data);
-                        setLocationMethod('ip');
                         toast.success("Location fetched successfully via IP");
                         startLoading('fetching');
                         try {
@@ -101,7 +86,6 @@ export default function Location() {
                 if (result.success) {
                     setLocation(result.data);
                     setEditedLocation(result.data);
-                    setLocationMethod('ip');
                     toast.success("Location fetched successfully via IP");
                     startLoading('fetching');
                     try {
@@ -135,8 +119,6 @@ export default function Location() {
         setEditedLocation(location);
         setShowForm(false);
         setIsEdited(false);
-        setSuggestions([]);
-        setActiveField(null);
     }, [location, setEditedLocation]);
 
     useEffect(() => {
@@ -158,35 +140,6 @@ export default function Location() {
     const handleChange = async (field, value) => {
         setEditedLocation({ ...editedLocation, [field]: value });
         setIsEdited(true);
-        setActiveField(field);
-        setLocationMethod('manual');
-
-        if (value.length > 2) {
-            try {
-                const mockSuggestions = {
-                    country: ["India", "United States", "United Kingdom"],
-                    state: ["Maharashtra", "Karnataka", "Delhi"],
-                    district: ["Mumbai Suburban", "Pune", "Thane"],
-                    city: ["Mumbai", "Pune", "Nagpur"],
-                    town: ["Andheri", "Bandra", "Juhu"],
-                    village: ["Village A", "Village B"],
-                    locality: ["Andheri East", "Bandra West", "Juhu Vile Parle"],
-                    pincode: ["400053", "400058", "400047"]
-                };
-                setSuggestions(mockSuggestions[field] || []);
-            } catch (error) {
-                console.error("Autocomplete fetch error:", error);
-                setSuggestions([]);
-            }
-        } else {
-            setSuggestions([]);
-        }
-    };
-
-    const handleSelectSuggestion = (field, suggestion) => {
-        setEditedLocation({ ...editedLocation, [field]: suggestion });
-        setSuggestions([]);
-        setActiveField(null);
     };
 
     const applyChanges = async () => {
@@ -194,7 +147,6 @@ export default function Location() {
         if (hasChanged) {
             setLocation(editedLocation);
             setShowForm(false);
-            setLocationMethod('manual');
             toast.success("Location updated successfully");
             startLoading('fetching');
             try {
@@ -218,7 +170,6 @@ export default function Location() {
         setEditedLocation({});
         setIsFetching(false);
         setShowForm(false);
-        setLocationMethod('');
         fetchLocation();
     };
 
@@ -239,6 +190,16 @@ export default function Location() {
         return parts.join(", ");
     };
 
+    useEffect(() => {
+        const handleClickOutside = () => setShowTooltip(false);
+
+        document.addEventListener("click", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
+
     const renderField = (label, field, icon) => {
         return (
             <div className="relative z-10">
@@ -254,104 +215,69 @@ export default function Location() {
                         type="text"
                         value={editedLocation[field] || ""}
                         onChange={(e) => handleChange(field, e.target.value)}
-                        onFocus={() => setActiveField(field)}
-                        onBlur={() => setTimeout(() => setActiveField(null), 200)}
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white transition-colors duration-200"
+                        className="w-full pl-10 pr-4 py-2.5 border border-black dark:border-white rounded-lg bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-white transition-colors duration-200"
                         placeholder={`Enter ${label}`}
                         autoComplete="off"
                     />
                 </div>
-                {activeField === field && suggestions.length > 0 && (
-                    <ul className="absolute z-20 w-full bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-md mt-1 max-h-48 overflow-y-auto shadow-xl animate-fade-in-down">
-                        {suggestions.map((suggestion, index) => (
-                            <li
-                                key={index}
-                                onMouseDown={(e) => { e.preventDefault(); handleSelectSuggestion(field, suggestion); }}
-                                className="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-800 dark:text-white transition-colors duration-200"
-                            >
-                                {suggestion}
-                            </li>
-                        ))}
-                    </ul>
-                )}
             </div>
         );
     };
 
     return (
         <div className="w-full bg-gray-100 dark:bg-neutral-950 flex flex-col items-center pt-20">
-            <div className="w-full max-w-7xl px-4 py-8">
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white rounded-t-xl shadow-lg">
-                    <div className="flex items-center">
-                        <MapPin size={28} className="mr-3" />
-                        <h2 className="text-xl md:text-2xl font-bold">Stores delivering to your area</h2>
+            <div className="w-full max-w-2xl mx-auto px-3 py-8">
+                {Object.keys(location).length > 0 ? (
+                    <div className="w-fit flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-lg px-4 py-3 shadow-sm gap-4 relative">
+
+                        <div className="flex items-center gap-2 relative">
+                            <MapPin size={18} className="text-blue-600 dark:text-blue-400 shrink-0" />
+                            <span className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
+                                {renderLocationText()}
+                            </span>
+                            <div className="relative">
+                                <CircleHelp
+                                    size={16}
+                                    className="text-gray-500 cursor-pointer"
+                                    onClick={() => setShowTooltip(true)}
+                                    onMouseEnter={() => setHoverTooltip(true)}
+                                    onMouseLeave={() => setHoverTooltip(false)}
+                                />
+                                {(showTooltip || hoverTooltip) && (
+                                    <div
+                                        className="w-60 absolute top-4 left-[-105px] -translate-x-1/2 sm:left-0 sm:translate-x-0 bg-black text-white text-xs rounded px-3 py-2 shadow-lg z-20 text-center whitespace-normal break-words max-w-[90vw] sm:max-w-xs"
+                                    >
+                                        This is your detected location. We are showing you products from stores delivering in this area.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                            <button
+                                onClick={toggleForm}
+                                className="flex items-center text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                            >
+                                <Edit size={14} className="mr-1" /> Change
+                            </button>
+                            <button
+                                onClick={handleRefresh}
+                                disabled={isFetching}
+                                className="flex items-center justify-center text-xs px-3 py-1 rounded-full border border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 disabled:opacity-50 w-full sm:w-auto"
+                            >
+                                <RefreshCw size={14} className={`mr-1 ${isFetching ? "animate-spin" : ""}`} />
+                                {isFetching ? "Refreshing..." : "Refresh"}
+                            </button>
+                        </div>
                     </div>
-                </div>
-
-                <div className="bg-white dark:bg-neutral-900 rounded-b-xl shadow-lg p-6 md:p-8">
-                    {Object.keys(location).length === 0 ? (
-                        <div className="text-center py-10">
-                            <div className="flex justify-center mb-4">
-                                <Navigation size={48} className="text-blue-500 animate-spin" />
-                            </div>
-                            <p className="text-gray-600 dark:text-gray-300 font-medium">Fetching your location information...</p>
-                        </div>
-                    ) : (
-                        <div>
-                            <div className="mb-6 p-4 md:p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-900">
-                                <h3 className="text-lg md:text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">Your Current Location</h3>
-                                <p className="text-blue-700 dark:text-blue-300 text-sm md:text-base leading-relaxed mb-2">
-                                    {renderLocationText()}
-                                </p>
-                                {locationMethod === 'ip' && (
-                                    <>
-                                        <p className="text-sm text-red-600 dark:text-red-400 font-semibold mt-4">
-                                            The location fetched via IP address might not be accurate. For better results, please enter your correct location.
-                                        </p>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mt-2">
-                                            If you want to see result of store delivering in our area by sharimg your location click 'Refresh Location'.
-                                        </p>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mt-2">
-                                            If you didn't see the location access popup, click the lock icon in your browser's URL bar, enable location, and then click 'Refresh Location'.
-                                        </p>
-                                    </>
-                                )}
-                                {locationMethod === 'gps' && (
-                                    <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold mt-4">
-                                        Based on your current GPS location, we are showing you stores in this area. If you want delivery to a different location, you can change your address.
-                                    </p>
-                                )}
-                                {locationMethod === 'manual' && (
-                                    <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold mt-4">
-                                        Based on the address you provided, we are showing you stores in this area.
-                                    </p>
-                                )}
-                            </div>
-
-                            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200 dark:border-neutral-700">
-                                <button
-                                    onClick={toggleForm}
-                                    className="flex items-center text-blue-600 dark:text-blue-400 font-semibold text-sm hover:underline transition-transform transform hover:scale-105"
-                                >
-                                    <Edit size={16} className="mr-2" /> Not my location?
-                                </button>
-                                <button
-                                    onClick={handleRefresh}
-                                    disabled={isFetching}
-                                    className="flex items-center text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-400 px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <RefreshCw size={16} className={`mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-                                    {isFetching ? "Refreshing..." : "Refresh Location"}
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                ):(
+                    <div className="h-screen"></div>
+                )}
             </div>
 
             {showForm && (
                 <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div ref={formRef} className="bg-white dark:bg-neutral-900 rounded-xl shadow-2xl w-full max-w-lg p-6 md:p-8 transform scale-95 md:scale-100 animate-slide-up-fade-in">
+                    <div ref={formRef} className="bg-white dark:bg-neutral-900 rounded-xl shadow-2xl w-full max-w-lg p-6 md:p-8 transform scale-95 md:scale-100 border border-black dark:border-white animate-slide-up-fade-in">
                         <div className="flex justify-between items-center mb-6 border-b border-gray-200 dark:border-neutral-700 pb-4">
                             <h3 className="text-xl font-bold text-gray-800 dark:text-white">
                                 Edit Your Location
@@ -364,7 +290,7 @@ export default function Location() {
                             </button>
                         </div>
 
-                        <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2 hide-scrollbar">
+                        <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2 hide-scrollbar w-full">
                             {renderField("Country", "country", <Globe size={20} />)}
                             {renderField("State", "state", <Map size={20} />)}
                             {renderField("District", "district", <LandPlot size={20} />)}
@@ -379,7 +305,7 @@ export default function Location() {
                             <button
                                 onClick={applyChanges}
                                 disabled={!isEdited}
-                                className="px-6 py-2 bg-green-500 text-white rounded-full font-semibold hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                className="px-6 py-2 bg-green-500 text-white rounded-lg border border-black dark:border-white font-semibold hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                             >
                                 Apply Changes
                             </button>

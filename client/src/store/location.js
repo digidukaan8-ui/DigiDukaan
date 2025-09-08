@@ -11,7 +11,9 @@ const useLocationStore = create(
         set({ location: data, editedLocation: data }),
 
       setEditedLocation: (data) =>
-        set((state) => ({ editedLocation: { ...state.editedLocation, ...data } })),
+        set((state) => ({
+          editedLocation: { ...state.editedLocation, ...data },
+        })),
 
       resetEdited: () => set({ editedLocation: get().location }),
 
@@ -19,9 +21,19 @@ const useLocationStore = create(
     }),
     {
       name: "location-storage",
+      storage: {
+        getItem: (name) => {
+          const item = sessionStorage.getItem(name);
+          return item ? JSON.parse(item) : null;
+        },
+        setItem: (name, value) => {
+          sessionStorage.setItem(name, JSON.stringify(value));
+        },
+        removeItem: (name) => sessionStorage.removeItem(name),
+      },
       partialize: (state) => ({
         location: state.location,
-        editedLocation: state.editedLocation, 
+        editedLocation: state.editedLocation,
       }),
       onRehydrateStorage: () => (state) => {
         if (state.location && !state.editedLocation) {

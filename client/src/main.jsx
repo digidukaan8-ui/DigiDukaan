@@ -3,7 +3,7 @@ import './index.css'
 import App from './App.jsx'
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
 import { Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct } from './pages/index.js'
-import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm,ProductDetails } from './components/index.js'
+import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm } from './components/index.js'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -19,7 +19,6 @@ const router = createBrowserRouter(
       <Route path='support' element={<Support />} />
       <Route path='logout' element={<Logout />} />
       <Route path='product' element={<Product />} />
-      <Route path='product-details' element={<ProductDetails />} />
       <Route path='used-product' element={<UsedProduct />} />
 
       <Route path='buyer' element={<BuyerRoute />} >
