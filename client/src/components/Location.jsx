@@ -7,6 +7,7 @@ import { MapPin, Edit, X, RefreshCw, Globe, Map, LandPlot, Building, Home, Searc
 import { getProducts } from '../api/product';
 import useStores from '../store/stores';
 import useCategoryProductStore from "../store/categoryProducts";
+import useUsedCategoryProductStore from "../store/categoryUsedProduct";
 
 export default function Location() {
     const { location, editedLocation, setLocation, setEditedLocation } = useLocationStore();
@@ -53,6 +54,8 @@ export default function Location() {
                                 useStores.getState().addStores(data.stores);
                                 useCategoryProductStore.getState().clearCategories();
                                 useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
+                                useUsedCategoryProductStore.getState().clearUsedCategories();
+                                useUsedCategoryProductStore.getState().setAllUsedCategories(data.usedProductsByCategory);
                             }
                         } finally {
                             stopLoading();
@@ -74,6 +77,8 @@ export default function Location() {
                                 useStores.getState().addStores(data.stores);
                                 useCategoryProductStore.getState().clearCategories();
                                 useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
+                                useUsedCategoryProductStore.getState().clearUsedCategories();
+                                useUsedCategoryProductStore.getState().setAllUsedCategories(data.usedProductsByCategory);
                             }
                         } finally {
                             stopLoading();
@@ -96,6 +101,8 @@ export default function Location() {
                             useStores.getState().addStores(data.stores);
                             useCategoryProductStore.getState().clearCategories();
                             useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
+                            useUsedCategoryProductStore.getState().clearUsedCategories();
+                            useUsedCategoryProductStore.getState().setAllUsedCategories(data.usedProductsByCategory);
                         }
                     } finally {
                         stopLoading();
@@ -157,6 +164,8 @@ export default function Location() {
                     useStores.getState().addStores(data.stores);
                     useCategoryProductStore.getState().clearCategories();
                     useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
+                    useUsedCategoryProductStore.getState().clearUsedCategories();
+                    useUsedCategoryProductStore.getState().setAllUsedCategories(data.usedProductsByCategory);
                 }
             } finally {
                 stopLoading();
@@ -226,11 +235,11 @@ export default function Location() {
 
     return (
         <div className="w-full bg-gray-100 dark:bg-neutral-950 flex flex-col items-center pt-20">
-            <div className="w-full max-w-2xl mx-auto px-3 py-8">
+            <div className="w-full max-w-3xl mx-auto px-3 py-8">
                 {Object.keys(location).length > 0 ? (
-                    <div className="w-fit flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-lg px-4 py-3 shadow-sm gap-4 relative">
+                    <div className="w-full max-w-2xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-lg px-4 py-3 shadow-sm gap-4 relative">
 
-                        <div className="flex items-center gap-2 relative">
+                        <div className="flex items-center justify-center gap-2 relative">
                             <MapPin size={18} className="text-blue-600 dark:text-blue-400 shrink-0" />
                             <span className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
                                 {renderLocationText()}
@@ -253,7 +262,7 @@ export default function Location() {
                             </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                        <div className="flex flex-wrap items-center justify-center gap-3 w-full">
                             <button
                                 onClick={toggleForm}
                                 className="flex items-center text-xs text-blue-600 dark:text-blue-400 hover:underline"
@@ -263,14 +272,14 @@ export default function Location() {
                             <button
                                 onClick={handleRefresh}
                                 disabled={isFetching}
-                                className="flex items-center justify-center text-xs px-3 py-1 rounded-full border border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 disabled:opacity-50 w-full sm:w-auto"
+                                className="flex items-center justify-center text-xs px-3 py-1 rounded-full border border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 disabled:opacity-50 w-fit"
                             >
                                 <RefreshCw size={14} className={`mr-1 ${isFetching ? "animate-spin" : ""}`} />
                                 {isFetching ? "Refreshing..." : "Refresh"}
                             </button>
                         </div>
                     </div>
-                ):(
+                ) : (
                     <div className="h-screen"></div>
                 )}
             </div>

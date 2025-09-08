@@ -5,11 +5,15 @@ import useAuthStore from "../store/auth";
 import useUsedProductStore from "../store/usedProduct";
 import { toast } from "react-hot-toast";
 import { removeUsedProduct } from "../api/product";
+import useUsedCategoryProductStore from "../store/categoryUsedProduct";
 
 const UsedProductDetail = ({ id }) => {
     const navigate = useNavigate();
-    const { user } = useAuthStore();
-    const product = useUsedProductStore.getState().getUsedProduct(id);
+    let { user } = useAuthStore();
+    let product = useUsedProductStore.getState().getUsedProduct(id);
+    if (!product) {
+        product = useUsedCategoryProductStore.getState().getUsedProductById(id);
+    }
 
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
@@ -64,19 +68,19 @@ const UsedProductDetail = ({ id }) => {
     const prevImage = () => setSelectedImageIndex((prev) => (prev - 1 + img.length) % img.length);
 
     const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      startLoading("removeProduct");
-      try {
-        const result = await removeUsedProduct(id);
-        if (result.success) {
-          useUsedProductStore.getState().removeUsedProduct(id);
-          toast.success("Product removed successfully");
+        if (confirm("Are you sure you want to delete this product?")) {
+            startLoading("removeProduct");
+            try {
+                const result = await removeUsedProduct(id);
+                if (result.success) {
+                    useUsedProductStore.getState().removeUsedProduct(id);
+                    toast.success("Product removed successfully");
+                }
+            } finally {
+                stopLoading();
+            }
         }
-      } finally {
-        stopLoading();
-      }
-    }
-  };
+    };
 
     const getConditionColor = (condition) => {
         switch (condition?.toLowerCase()) {
@@ -92,6 +96,12 @@ const UsedProductDetail = ({ id }) => {
                 return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200';
         }
     };
+
+    if (!user) {
+        user = { role: "buyer" };
+    } else if (!user.role) {
+        user.role = "buyer";
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-30 pb-10">
@@ -198,11 +208,11 @@ const UsedProductDetail = ({ id }) => {
                                     <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">Save ₹{(price - finalPrice).toFixed(2)}</span>
                                 )}
                             </div>
-                                {isNegotiable && (
-                                    <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-full">
-                                        Negotiable
-                                    </span>
-                                )}
+                            {isNegotiable && (
+                                <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-full">
+                                    Negotiable
+                                </span>
+                            )}
                         </div>
 
                         {/* Description */}

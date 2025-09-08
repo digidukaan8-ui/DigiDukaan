@@ -5,6 +5,7 @@ import { removeUsedProduct } from "../api/product";
 import useLoaderStore from "../store/loader";
 import { toast } from "react-hot-toast";
 import useUsedProductStore from "../store/usedProduct";
+import useAuthStore from "../store/auth";
 
 export default function UsedProductCard({ product, userRole = "buyer", onQuickView }) {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const { user } = useAuthStore();
 
   const hasDiscount = product.discount?.percentage || product.discount?.amount;
   const finalPrice = hasDiscount
@@ -27,24 +29,52 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
   const handleWishlistToggle = (e) => {
     e.stopPropagation();
-    if (userRole === "buyer") {
-      setIsWishlisted(!isWishlisted);
-      console.log(isWishlisted ? "Removed from wishlist" : "Added to wishlist");
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "seller" || user?.role === "admin") {
+      toast.error("Only for buyer");
+      return;
     }
+    setIsWishlisted(!isWishlisted);
   };
 
   const handleChatSeller = (e) => {
     e.stopPropagation();
-    if (userRole === "buyer") alert("Open chat modal here!");
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "seller" || user?.role === "admin") {
+      toast.error("Only for buyer");
+      return;
+    }
   };
 
   const handleEditClick = (e) => {
     e.stopPropagation();
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "buyer" || user?.role === "admin") {
+      toast.error("Only for seller");
+      return;
+    }
     navigate("/seller/used-product", { state: { initialData: product } });
   };
 
   const handleDeleteClick = async (e) => {
     e.stopPropagation();
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "buyer" || user?.role === "admin") {
+      toast.error("Only for seller");
+      return;
+    }
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     startLoading("removeUsedProduct");
     try {
@@ -98,7 +128,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
           {userRole === "buyer" && (
             <div className="absolute top-4 right-4">
               <button
-                onClick={handleWishlistToggle}
+                onClick={(e) => handleWishlistToggle(e)}
                 className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${isWishlisted
                   ? 'bg-red-500 text-white'
                   : 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'

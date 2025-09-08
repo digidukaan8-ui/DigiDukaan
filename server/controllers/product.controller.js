@@ -469,91 +469,100 @@ const removeUsedProduct = async (req, res) => {
 }
 
 const getProducts = async (req, res) => {
-  try {
-    const locations = req.body;
+    try {
+        const locations = req.body;
 
-    if (!Array.isArray(locations) || locations.length === 0) {
-      return res.status(400).json({ success: false, message: "Locations array required" });
+        if (!Array.isArray(locations) || locations.length === 0) {
+            return res.status(400).json({ success: false, message: "Locations array required" });
+        }
+
+        const storeZones = await DeliveryZone.find({
+            areaName: { $in: locations }
+        }).select("storeId");
+
+        const storeIds = storeZones.map((z) => z.storeId);
+
+        if (storeIds.length === 0) {
+            return res.status(200).json({
+                success: true,
+                stores: [],
+                productsByCategory: [],
+                usedProductsByCategory: []
+            });
+        }
+
+        const productPipeline = [
+            { $match: { storeId: { $in: storeIds } } },
+            { $sort: { createdAt: -1 } },
+            {
+                $group: {
+                    _id: "$category.slug",
+                    products: { $push: "$$ROOT" }
+                }
+            },
+            {
+                $project: {
+                    products: { $slice: ["$products", 10] }
+                }
+            }
+        ];
+
+        const usedProductPipeline = [
+            {
+                $match: {
+                    $or: [
+                        { "delivery.pickupLocation.state": { $in: locations } },
+                        { "delivery.pickupLocation.city": { $in: locations } },
+                        { "delivery.pickupLocation.pincode": { $in: locations } },
+                        { "delivery.shippingLocations.areaName": { $in: locations } }
+                    ]
+                }
+            },
+            { $sort: { createdAt: -1 } },
+            {
+                $group: {
+                    _id: "$category.slug",
+                    products: { $push: "$$ROOT" }
+                }
+            },
+            {
+                $project: {
+                    products: { $slice: ["$products", 10] }
+                }
+            }
+        ];
+
+
+
+        const aggregatedProducts = await Product.aggregate(productPipeline);
+        const aggregatedUsedProducts = await UsedProduct.aggregate(usedProductPipeline);
+
+        const productsByCategory = aggregatedProducts.map((item) => ({
+            [item._id]: item.products
+        }));
+
+        const usedProductsByCategory = aggregatedUsedProducts.map((item) => ({
+            [item._id]: item.products
+        }));
+
+        const usedStoreIds = aggregatedUsedProducts.flatMap((cat) =>
+            cat.products.map((p) => p.storeId.toString())
+        );
+
+        const allStoreIds = [...new Set([...storeIds.map(String), ...usedStoreIds])];
+
+        const stores = await Store.find({ _id: { $in: allStoreIds } });
+
+        return res.status(200).json({
+            success: true,
+            stores,
+            productsByCategory,
+            usedProductsByCategory
+        });
+    } catch (error) {
+        console.error("Error in Get Product controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
-
-    const storeZones = await DeliveryZone.find({
-      areaName: { $in: locations }
-    }).select("storeId");
-
-    const storeIds = storeZones.map((z) => z.storeId);
-
-    if (storeIds.length === 0) {
-      return res.status(200).json({
-        success: true,
-        stores: [],
-        productsByCategory: [],
-        usedProductsByCategory: []
-      });
-    }
-
-    const productPipeline = [
-      { $match: { storeId: { $in: storeIds } } },
-      { $sort: { createdAt: -1 } },
-      {
-        $group: {
-          _id: "$category.slug",
-          products: { $push: "$$ROOT" }
-        }
-      },
-      {
-        $project: {
-          products: { $slice: ["$products", 10] }
-        }
-      }
-    ];
-
-    const usedProductPipeline = [
-      { $match: { storeId: { $in: storeIds } } },
-      { $sort: { createdAt: -1 } },
-      {
-        $group: {
-          _id: "$category.slug",
-          products: { $push: "$$ROOT" }
-        }
-      },
-      {
-        $project: {
-          products: { $slice: ["$products", 10] }
-        }
-      }
-    ];
-
-    const [aggregatedProducts, aggregatedUsedProducts] = await Promise.all([
-      Product.aggregate(productPipeline),
-      UsedProduct.aggregate(usedProductPipeline)
-    ]);
-
-    const productsByCategory = aggregatedProducts.map((item) => ({
-      [item._id]: item.products
-    }));
-
-    const usedProductsByCategory = aggregatedUsedProducts.map((item) => ({
-      [item._id]: item.products
-    }));
-
-    const usedStoreIds = aggregatedUsedProducts.flatMap((cat) =>
-      cat.products.map((p) => p.storeId.toString())
-    );
-
-    const allStoreIds = [...new Set([...storeIds.map(String), ...usedStoreIds])];
-
-    const stores = await Store.find({ _id: { $in: allStoreIds } });
-
-    return res.status(200).json({
-      success: true,
-      stores,
-      productsByCategory,
-      usedProductsByCategory
-    });
-  } catch (error) {
-    console.error("Error in Get Product controller: ", error);
-    return res.status(500).json({ success: false, message: "Internal server error" });
-  }
 };
 
 const getViewedProducts = async (req, res) => {

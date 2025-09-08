@@ -1,10 +1,11 @@
-import { ShoppingCart, Star, Edit2, Trash2, Eye, Heart, Truck, Tag } from "lucide-react";
+import { ShoppingCart, Star, Edit2, Trash2, Eye, Heart, Truck } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { removeProduct, changeAvailability } from "../api/product";
 import useLoaderStore from "../store/loader";
 import { toast } from "react-hot-toast";
 import useProductStore from "../store/product";
+import useAuthStore from "../store/auth";
 
 export default function Card({ product, userRole = "buyer", onQuickView }) {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const { user } = useAuthStore();
 
   const hasDiscount = product.discount?.percentage || product.discount?.amount;
   const finalPrice = hasDiscount
@@ -27,23 +29,55 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
   const handleCardClick = (product) => {
     navigate(`/product?productId=${product._id}`);
   };
-
+  
   const handleWishlistToggle = (e) => {
     e.stopPropagation();
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "seller" || user?.role === "admin") {
+      toast.error("Only for buyer");
+      return;
+    }
     setIsWishlisted(!isWishlisted);
   };
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "seller" || user?.role === "admin") {
+      toast.error("Only for buyer");
+      return;
+    }
   };
 
   const handleEdit = (e, product) => {
     e.stopPropagation();
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "buyer" || user?.role === "admin") {
+      toast.error("Only for seller");
+      return;
+    }
     navigate("/seller/new-product", { state: { initialData: product } });
   };
 
   const handleDelete = async (e, id) => {
     e.stopPropagation();
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "buyer" || user?.role === "admin") {
+      toast.error("Only for seller");
+      return;
+    }
     if (window.confirm("Are you sure you want to delete this product?")) {
       startLoading("removeProduct");
       try {
@@ -60,6 +94,14 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
   const toggleAvailability = async (e, id, available) => {
     e.stopPropagation();
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "buyer" || user?.role === "admin") {
+      toast.error("Only for seller");
+      return;
+    }
     startLoading("changeAval");
     try {
       const result = await changeAvailability(id, available);
@@ -122,7 +164,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
           {userRole === "buyer" && (
             <div className="absolute top-4 right-4">
               <button
-                onClick={handleWishlistToggle}
+                onClick={(e) => handleWishlistToggle(e)}
                 className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${isWishlisted
                   ? "bg-red-500 text-white"
                   : "bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500"
@@ -138,21 +180,13 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
           >
             <button
               onClick={(e) => handleQuickView(e)}
-              className={`bg-white/95 text-gray-800 px-4 py-2 rounded-full shadow-lg hover:bg-white transition-all z-50 duration-300 font-medium text-sm flex items-center gap-2 transform ${isHovered ? "translate-y-0" : "translate-y-5"
+              className={`bg-white/95 cursor-pointer text-gray-800 px-4 py-2 rounded-full shadow-lg hover:bg-white transition-all z-50 duration-300 font-medium text-sm flex items-center gap-2 transform ${isHovered ? "translate-y-0" : "translate-y-5"
                 }`}
             >
               <Eye size={16} />
               Quick View
             </button>
           </div>
-          {product.deliveryCharge === 0 && (
-            <div className="absolute bottom-4 left-4">
-              <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
-                <Truck size={12} />
-                Free Delivery
-              </span>
-            </div>
-          )}
         </div>
       </div>
       <div className="flex flex-col flex-grow p-5">
@@ -206,7 +240,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
             <button
               onClick={handleAddToCart}
               disabled={product.stock <= 0}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
+              className="w-full flex items-center cursor-pointer justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
             >
               <ShoppingCart className="h-5 w-5" />
               {product.stock > 0 ? "Add to Cart" : "Out of Stock"}

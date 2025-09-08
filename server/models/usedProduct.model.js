@@ -134,7 +134,21 @@ const usedProductSchema = new mongoose.Schema({
   tags: { type: [String], default: [] }
 }, { timestamps: true });
 
-usedProductSchema.index({ storeId: 1, "category.slug": 1, "subCategory.slug": 1 });
+usedProductSchema.index({
+  storeId: 1,
+  "category.slug": 1,
+  "subCategory.slug": 1,
+  "delivery.pickupLocation.state": 1,
+  "delivery.pickupLocation.city": 1,
+  "delivery.pickupLocation.pincode": 1
+});
+
+usedProductSchema.index({
+  storeId: 1,
+  "category.slug": 1,
+  "subCategory.slug": 1,
+  "delivery.shippingLocations.areaName": 1
+});
 
 const UsedProduct = mongoose.model("UsedProduct", usedProductSchema);
 

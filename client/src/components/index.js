@@ -1,6 +1,7 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import Card from "./Card";
+import UsedProductCard from "./UsedProductCard";
 import BuyerRoute from "./routes/BuyerRoute";
 import SellerRoute from "./routes/SellerRoute";
 import AdminRoute from "./routes/AdminRoute";
@@ -15,4 +16,4 @@ import UsedProductDetails from "./UsedProductDetails";
 import Location from "./Location";
 import Recaptcha from "./forms/Recaptcha";
 
-export { Header, Footer, Card, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, ProductDetails, QuickView, UsedProductDetails, Location,Recaptcha };
+export { Header, Footer, Card, UsedProductCard, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, ProductDetails, QuickView, UsedProductDetails, Location, Recaptcha };
