@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import useCategoryProductStore from "../../store/categoryProducts";
 import useUsedCategoryProductStore from "../../store/categoryUsedProduct";
 import { Location, QuickView, Card, UsedProductCard } from "../../components/index";
@@ -6,15 +7,23 @@ import useAuthStore from "../../store/auth";
 
 const Home = () => {
   const categories = useCategoryProductStore((state) => state.categories);
-  const usedProductCategories = useUsedCategoryProductStore((state)=>state.usedProductCategories);
+  const usedProductCategories = useUsedCategoryProductStore((state) => state.usedProductCategories);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
-  const [activeTab, setActiveTab] = useState("new");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (!searchParams.get("show")) {
+      searchParams.set("show", "new");
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, []);
+
+  const activeTab = searchParams.get("show") || "new";
   const currentCategories = activeTab === "used" ? usedProductCategories : categories;
 
   let { user } = useAuthStore();
   if (!user) user = { role: "buyer" };
   else if (!user.role) user.role = "buyer";
-
 
   return (
     <>
@@ -26,11 +35,14 @@ const Home = () => {
             {["new", "used"].map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => {
+                  searchParams.set("show", tab);
+                  setSearchParams(searchParams, { replace: true });
+                }}
                 className={`text-sm sm:text-base px-5 py-2 rounded-lg border border-black dark:border-white font-semibold transition-colors duration-300 ${
                   activeTab === tab
                     ? "bg-blue-600 text-white shadow-lg"
-                    : "bg-white dark:bg-neutral-900 text-blaxk dark:text-white"
+                    : "bg-white dark:bg-neutral-900 text-black dark:text-white"
                 }`}
               >
                 {tab === "new" ? "New Products" : "Used Products"}

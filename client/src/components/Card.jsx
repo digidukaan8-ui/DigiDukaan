@@ -67,6 +67,14 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
     }
   };
 
+  const handleCartBtn = (id) => {
+    let productId = useCartStore.getState().getIdFromCart() || [];
+    if (productId.includes(id) && product.isAvailable) {
+      return true;
+    }
+    return false;
+  }
+
   const handleEdit = (e, product) => {
     e.stopPropagation();
     if (!user) {
@@ -251,7 +259,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
           {userRole === "buyer" && (
             <button
               onClick={handleAddToCart}
-              disabled={product.stock <= 0}
+              disabled={handleCartBtn(product._id)}
               className="w-full flex items-center cursor-pointer justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
             >
               <ShoppingCart className="h-5 w-5" />

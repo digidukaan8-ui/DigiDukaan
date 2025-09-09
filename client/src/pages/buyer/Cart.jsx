@@ -3,21 +3,15 @@ import { useEffect, useState } from "react";
 import { getCart, updateCart, removeCart } from "../../api/product";
 import useLoaderStore from "../../store/loader";
 import { toast } from "react-hot-toast";
-import {
-  Pencil,
-  X,
-  Trash2,
-  Check,
-  ShoppingCart,
-  RefreshCw,
-  ArrowRight,
-} from "lucide-react";
+import { Pencil, X, Trash2, Check, ShoppingCart, RefreshCw, ArrowRight, } from "lucide-react";
+import { useNavigate } from 'react-router-dom'
 
 function Cart() {
   const { cart } = useCartStore();
   const { startLoading, stopLoading } = useLoaderStore();
   const [quantities, setQuantities] = useState({});
   const [editing, setEditing] = useState({});
+  const navigate = useNavigate();
 
   const safeCart = Array.isArray(cart) ? cart : [];
 
@@ -119,6 +113,10 @@ function Cart() {
     0
   );
 
+  const handleOnCLick = (id) => {
+    navigate(`/product?productId=${id}`);
+  }
+
   return (
     <div className="w-full bg-gray-50 dark:bg-neutral-950 min-h-screen font-sans pt-32 pb-8 px-4 sm:px-6">
       <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
@@ -142,6 +140,7 @@ function Cart() {
             return (
               <div
                 key={item._id}
+                onClick={() => handleOnCLick(item.productId._id)}
                 className="relative flex flex-wrap justify-between items-center p-4 rounded-xl shadow-md bg-white dark:bg-neutral-900 transition-transform transform hover:scale-[1.01] border border-black dark:border-white"
               >
                 <button

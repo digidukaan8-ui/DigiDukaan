@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Heart, Share2, Star, ShoppingCart, ChevronLeft, ChevronRight, Play, Edit, Trash2, Plus, Minus } from 'lucide-react';
 import useAuthStore from '../store/auth';
 import useProductStore from '../store/product';
 import { useNavigate } from 'react-router-dom';
 import useLoaderStore from '../store/loader';
-import { removeProduct, changeAvailability } from '../api/product';
+import { removeProduct, changeAvailability, getProductById } from '../api/product';
 import { toast } from 'react-hot-toast';
 import useCategoryProductStore from '../store/categoryProducts';
 import useCartStore from '../store/cart';
@@ -16,10 +16,28 @@ const ProductDetail = ({ id }) => {
   const [isLiked, setIsLiked] = useState(false);
   let { user } = useAuthStore();
   const { startLoading, stopLoading } = useLoaderStore();
-  let product = useProductStore.getState().getProduct(id);
-  if (!product) {
-    product = useCategoryProductStore.getState().getProductById(id);
-  }
+  const [product, setProduct] = useState(
+    useProductStore.getState().getProduct(id) ||
+    useCategoryProductStore.getState().getProductById(id)
+  );
+
+  useEffect(() => {
+    if (!product) {
+      const fetchProduct = async () => {
+        startLoading("fetching");
+        try {
+          const result = await getProductById(id);
+          if (result.success) {
+            setProduct(result.data);
+            useProductStore.getState().addProduct(result.data);
+          }
+        } finally {
+          stopLoading();
+        }
+      };
+      fetchProduct();
+    }
+  }, [id, product, startLoading, stopLoading]);
 
   if (!product) {
     return (
@@ -169,6 +187,14 @@ const ProductDetail = ({ id }) => {
     }
     alert("Add new variant");
   };
+
+  const handleCartBtn = (id) => {
+    let productId = useCartStore.getState().getIdFromCart() || [];
+    if (productId.includes(id) && product.isAvailable) {
+      return true;
+    }
+    return false;
+  }
 
   if (!user) {
     user = { role: "buyer" };
@@ -388,7 +414,7 @@ const ProductDetail = ({ id }) => {
                       Add to Cart
                     </button>
                     <button
-                      disabled={stock === 0 || !isAvailable}
+                      disabled={handleCartBtn(product._id)}
                       className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
                     ${stock === 0 || !isAvailable
                           ? "bg-gray-400 text-gray-600 dark:bg-neutral-900 dark:text-gray-400 cursor-not-allowed"

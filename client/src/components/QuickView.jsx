@@ -54,6 +54,14 @@ export default function QuickView({ product, isOpen, onClose }) {
     }
   };
 
+  const handleCartBtn = (id) => {
+    let productId = useCartStore.getState().getIdFromCart() || [];
+    if (productId.includes(id) && product.isAvailable) {
+      return true;
+    }
+    return false;
+  }
+
   return (
     <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4">
       <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden relative border border-black dark:border-white">
@@ -112,6 +120,7 @@ export default function QuickView({ product, isOpen, onClose }) {
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => handleCart(product._id)}
+                disabled={handleCartBtn(product._id)}
                 className="flex items-center gap-2 flex-1 justify-center py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition border border-black dark:border-white">
                 <ShoppingCart className="h-5 w-5" />
                 Add to Cart

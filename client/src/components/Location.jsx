@@ -262,7 +262,7 @@ export default function Location() {
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center justify-center gap-3 w-full">
+                        <div className="flex flex-wrap items-center justify-end gap-3 w-full">
                             <button
                                 onClick={toggleForm}
                                 className="flex items-center text-xs text-blue-600 dark:text-blue-400 hover:underline"

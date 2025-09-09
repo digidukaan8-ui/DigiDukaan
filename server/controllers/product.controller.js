@@ -7,7 +7,7 @@ import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.co
 
 const addProduct = async (req, res) => {
     try {
-        const { title, description, category, subCategory,unit, price, stock, brand, deliveryCharge } = req.body;
+        const { title, description, category, subCategory, unit, price, stock, brand, deliveryCharge } = req.body;
         const { storeId } = req.params;
         const attributes = req.body.attributes;
         const tags = req.body.tags;
@@ -92,7 +92,7 @@ const getProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { productId } = req.params;
-        let { title, description, category, subCategory,unit, price, stock, brand, deliveryCharge, attributes, tags, discount, removedImg, keptImg, video } = req.body;
+        let { title, description, category, subCategory, unit, price, stock, brand, deliveryCharge, attributes, tags, discount, removedImg, keptImg, video } = req.body;
 
         if (attributes && typeof attributes === "string") {
             try { attributes = JSON.parse(attributes); }
@@ -254,7 +254,7 @@ const changeAvailability = async (req, res) => {
 
 const addUsedProduct = async (req, res) => {
     try {
-        let { title, description, category, subCategory,unit, price, condition, brand, delivery, isNegotiable, billAvailable, attributes, tags, discount } = req.body;
+        let { title, description, category, subCategory, unit, price, condition, brand, delivery, isNegotiable, billAvailable, attributes, tags, discount } = req.body;
         const { storeId } = req.params;
 
         if (typeof attributes === "string") attributes = JSON.parse(attributes);
@@ -343,7 +343,7 @@ const getUsedProduct = async (req, res) => {
 const updateUsedProduct = async (req, res) => {
     try {
         const { usedProductId } = req.params;
-        let { title, description, category, subCategory,unit, price, condition, brand, delivery, attributes, tags, discount, removedImg, keptImg, video, isNegotiable, billAvailable } = req.body;
+        let { title, description, category, subCategory, unit, price, condition, brand, delivery, attributes, tags, discount, removedImg, keptImg, video, isNegotiable, billAvailable } = req.body;
 
         if (typeof attributes === "string") attributes = JSON.parse(attributes);
         if (typeof tags === "string") tags = JSON.parse(tags);
@@ -568,6 +568,25 @@ const getProducts = async (req, res) => {
     }
 };
 
+const getProductById = async (req, res) => {
+    try {
+        const { productId } = req.params;
+        if (!productId) {
+            return res.status(400).json({ success: false, message: 'Product id is required' });
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Product fetched successfully', data: product })
+    } catch (error) {
+        console.error("Error in Get Product By Id controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
+
 const getViewedProducts = async (req, res) => {
     try {
 
@@ -587,28 +606,28 @@ const getWishlistProducts = async (req, res) => {
 }
 
 const getCartProducts = async (req, res) => {
-  try {
-    const user = req.user;
+    try {
+        const user = req.user;
 
-    const cartItems = await Cart.find({ userId: user._id })
-      .populate({
-        path: "productId",
-        select: "title description unit price img discount stock deliveryCharge storeId",
-        populate: {
-          path: "storeId",
-          select: "name"
-        }
-      });
+        const cartItems = await Cart.find({ userId: user._id })
+            .populate({
+                path: "productId",
+                select: "title description unit price img discount stock deliveryCharge storeId",
+                populate: {
+                    path: "storeId",
+                    select: "name"
+                }
+            });
 
-    return res.status(200).json({
-      success: true,
-      message: "Cart products fetched successfully",
-      data: cartItems,
-    });
-  } catch (error) {
-    console.error("Error in Get Cart Product controller: ", error);
-    return res.status(500).json({ success: false, message: "Internal server error" });
-  }
+        return res.status(200).json({
+            success: true,
+            message: "Cart products fetched successfully",
+            data: cartItems,
+        });
+    } catch (error) {
+        console.error("Error in Get Cart Product controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
 };
 
 const getReview = async (req, res) => {
@@ -639,38 +658,37 @@ const addWishlistProduct = async (req, res) => {
 }
 
 const addCartProduct = async (req, res) => {
-  try {
-    const { quantity } = req.body;
-    const { productId } = req.params;
-    const user = req.user;
+    try {
+        const { quantity } = req.body;
+        const { productId } = req.params;
+        const user = req.user;
 
-    const existing = await Cart.findOne({ userId: user._id, productId });
-    if (existing) {
-      return res.status(400).json({ success: false, message: "Product already in cart" });
-    }
-
-    let cartItem = await Cart.create({ userId: user._id, productId, quantity });
-
-    cartItem = await Cart.findById(cartItem._id)
-      .populate({
-        path: "productId",
-        select: "title description unit price img discount stock deliveryCharge storeId",
-        populate: {
-          path: "storeId",
-          select: "name"
+        const existing = await Cart.findOne({ userId: user._id, productId });
+        if (existing) {
+            return res.status(400).json({ success: false, message: "Product already in cart" });
         }
-      });
 
-    return res.status(201).json({
-      success: true,
-      message: "Product added to cart successfully",
-      data: cartItem,
-      deliveryZones: zonesByStore
-    });
-  } catch (error) {
-    console.error("Error in Add Cart Product controller: ", error);
-    return res.status(500).json({ success: false, message: "Internal server error" });
-  }
+        let cartItem = await Cart.create({ userId: user._id, productId, quantity });
+
+        cartItem = await Cart.findById(cartItem._id)
+            .populate({
+                path: "productId",
+                select: "title description unit price img discount stock deliveryCharge storeId",
+                populate: {
+                    path: "storeId",
+                    select: "name"
+                }
+            });
+
+        return res.status(201).json({
+            success: true,
+            message: "Product added to cart successfully",
+            data: cartItem,
+        });
+    } catch (error) {
+        console.error("Error in Add Cart Product controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
 };
 
 const addReview = async (req, res) => {
@@ -768,5 +786,6 @@ export {
     getProducts, getViewedProducts, getWishlistProducts, getCartProducts, getReview,
     addViewedProduct, addWishlistProduct, addCartProduct, addReview,
     removeViewedProduct, removeWishlistProduct, removeCartProduct, removeReview,
-    updateCart, updateReview
+    updateCart, updateReview,
+    getProductById
 };

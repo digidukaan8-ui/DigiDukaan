@@ -5,7 +5,9 @@ const useCartStore = create(
   persist(
     (set, get) => ({
       cart: [],
+
       setCart: (cart) => set({ cart }),
+
       addToCart: (product) => {
         const cart = get().cart;
         const existing = cart.find((item) => item.productId === product.productId);
@@ -20,6 +22,7 @@ const useCartStore = create(
           set({ cart: [...cart, product] });
         }
       },
+
       updateCart: (cartId, quantity) => {
         const cart = get().cart;
         const updatedCart = cart.map((item) =>
@@ -27,10 +30,16 @@ const useCartStore = create(
         );
         set({ cart: updatedCart });
       },
+
       removeFromCart: (cartId) => {
         const cart = get().cart.filter((item) => item._id !== cartId);
         set({ cart });
       },
+
+      getIdFromCart: () => {
+        return get().cart.map(item => item.productId._id);
+      },
+
       clearCart: () => set({ cart: [] }),
     }),
     {

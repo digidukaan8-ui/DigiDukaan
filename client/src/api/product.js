@@ -396,6 +396,30 @@ const getProducts = async (data) => {
     }
 }
 
+const getProductById = async (productId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/product/${productId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get products");
+            throw new Error(result.message || "Failed to get products");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in Get Products: ", error);
+        throw error;
+    }
+}
+
 const addToCart = async (productId, quantity) => {
     try {
         const response = await fetch(`http://localhost:3000/api/buyers/cart/${productId}`, {
@@ -497,6 +521,6 @@ const getCart = async () => {
 export {
     addProduct, getProduct, updateProduct, removeProduct, changeAvailability,
     addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct,
-    getProducts,
+    getProducts, getProductById,
     addToCart, getCart, updateCart, removeCart
 };
