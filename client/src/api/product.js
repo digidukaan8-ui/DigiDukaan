@@ -8,6 +8,7 @@ const addProduct = async (data) => {
         formData.append('description', data.description);
         formData.append('category', data.category);
         formData.append('subCategory', data.subCategory);
+        formData.append('unit', data.unit);
         if (data.img && data.img.length > 0) {
             for (let i = 0; i < data.img.length; i++) {
                 formData.append("img", data.img[i]);
@@ -76,6 +77,7 @@ const updateProduct = async (data) => {
             formData.append('description', data.description);
             formData.append('category', data.category);
             formData.append('subCategory', data.subCategory);
+            formData.append('unit', data.unit);
 
             if (data.img) {
                 data.img.forEach((file) => {
@@ -107,6 +109,7 @@ const updateProduct = async (data) => {
                 description: data.description,
                 category: data.category,
                 subCategory: data.subCategory,
+                unit: data.unit,
                 img: data.img,
                 video: data.video,
                 price: Number(data.price),
@@ -201,6 +204,7 @@ const addUsedProduct = async (data) => {
         formData.append('description', data.description);
         formData.append('category', data.category);
         formData.append('subCategory', data.subCategory);
+        formData.append('unit', data.unit);
         if (data.img && data.img.length > 0) {
             for (let i = 0; i < data.img.length; i++) {
                 formData.append("img", data.img[i]);
@@ -270,6 +274,7 @@ const updateUsedProduct = async (data) => {
             formData.append('description', data.description);
             formData.append('category', data.category);
             formData.append('subCategory', data.subCategory);
+            formData.append('unit', data.unit);
 
             if (data.img) {
                 data.img.forEach((file) => {
@@ -303,6 +308,7 @@ const updateUsedProduct = async (data) => {
                 description: data.description,
                 category: data.category,
                 subCategory: data.subCategory,
+                unit: data.unit,
                 img: data.img,
                 video: data.video,
                 price: Number(data.price),
@@ -390,8 +396,107 @@ const getProducts = async (data) => {
     }
 }
 
+const addToCart = async (productId, quantity) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/cart/${productId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            credentials: "include",
+            body: JSON.stringify({ quantity: quantity })
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to add product in cart");
+            throw new Error(result.message || "Failed to add product in cart");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in Add to Cart: ", error);
+        throw error;
+    }
+}
+
+const updateCart = async (cartId, quantity) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/cart/${cartId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'PUT',
+            credentials: "include",
+            body: JSON.stringify(quantity)
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to update cart");
+            throw new Error(result.message || "Failed to update cart");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in Update Cart: ", error);
+        throw error;
+    }
+}
+
+const removeCart = async (cartId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/cart/${cartId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'DELETE',
+            credentials: "include",
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to remove product in cart");
+            throw new Error(result.message || "Failed to remove product in cart");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in Remove Cart: ", error);
+        throw error;
+    }
+}
+
+const getCart = async () => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/cart`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+            credentials: "include",
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get product from cart");
+            throw new Error(result.message || "Failed to get product from cart");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in Get Cart: ", error);
+        throw error;
+    }
+}
+
 export {
     addProduct, getProduct, updateProduct, removeProduct, changeAvailability,
     addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct,
-    getProducts
+    getProducts,
+    addToCart, getCart, updateCart, removeCart
 };

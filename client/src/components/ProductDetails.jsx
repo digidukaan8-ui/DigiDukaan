@@ -7,6 +7,7 @@ import useLoaderStore from '../store/loader';
 import { removeProduct, changeAvailability } from '../api/product';
 import { toast } from 'react-hot-toast';
 import useCategoryProductStore from '../store/categoryProducts';
+import useCartStore from '../store/cart';
 
 const ProductDetail = ({ id }) => {
   const navigate = useNavigate();
@@ -68,19 +69,60 @@ const ProductDetail = ({ id }) => {
   const nextImage = () => setSelectedImageIndex((prev) => (prev + 1) % img.length);
   const prevImage = () => setSelectedImageIndex((prev) => (prev - 1 + img.length) % img.length);
 
-  const handleAddToCart = () => {
-    if (stock === 0) {
-      alert("Out of stock!");
+  const handleAddToCart = async (id) => {
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "seller" || user?.role === "admin") {
+      toast.error("Only for buyer");
       return;
     }
-    alert("Added to cart!");
+    startLoading("addToCart");
+    try {
+      const result = await addToCart(id, quantity);
+      if (result.success) {
+        useCartStore.getState().addToCart(result.data);
+        toast.success("Product added to cart");
+      }
+    } finally {
+      stopLoading();
+    }
+  };
+
+  const handleWishList = (id) => {
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "seller" || user?.role === "admin") {
+      toast.error("Only for buyer");
+      return;
+    }
+    setIsLiked(!isLiked);
   };
 
   const handleUpdateDetails = (product) => {
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "buyer" || user?.role === "admin") {
+      toast.error("Only for seller");
+      return;
+    }
     navigate("/seller/new-product", { state: { initialData: product } });
   };
 
   const handleToggleAvailability = async (id, available) => {
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "buyer" || user?.role === "admin") {
+      toast.error("Only for seller");
+      return;
+    }
     startLoading("changeAval");
     try {
       const result = await changeAvailability(id, available);
@@ -94,6 +136,14 @@ const ProductDetail = ({ id }) => {
   };
 
   const handleDelete = async (id) => {
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "buyer" || user?.role === "admin") {
+      toast.error("Only for seller");
+      return;
+    }
     if (confirm("Are you sure you want to delete this product?")) {
       startLoading("removeProduct");
       try {
@@ -109,6 +159,14 @@ const ProductDetail = ({ id }) => {
   };
 
   const handleManageVariant = () => {
+    if (!user) {
+      navigate(`/login`);
+      toast.error("Login First");
+      return;
+    } else if (user?.role === "buyer" || user?.role === "admin") {
+      toast.error("Only for seller");
+      return;
+    }
     alert("Add new variant");
   };
 
@@ -119,7 +177,7 @@ const ProductDetail = ({ id }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-30 pb-10">
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-32 pb-10">
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10">
           <div className="flex flex-col">
@@ -229,7 +287,7 @@ const ProductDetail = ({ id }) => {
             </div>
 
             <div className="border-y border-gray-200 dark:border-neutral-800 py-4 space-y-4">
-              {hasDiscount && (
+              {hasDiscount > 0 && (
                 <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
                   -{discountType === "₹" && "₹"}{discountValue}
                   {discountType === "%" && "%"} OFF
@@ -237,10 +295,10 @@ const ProductDetail = ({ id }) => {
               )}
               <div className="flex items-baseline gap-2 mt-2">
                 <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">₹{finalPrice.toFixed(2)}</span>
-                {hasDiscount && (
+                {hasDiscount > 0 && (
                   <span className="line-through text-gray-500 dark:text-gray-400 text-base">₹{price.toFixed(2)}</span>
                 )}
-                {hasDiscount && (
+                {hasDiscount > 0 && (
                   <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">Save ₹{(price - finalPrice).toFixed(2)}</span>
                 )}
               </div>
@@ -319,7 +377,7 @@ const ProductDetail = ({ id }) => {
                 <div className="flex flex-col justify-center items-center sm:items-baseline gap-5">
                   <div className='flex flex-col justify-between items-center gap-3 w-[300px]'>
                     <button
-                      onClick={handleAddToCart}
+                      onClick={() => handleAddToCart(product._id)}
                       disabled={stock === 0 || !isAvailable}
                       className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
                     ${stock === 0 || !isAvailable
@@ -330,7 +388,6 @@ const ProductDetail = ({ id }) => {
                       Add to Cart
                     </button>
                     <button
-                      onClick={handleAddToCart}
                       disabled={stock === 0 || !isAvailable}
                       className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
                     ${stock === 0 || !isAvailable
@@ -344,7 +401,7 @@ const ProductDetail = ({ id }) => {
 
                   <div className='flex justify-center items-center gap-3 w-[300px]'>
                     <button
-                      onClick={() => setIsLiked(!isLiked)}
+                      onClick={() => handleWishList(product._id)}
                       className={`w-10 h-10 flex items-center justify-center cursor-pointer rounded-full border border-black dark:border-white transition-colors
                       ${isLiked
                           ? "bg-red-100 text-red-500 dark:bg-red-900/20 dark:text-red-400"

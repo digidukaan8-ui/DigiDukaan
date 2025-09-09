@@ -33,6 +33,7 @@ export default function NewProductForm() {
     defaultValues: {
       title: initialData?.title || "",
       description: initialData?.description || "",
+      unit: initialData?.unit,
       category: defaultCategory,
       subCategory: defaultSubCategory,
       brand: initialData?.brand || "",
@@ -393,7 +394,7 @@ export default function NewProductForm() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label htmlFor="stock" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
                 Stock
@@ -422,6 +423,40 @@ export default function NewProductForm() {
               />
               {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label
+                htmlFor="unit"
+                className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
+              >
+                Unit
+              </label>
+              <select
+                id="unit"
+                {...register("unit")}
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              >
+                <option value="">Select unit</option>
+                <option value="g">Gram (g)</option>
+                <option value="kg">Kilogram (kg)</option>
+                <option value="ml">Milliliter (ml)</option>
+                <option value="l">Liter (l)</option>
+                <option value="pc">Piece (pc)</option>
+                <option value="pkt">Packet (pkt)</option>
+                <option value="box">Box</option>
+                <option value="doz">Dozen (doz)</option>
+                <option value="pair">Pair</option>
+                <option value="set">Set</option>
+                <option value="bottle">Bottle</option>
+                <option value="can">Can</option>
+                <option value="jar">Jar</option>
+              </select>
+              {errors.unit && (
+                <p className="text-red-500 text-sm mt-1">{errors.unit.message}</p>
+              )}
+            </div>
 
             <div>
               <label htmlFor="deliveryCharge" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
@@ -437,7 +472,7 @@ export default function NewProductForm() {
               />
               {errors.deliveryCharge && <p className="text-red-500 text-sm mt-1">{errors.deliveryCharge.message}</p>}
               <p className="pl-0.5 text-xs text-gray-600 dark:text-gray-400 mt-1">
-                Charged per product.
+                Charged on product.
               </p>
             </div>
           </div>

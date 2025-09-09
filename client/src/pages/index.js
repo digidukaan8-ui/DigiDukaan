@@ -11,7 +11,9 @@ import Logout from "./common/Logout";
 import Store from "./seller/Store";
 import Product from "./common/Product";
 import UsedProduct from "./common/UsedProduct";
+import Profile from "./buyer/Profile";
+import Cart from "./buyer/Cart"
 
 export {
-    Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct
+    Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct, Profile, Cart
 };

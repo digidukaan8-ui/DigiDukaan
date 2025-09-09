@@ -80,6 +80,13 @@ const usedProductSchema = new mongoose.Schema({
     amount: { type: Number, min: 0, default: null }
   },
 
+  unit: {
+    type: String,
+    enum: ["pc", "set", "pair", "box", "pkt"],
+    default: 'pc',
+    required: true
+  },
+
   delivery: {
     type: {
       type: String,

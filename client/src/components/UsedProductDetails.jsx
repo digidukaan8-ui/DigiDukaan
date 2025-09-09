@@ -67,7 +67,27 @@ const UsedProductDetail = ({ id }) => {
     const nextImage = () => setSelectedImageIndex((prev) => (prev + 1) % img.length);
     const prevImage = () => setSelectedImageIndex((prev) => (prev - 1 + img.length) % img.length);
 
+    const handleUpdate = (product) => {
+        if (!user) {
+            navigate(`/login`);
+            toast.error("Login First");
+            return;
+        } else if (user?.role === "buyer" || user?.role === "admin") {
+            toast.error("Only for seller");
+            return;
+        }
+        navigate("/seller/used-product", { state: { initialData: product } });
+    };
+
     const handleDelete = async (id) => {
+        if (!user) {
+            navigate(`/login`);
+            toast.error("Login First");
+            return;
+        } else if (user?.role === "buyer" || user?.role === "admin") {
+            toast.error("Only for seller");
+            return;
+        }
         if (confirm("Are you sure you want to delete this product?")) {
             startLoading("removeProduct");
             try {
@@ -79,6 +99,29 @@ const UsedProductDetail = ({ id }) => {
             } finally {
                 stopLoading();
             }
+        }
+    };
+
+    const handleWishlist = (id) => {
+        if (!user) {
+            navigate(`/login`);
+            toast.error("Login First");
+            return;
+        } else if (user?.role === "seller" || user?.role === "admin") {
+            toast.error("Only for buyer");
+            return;
+        }
+        setIsLiked(!isLiked);
+    };
+
+    const handleChatSeller = () => {
+        if (!user) {
+            navigate(`/login`);
+            toast.error("Login First");
+            return;
+        } else if (user?.role === "seller" || user?.role === "admin") {
+            toast.error("Only for buyer");
+            return;
         }
     };
 
@@ -104,7 +147,7 @@ const UsedProductDetail = ({ id }) => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-30 pb-10">
+        <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-32 pb-10">
             <div className="container mx-auto px-4 py-6 sm:py-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
                     <div className="flex flex-col">
@@ -193,7 +236,7 @@ const UsedProductDetail = ({ id }) => {
                         </div>
 
                         <div className="border-y border-gray-200 dark:border-neutral-800 py-4 space-y-4">
-                            {hasDiscount && (
+                            {hasDiscount > 0 && (
                                 <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
                                     -{discountType === "₹" && "₹"}{discountValue}
                                     {discountType === "%" && "%"} OFF
@@ -201,10 +244,10 @@ const UsedProductDetail = ({ id }) => {
                             )}
                             <div className="flex items-baseline gap-2 mt-2">
                                 <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">₹{finalPrice.toFixed(2)}</span>
-                                {hasDiscount && (
+                                {hasDiscount > 0 && (
                                     <span className="line-through text-gray-500 dark:text-gray-400 text-base">₹{price.toFixed(2)}</span>
                                 )}
-                                {hasDiscount && (
+                                {hasDiscount > 0 && (
                                     <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">Save ₹{(price - finalPrice).toFixed(2)}</span>
                                 )}
                             </div>
@@ -215,7 +258,6 @@ const UsedProductDetail = ({ id }) => {
                             )}
                         </div>
 
-                        {/* Description */}
                         <div>
                             <h2 className="text-lg md:text-xl font-bold mb-2">About this item</h2>
                             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -223,7 +265,6 @@ const UsedProductDetail = ({ id }) => {
                             </p>
                         </div>
 
-                        {/* Basic Info */}
                         <div className="flex flex-wrap items-center gap-2 mb-1 text-sm md:text-base">
                             {brand && (
                                 <span className='bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-md px-4 py-2'>
@@ -242,7 +283,6 @@ const UsedProductDetail = ({ id }) => {
                             )}
                         </div>
 
-                        {/* Delivery Information */}
                         {delivery && (
                             <div>
                                 <h2 className="text-lg md:text-xl font-bold mb-2">Delivery Options</h2>
@@ -321,7 +361,6 @@ const UsedProductDetail = ({ id }) => {
                             </div>
                         )}
 
-                        {/* Specifications */}
                         {attributes && attributes.length > 0 && (
                             <div>
                                 <h2 className="text-lg md:text-xl font-bold mb-2">Specifications</h2>
@@ -339,7 +378,6 @@ const UsedProductDetail = ({ id }) => {
                             </div>
                         )}
 
-                        {/* Tags */}
                         {tags && tags.length > 0 && (
                             <div>
                                 <h2 className="text-lg md:text-xl font-bold mb-2">Tags</h2>
@@ -356,13 +394,13 @@ const UsedProductDetail = ({ id }) => {
                             </div>
                         )}
 
-                        {/* Action Buttons */}
                         {user.role === "buyer" ? (
                             <div className="border-y border-gray-200 dark:border-neutral-800 py-4 space-y-4">
                                 <div className="flex flex-col justify-center items-center sm:items-baseline gap-5">
                                     <div className='flex flex-col justify-between items-center gap-3 w-[300px]'>
                                         <button
                                             disabled={isSold}
+                                            onClick={handleChatSeller}
                                             className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
                                                 ${isSold
                                                     ? "bg-gray-400 text-gray-600 dark:bg-neutral-900 dark:text-gray-400 cursor-not-allowed"
@@ -375,7 +413,7 @@ const UsedProductDetail = ({ id }) => {
 
                                     <div className='flex justify-center items-center gap-3 w-[300px]'>
                                         <button
-                                            onClick={() => setIsLiked(!isLiked)}
+                                            onClick={() => handleWishlist(product._id)}
                                             className={`w-10 h-10 flex items-center justify-center cursor-pointer rounded-full border border-black dark:border-white transition-colors
                                                 ${isLiked
                                                     ? "bg-red-100 text-red-500 dark:bg-red-900/20 dark:text-red-400"
@@ -394,7 +432,7 @@ const UsedProductDetail = ({ id }) => {
                         ) : (
                             <div className="flex flex-wrap justify-center items-center gap-3 mt-4">
                                 <button
-                                    onClick={() => navigate("/seller/used-product", { state: { initialData: product } })}
+                                    onClick={() => handleUpdate(product)}
                                     className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-sky-600 text-white font-semibold text-sm transition-all hover:bg-sky-700 border border-black dark:border-white"
                                 >
                                     <Edit className="w-4 h-4" />

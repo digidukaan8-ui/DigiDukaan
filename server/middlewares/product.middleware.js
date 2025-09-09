@@ -1,9 +1,10 @@
+import Product from "../models/product.model.js";
 import Store from "../models/store.model.js";
 import { isValidCategory, isValidSubCategory, isValidUsedProductCategory, isValidUsedProductSubCategory } from "../utils/category.util.js";
 
 const handleAddProduct = async (req, res, next) => {
     try {
-        let { title, description, category, subCategory, price, discount, stock, attributes, brand, tags, deliveryCharge } = req.body;
+        let { title, description, category, subCategory, unit, price, discount, stock, attributes, brand, tags, deliveryCharge } = req.body;
 
         const { storeId } = req.params;
 
@@ -31,7 +32,7 @@ const handleAddProduct = async (req, res, next) => {
             }
         }
 
-        if (!storeId || !title || !description || !category || !subCategory || !price || !stock || !attributes) {
+        if (!storeId || !title || !description || !category || !subCategory || !price || !stock || !attributes || !unit) {
             return res.status(400).json({ success: false, message: "Missing required fields" });
         }
 
@@ -40,7 +41,8 @@ const handleAddProduct = async (req, res, next) => {
             typeof title !== "string" ||
             typeof description !== "string" ||
             typeof category !== "string" ||
-            typeof subCategory !== "string"
+            typeof subCategory !== "string" ||
+            typeof unit !== "string"
         ) {
             return res.status(400).json({ success: false, message: "Invalid input format for required fields" });
         }
@@ -107,7 +109,7 @@ const handleAddProduct = async (req, res, next) => {
 
 const handleUpdateProduct = async (req, res, next) => {
     try {
-        let { title, description, category, subCategory, price, discount, stock, attributes, brand, tags, deliveryCharge } = req.body;
+        let { title, description, category, subCategory, unit, price, discount, stock, attributes, brand, tags, deliveryCharge } = req.body;
         const { productId } = req.params;
 
         if (attributes && typeof attributes === "string") {
@@ -125,11 +127,11 @@ const handleUpdateProduct = async (req, res, next) => {
             catch { return res.status(400).json({ success: false, message: "Invalid discount format" }); }
         }
 
-        if (!productId || !title || !description || !category || !subCategory || price == null || stock == null || !attributes) {
+        if (!productId || !title || !description || !category || !subCategory || price == null || stock == null || !attributes || !unit) {
             return res.status(400).json({ success: false, message: "Missing required fields" });
         }
 
-        if ([title, category, description, subCategory].some(v => typeof v !== "string")) {
+        if ([title, category, description, subCategory, unit].some(v => typeof v !== "string")) {
             return res.status(400).json({ success: false, message: "Invalid input format for required fields" });
         }
 
@@ -195,14 +197,14 @@ const handleUpdateProduct = async (req, res, next) => {
 
 const handleAddUsedProduct = async (req, res, next) => {
     try {
-        let { title, description, category, subCategory, price, condition, attributes, brand, tags, isNegotiable, billAvailable, delivery, discount } = req.body;
+        let { title, description, category, subCategory, unit, price, condition, attributes, brand, tags, isNegotiable, billAvailable, delivery, discount } = req.body;
         const { storeId } = req.params;
         if (typeof attributes === "string") attributes = JSON.parse(attributes);
         if (typeof tags === "string") tags = JSON.parse(tags);
         if (typeof discount === "string") discount = JSON.parse(discount);
         if (typeof delivery === "string") delivery = JSON.parse(delivery);
 
-        if (!title || !description || !category || !subCategory || !price || !condition || !attributes) {
+        if (!title || !description || !category || !subCategory || !price || !condition || !attributes || !unit) {
             return res.status(400).json({ success: false, message: "Missing required fields" });
         }
 
@@ -215,7 +217,8 @@ const handleAddUsedProduct = async (req, res, next) => {
             typeof subCategory !== "string" ||
             typeof condition !== "string" ||
             typeof isNegotiable !== "boolean" ||
-            typeof billAvailable !== "boolean"
+            typeof billAvailable !== "boolean" ||
+            typeof unit !== "string"
         ) {
             return res.status(400).json({ success: false, message: "Invalid types for required fields" });
         }
@@ -299,7 +302,7 @@ const handleAddUsedProduct = async (req, res, next) => {
 
 const handleUpdateUsedProduct = async (req, res, next) => {
     try {
-        let { title, description, category, subCategory, price, discount, attributes, brand, tags, condition, isNegotiable, billAvailable, delivery } = req.body;
+        let { title, description, category, subCategory, unit, price, discount, attributes, brand, tags, condition, isNegotiable, billAvailable, delivery } = req.body;
         const { usedProductId } = req.params;
 
         if (typeof attributes === "string") attributes = JSON.parse(attributes);
@@ -307,7 +310,7 @@ const handleUpdateUsedProduct = async (req, res, next) => {
         if (typeof discount === "string") discount = JSON.parse(discount);
         if (typeof delivery === "string") delivery = JSON.parse(delivery);
 
-        if (!usedProductId || !title || !description || !category || !subCategory || !price || !condition || !attributes) {
+        if (!usedProductId || !title || !description || !category || !subCategory || !price || !condition || !attributes || !unit) {
             return res.status(400).json({ success: false, message: "Missing required fields" });
         }
 
@@ -320,6 +323,7 @@ const handleUpdateUsedProduct = async (req, res, next) => {
             typeof category !== "string" ||
             typeof subCategory !== "string" ||
             typeof condition !== "string" ||
+            typeof unit !== "string" ||
             typeof isNegotiable !== "boolean" ||
             typeof billAvailable !== "boolean"
         ) {
@@ -393,4 +397,59 @@ const handleUpdateUsedProduct = async (req, res, next) => {
     }
 }
 
-export { handleAddProduct, handleUpdateProduct, handleAddUsedProduct, handleUpdateUsedProduct };
+const handleAddToCart = async (req, res, next) => {
+    try {
+        let { quantity } = req.body;
+        const { productId } = req.params;
+
+        if (!productId || !quantity) {
+            return res.status(400).json({ success: false, message: 'All fields are required' });
+        }
+
+        quantity = Number(quantity);
+        if (typeof productId !== "string" || isNaN(quantity)) {
+            return res.status(400).json({ success: false, message: 'Invalid format' });
+        }
+
+        if (quantity < 1) {
+            return res.status(400).json({ success: false, message: 'Quantity must be at least 1' });
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        return next();
+    } catch (error) {
+        console.error("Error in Add To Cart middleware: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+const handleUpdateCart = (req, res, next) => {
+    try {
+        let { quantity } = req.body;
+        const { cartId } = req.params;
+
+        if (!cartId || !quantity) {
+            return res.status(400).json({ success: false, message: 'All fields are required' });
+        }
+
+        quantity = Number(quantity);
+        if (typeof cartId !== "string" || isNaN(quantity)) {
+            return res.status(400).json({ success: false, message: 'Invalid format' });
+        }
+
+        if (quantity < 1) {
+            return res.status(400).json({ success: false, message: 'Quantity must be at least 1' });
+        }
+
+        return next();
+    } catch (error) {
+        console.error("Error in Update Cart middleware: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+export { handleAddProduct, handleUpdateProduct, handleAddUsedProduct, handleUpdateUsedProduct, handleAddToCart, handleUpdateCart };

@@ -106,6 +106,18 @@ const productSchema = new mongoose.Schema({
         }
     ],
 
+    unit: {
+        type: String,
+        enum: [
+            "g", "kg",
+            "ml", "l",
+            "pc", "pkt", "box", "doz", "pair", "set",
+            "bottle", "can", "jar"
+        ],
+        default: 'pc',
+        required: true
+    },
+
     brand: {
         type: String,
         trim: true

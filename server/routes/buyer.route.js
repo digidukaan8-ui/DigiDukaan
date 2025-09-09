@@ -4,26 +4,28 @@ import {
     getViewedProducts, getWishlistProducts, getCartProducts, getReview,
     addViewedProduct, addWishlistProduct, addCartProduct, addReview,
     removeViewedProduct, removeWishlistProduct, removeCartProduct, removeReview,
-    updateReview
+    updateCart, updateReview
 } from '../controllers/product.controller.js';
+import { handleAddToCart, handleUpdateCart } from '../middlewares/product.middleware.js';
 
 const buyerRouter = express.Router();
 
-buyerRouter.get('/products/viewed', authMiddleware('buyer'), getViewedProducts);
-buyerRouter.get('/products/wishlist', authMiddleware('buyer'), getWishlistProducts);
-buyerRouter.get('/products/cart', authMiddleware('buyer'), getCartProducts);
-buyerRouter.get('/products/reviews', authMiddleware('buyer'), getReview);
+buyerRouter.get('/cart', authMiddleware('buyer'), getCartProducts);
+buyerRouter.get('/wishlist', authMiddleware('buyer'), getWishlistProducts);
+buyerRouter.get('/viewed', authMiddleware('buyer'), getViewedProducts);
+buyerRouter.get('/reviews', authMiddleware('buyer'), getReview);
 
-buyerRouter.post('/products/:productId/viewed', authMiddleware('buyer'), addViewedProduct);
-buyerRouter.post('/products/:productId/wishlist', authMiddleware('buyer'), addWishlistProduct);
-buyerRouter.post('/products/:productId/cart', authMiddleware('buyer'), addCartProduct);
-buyerRouter.post('/products/:productId/review', authMiddleware('buyer'), addReview);
+buyerRouter.post('/cart/:productId', authMiddleware('buyer'), handleAddToCart, addCartProduct);
+buyerRouter.post('/wishlist/:productId', authMiddleware('buyer'), addWishlistProduct);
+buyerRouter.post('/viewed/:productId', authMiddleware('buyer'), addViewedProduct);
+buyerRouter.post('/review/:productId', authMiddleware('buyer'), addReview);
 
-buyerRouter.put('/products/review/:reviewId', authMiddleware('buyer'), updateReview);
+buyerRouter.put('/cart/:cartId', authMiddleware('buyer'), handleUpdateCart, updateCart);
+buyerRouter.put('/review/:reviewId', authMiddleware('buyer'), updateReview);
 
-buyerRouter.delete('/products/:productId/viewed', authMiddleware('buyer'), removeViewedProduct);
-buyerRouter.delete('/products/:productId/wishlist', authMiddleware('buyer'), removeWishlistProduct);
-buyerRouter.delete('/products/:productId/cart', authMiddleware('buyer'), removeCartProduct);
-buyerRouter.delete('/products/review/:reviewId', authMiddleware('buyer'), removeReview);
+buyerRouter.delete('/cart/:cartId', authMiddleware('buyer'), removeCartProduct);
+buyerRouter.delete('/wishlist/:productId', authMiddleware('buyer'), removeWishlistProduct);
+buyerRouter.delete('/viewed/:productId', authMiddleware('buyer'), removeViewedProduct);
+buyerRouter.delete('/review/:reviewId', authMiddleware('buyer'), removeReview);
 
 export default buyerRouter;

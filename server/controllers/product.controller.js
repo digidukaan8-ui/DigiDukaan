@@ -2,11 +2,12 @@ import Store from "../models/store.model.js";
 import Product from "../models/product.model.js";
 import DeliveryZone from "../models/deliveryzone.model.js";
 import UsedProduct from "../models/usedProduct.model.js";
+import Cart from "../models/cart.model.js"
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.config.js";
 
 const addProduct = async (req, res) => {
     try {
-        const { title, description, category, subCategory, price, stock, brand, deliveryCharge } = req.body;
+        const { title, description, category, subCategory,unit, price, stock, brand, deliveryCharge } = req.body;
         const { storeId } = req.params;
         const attributes = req.body.attributes;
         const tags = req.body.tags;
@@ -54,7 +55,8 @@ const addProduct = async (req, res) => {
             attributes,
             brand,
             tags,
-            deliveryCharge
+            deliveryCharge,
+            unit
         });
 
         await product.save();
@@ -90,7 +92,7 @@ const getProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { productId } = req.params;
-        let { title, description, category, subCategory, price, stock, brand, deliveryCharge, attributes, tags, discount, removedImg, keptImg, video } = req.body;
+        let { title, description, category, subCategory,unit, price, stock, brand, deliveryCharge, attributes, tags, discount, removedImg, keptImg, video } = req.body;
 
         if (attributes && typeof attributes === "string") {
             try { attributes = JSON.parse(attributes); }
@@ -197,6 +199,7 @@ const updateProduct = async (req, res) => {
         product.brand = brand || product.brand;
         product.tags = tags || product.tags;
         product.deliveryCharge = deliveryCharge || product.deliveryCharge;
+        product.unit = unit || product.unit;
 
         await product.save();
 
@@ -251,7 +254,7 @@ const changeAvailability = async (req, res) => {
 
 const addUsedProduct = async (req, res) => {
     try {
-        let { title, description, category, subCategory, price, condition, brand, delivery, isNegotiable, billAvailable, attributes, tags, discount } = req.body;
+        let { title, description, category, subCategory,unit, price, condition, brand, delivery, isNegotiable, billAvailable, attributes, tags, discount } = req.body;
         const { storeId } = req.params;
 
         if (typeof attributes === "string") attributes = JSON.parse(attributes);
@@ -303,7 +306,8 @@ const addUsedProduct = async (req, res) => {
             delivery,
             isNegotiable,
             billAvailable,
-            condition
+            condition,
+            unit
         });
 
         await product.save();
@@ -339,7 +343,7 @@ const getUsedProduct = async (req, res) => {
 const updateUsedProduct = async (req, res) => {
     try {
         const { usedProductId } = req.params;
-        let { title, description, category, subCategory, price, condition, brand, delivery, attributes, tags, discount, removedImg, keptImg, video, isNegotiable, billAvailable } = req.body;
+        let { title, description, category, subCategory,unit, price, condition, brand, delivery, attributes, tags, discount, removedImg, keptImg, video, isNegotiable, billAvailable } = req.body;
 
         if (typeof attributes === "string") attributes = JSON.parse(attributes);
         if (typeof tags === "string") tags = JSON.parse(tags);
@@ -438,6 +442,7 @@ const updateUsedProduct = async (req, res) => {
         product.delivery = delivery || product.delivery;
         product.isNegotiable = isNegotiable || product.isNegotiable;
         product.billAvailable = billAvailable || product.billAvailable;
+        product.unit = unit || product.unit;
 
         await product.save();
 
@@ -532,8 +537,6 @@ const getProducts = async (req, res) => {
             }
         ];
 
-
-
         const aggregatedProducts = await Product.aggregate(productPipeline);
         const aggregatedUsedProducts = await UsedProduct.aggregate(usedProductPipeline);
 
@@ -584,13 +587,29 @@ const getWishlistProducts = async (req, res) => {
 }
 
 const getCartProducts = async (req, res) => {
-    try {
+  try {
+    const user = req.user;
 
-    } catch (error) {
-        console.error('Error in Get Cart Product controller: ', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-}
+    const cartItems = await Cart.find({ userId: user._id })
+      .populate({
+        path: "productId",
+        select: "title description unit price img discount stock deliveryCharge storeId",
+        populate: {
+          path: "storeId",
+          select: "name"
+        }
+      });
+
+    return res.status(200).json({
+      success: true,
+      message: "Cart products fetched successfully",
+      data: cartItems,
+    });
+  } catch (error) {
+    console.error("Error in Get Cart Product controller: ", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 
 const getReview = async (req, res) => {
     try {
@@ -620,13 +639,39 @@ const addWishlistProduct = async (req, res) => {
 }
 
 const addCartProduct = async (req, res) => {
-    try {
+  try {
+    const { quantity } = req.body;
+    const { productId } = req.params;
+    const user = req.user;
 
-    } catch (error) {
-        console.error('Error in Add Cart Product controller: ', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+    const existing = await Cart.findOne({ userId: user._id, productId });
+    if (existing) {
+      return res.status(400).json({ success: false, message: "Product already in cart" });
     }
-}
+
+    let cartItem = await Cart.create({ userId: user._id, productId, quantity });
+
+    cartItem = await Cart.findById(cartItem._id)
+      .populate({
+        path: "productId",
+        select: "title description unit price img discount stock deliveryCharge storeId",
+        populate: {
+          path: "storeId",
+          select: "name"
+        }
+      });
+
+    return res.status(201).json({
+      success: true,
+      message: "Product added to cart successfully",
+      data: cartItem,
+      deliveryZones: zonesByStore
+    });
+  } catch (error) {
+    console.error("Error in Add Cart Product controller: ", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 
 const addReview = async (req, res) => {
     try {
@@ -657,12 +702,25 @@ const removeWishlistProduct = async (req, res) => {
 
 const removeCartProduct = async (req, res) => {
     try {
+        const { cartId } = req.params;
+        const user = req.user;
 
+        if (!cartId) {
+            return res.status(400).json({ success: false, message: 'Cart id is required' });
+        }
+
+        const cartItem = await Cart.findOneAndDelete({ _id: cartId, userId: user._id });
+
+        if (!cartItem) {
+            return res.status(404).json({ success: false, message: 'Cart product not found' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Product removed from cart successfully' });
     } catch (error) {
         console.error('Error in Remove Cart Product controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
-}
+};
 
 const removeReview = async (req, res) => {
     try {
@@ -672,6 +730,28 @@ const removeReview = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
+
+const updateCart = async (req, res) => {
+    try {
+        const { quantity } = req.body;
+        const { cartId } = req.params;
+
+        const cartItem = await Cart.findByIdAndUpdate(
+            { _id: cartId, userId: req.user._id },
+            { quantity },
+            { new: true }
+        );
+
+        if (!cartItem) {
+            return res.status(404).json({ success: false, message: 'Cart Product not found' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Cart updated successfully', cartItem });
+    } catch (error) {
+        console.error('Error in Update Cart controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
 
 const updateReview = async (req, res) => {
     try {
@@ -688,5 +768,5 @@ export {
     getProducts, getViewedProducts, getWishlistProducts, getCartProducts, getReview,
     addViewedProduct, addWishlistProduct, addCartProduct, addReview,
     removeViewedProduct, removeWishlistProduct, removeCartProduct, removeReview,
-    updateReview
+    updateCart, updateReview
 };

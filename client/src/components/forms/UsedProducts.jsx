@@ -36,6 +36,7 @@ export default function UsedProductForm() {
       subCategory: defaultSubCategory,
       brand: initialData?.brand || "",
       price: initialData?.price || "",
+      unit: initialData?.unit,
       condition: initialData?.condition || "used",
       discount: initialData?.discount
         ? initialData.discount.percentage !== null
@@ -377,7 +378,7 @@ export default function UsedProductForm() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label htmlFor="price" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
                 Price
@@ -391,6 +392,30 @@ export default function UsedProductForm() {
                 className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
               />
               {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
+            </div>
+
+            <div>
+              <label
+                htmlFor="unit"
+                className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
+              >
+                Unit
+              </label>
+              <select
+                id="unit"
+                {...register("unit", { required: "unit is required" })}
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+              >
+                <option value="">Select unit</option>
+                <option value="pc">Piece (pc)</option>
+                <option value="set">Set</option>
+                <option value="pair">Pair</option>
+                <option value="box">Box</option>
+                <option value="pkt">Packet (pkt)</option>
+              </select>
+              {errors.unit && (
+                <p className="text-red-500 text-sm mt-1">{errors.unit.message}</p>
+              )}
             </div>
 
             <div>

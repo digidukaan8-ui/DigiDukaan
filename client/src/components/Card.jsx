@@ -6,6 +6,8 @@ import useLoaderStore from "../store/loader";
 import { toast } from "react-hot-toast";
 import useProductStore from "../store/product";
 import useAuthStore from "../store/auth";
+import { addToCart } from "../api/product";
+import useCartStore from "../store/cart";
 
 export default function Card({ product, userRole = "buyer", onQuickView }) {
   const navigate = useNavigate();
@@ -29,7 +31,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
   const handleCardClick = (product) => {
     navigate(`/product?productId=${product._id}`);
   };
-  
+
   const handleWishlistToggle = (e) => {
     e.stopPropagation();
     if (!user) {
@@ -43,7 +45,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
     setIsWishlisted(!isWishlisted);
   };
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = async (e) => {
     e.stopPropagation();
     if (!user) {
       navigate(`/login`);
@@ -52,6 +54,16 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
     } else if (user?.role === "seller" || user?.role === "admin") {
       toast.error("Only for buyer");
       return;
+    }
+    startLoading("addToCart");
+    try {
+      const result = await addToCart(product._id, 1);
+      if (result.success) {
+        useCartStore.getState().addToCart(result.data);
+        toast.success("Product added to cart");
+      }
+    } finally {
+      stopLoading();
     }
   };
 

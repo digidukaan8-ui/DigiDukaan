@@ -39,7 +39,10 @@ export default function Loader() {
     removeZone: "Removing delivery zone...",
     message: "Sending your message...",
     orders: "Fetching your orders...",
-    cart: "Updating cart...",
+    addToCart: "Adding product to cart...",
+    updateCart: "Updating cart details...",
+    removeCart: "Removing product from cart...",
+    fetchCart: "Fetching cart details...",
     default: "Loading...",
   };
 
@@ -67,7 +70,10 @@ export default function Loader() {
     removeZone: "text-purple-500",
     message: "text-sky-500",
     orders: "text-sky-500",
-    cart: "text-pink-500",
+    addToCart: "text-purple-500",
+    updateCart: "text-purple-500",
+    removeCart: "text-purple-500",
+    fetchCart: "text-purple-500",
     default: "text-gray-500",
   };
 

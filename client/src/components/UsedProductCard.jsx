@@ -117,7 +117,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
           )}
 
           <div className="absolute top-4 left-4">
-            {hasDiscount && (
+            {hasDiscount > 0 && (
               <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
                 -{discountType === "₹" && "₹"}{discountValue}
                 {discountType === "%" && "%"} OFF
@@ -197,12 +197,12 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
             <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               ₹{finalPrice.toFixed(2)}
             </span>
-            {hasDiscount && (
+            {hasDiscount > 0 && (
               <span className="line-through text-gray-500 dark:text-gray-400 text-base">
                 ₹{product.price.toFixed(2)}
               </span>
             )}
-            {hasDiscount && (
+            {hasDiscount > 0 && (
               <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">
                 Save ₹{(product.price - finalPrice).toFixed(2)}
               </span>

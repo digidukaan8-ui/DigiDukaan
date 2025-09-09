@@ -9,7 +9,7 @@ function SellerRoute() {
   }
 
   if (user.role !== "seller") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/seller/store" replace />;
   }
 
   return <Outlet />;
