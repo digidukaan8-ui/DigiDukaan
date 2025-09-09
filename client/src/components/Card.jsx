@@ -1,12 +1,13 @@
 import { ShoppingCart, Star, Edit2, Trash2, Eye, Heart, Truck } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { removeProduct, changeAvailability } from "../api/product";
+import { removeProduct, changeAvailability, removeFromWishlist } from "../api/product";
 import useLoaderStore from "../store/loader";
 import { toast } from "react-hot-toast";
 import useProductStore from "../store/product";
 import useAuthStore from "../store/auth";
-import { addToCart } from "../api/product";
+import useWishlistStore from "../store/wishlist";
+import { addToCart, addToWishlist } from "../api/product";
 import useCartStore from "../store/cart";
 
 export default function Card({ product, userRole = "buyer", onQuickView }) {
@@ -14,8 +15,8 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
   const { startLoading, stopLoading } = useLoaderStore();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const { user } = useAuthStore();
+  const { wishlist } = useWishlistStore();
 
   const hasDiscount = product.discount?.percentage || product.discount?.amount;
   const finalPrice = hasDiscount
@@ -27,12 +28,14 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
   const rating = product.rating || 0;
   const discountValue = product.discount?.percentage || product.discount?.amount;
   const discountType = product.discount?.percentage ? "%" : "₹";
+  const productIds = useWishlistStore((state) => state.wishlist.productIds);
+  const isWishlisted = productIds.includes(product._id);
 
   const handleCardClick = (product) => {
     navigate(`/product?productId=${product._id}`);
   };
 
-  const handleWishlistToggle = (e) => {
+  const handleWishlistToggle = async (e) => {
     e.stopPropagation();
     if (!user) {
       navigate(`/login`);
@@ -42,7 +45,33 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
       toast.error("Only for buyer");
       return;
     }
-    setIsWishlisted(!isWishlisted);
+
+    if (isWishlisted) {
+      startLoading("removeFromWishlist");
+      try {
+        const result = await removeFromWishlist(wishlist._id, product._id);
+        if (result.success) {
+          useWishlistStore.getState().removeFromWishlist(product._id);
+          toast.success("Product removed from wishlist");
+        }
+      } finally {
+        stopLoading();
+      }
+    } else {
+      startLoading("addToWishlist");
+      try {
+        const result = await addToWishlist(product._id);
+        if (result.success) {
+          useWishlistStore.getState().addToWishlist(
+            result.data._id,
+            product._id
+          );
+          toast.success("Product added to wishlist");
+        }
+      } finally {
+        stopLoading();
+      }
+    }
   };
 
   const handleAddToCart = async (e) => {
@@ -58,7 +87,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
     startLoading("addToCart");
     try {
       const result = await addToCart(product._id, 1);
-      if (result.success) {
+      if (result?.success) {
         useCartStore.getState().addToCart(result.data);
         toast.success("Product added to cart");
       }
@@ -182,7 +211,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
             )}
           </div>
           {userRole === "buyer" && (
-            <div className="absolute top-4 right-4">
+            <div className="absolute top-4 right-4 z-20">
               <button
                 onClick={(e) => handleWishlistToggle(e)}
                 className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${isWishlisted
@@ -260,7 +289,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
             <button
               onClick={handleAddToCart}
               disabled={handleCartBtn(product._id)}
-              className="w-full flex items-center cursor-pointer justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
+              className="w-full border border-black dark:border-white flex items-center cursor-pointer justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
             >
               <ShoppingCart className="h-5 w-5" />
               {product.stock > 0 ? "Add to Cart" : "Out of Stock"}

@@ -4,17 +4,18 @@ import useAuthStore from '../store/auth';
 import useProductStore from '../store/product';
 import { useNavigate } from 'react-router-dom';
 import useLoaderStore from '../store/loader';
-import { removeProduct, changeAvailability, getProductById } from '../api/product';
+import { removeProduct, changeAvailability, getProductById, addToWishlist, removeFromWishlist } from '../api/product';
 import { toast } from 'react-hot-toast';
 import useCategoryProductStore from '../store/categoryProducts';
 import useCartStore from '../store/cart';
+import useWishlistStore from '../store/wishlist';
 
 const ProductDetail = ({ id }) => {
   const navigate = useNavigate();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [isLiked, setIsLiked] = useState(false);
   let { user } = useAuthStore();
+  const { wishlist } = useWishlistStore();
   const { startLoading, stopLoading } = useLoaderStore();
   const [product, setProduct] = useState(
     useProductStore.getState().getProduct(id) ||
@@ -57,6 +58,8 @@ const ProductDetail = ({ id }) => {
     );
   }
 
+  const productIds = useWishlistStore((state) => state.wishlist.productIds);
+  const isWishlisted = productIds.includes(product._id);
   const {
     title,
     brand,
@@ -108,7 +111,7 @@ const ProductDetail = ({ id }) => {
     }
   };
 
-  const handleWishList = (id) => {
+  const handleWishList = async () => {
     if (!user) {
       navigate(`/login`);
       toast.error("Login First");
@@ -117,7 +120,33 @@ const ProductDetail = ({ id }) => {
       toast.error("Only for buyer");
       return;
     }
-    setIsLiked(!isLiked);
+
+    if (isWishlisted) {
+      startLoading("removeFromWishlist");
+      try {
+        const result = await removeFromWishlist(wishlist._id, product._id);
+        if (result.success) {
+          useWishlistStore.getState().removeFromWishlist(product._id);
+          toast.success("Product removed from wishlist");
+        }
+      } finally {
+        stopLoading();
+      }
+    } else {
+      startLoading("addToWishlist");
+      try {
+        const result = await addToWishlist(product._id);
+        if (result.success) {
+          useWishlistStore.getState().addToWishlist(
+            result.data._id,
+            product._id
+          );
+          toast.success("Product added to wishlist");
+        }
+      } finally {
+        stopLoading();
+      }
+    }
   };
 
   const handleUpdateDetails = (product) => {
@@ -404,7 +433,7 @@ const ProductDetail = ({ id }) => {
                   <div className='flex flex-col justify-between items-center gap-3 w-[300px]'>
                     <button
                       onClick={() => handleAddToCart(product._id)}
-                      disabled={stock === 0 || !isAvailable}
+                      disabled={handleCartBtn(product._id) || !isAvailable}
                       className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
                     ${stock === 0 || !isAvailable
                           ? "bg-gray-400 text-gray-600 dark:bg-neutral-900 dark:text-gray-400 cursor-not-allowed"
@@ -414,7 +443,7 @@ const ProductDetail = ({ id }) => {
                       Add to Cart
                     </button>
                     <button
-                      disabled={handleCartBtn(product._id)}
+                      disabled={!isAvailable}
                       className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
                     ${stock === 0 || !isAvailable
                           ? "bg-gray-400 text-gray-600 dark:bg-neutral-900 dark:text-gray-400 cursor-not-allowed"
@@ -429,12 +458,12 @@ const ProductDetail = ({ id }) => {
                     <button
                       onClick={() => handleWishList(product._id)}
                       className={`w-10 h-10 flex items-center justify-center cursor-pointer rounded-full border border-black dark:border-white transition-colors
-                      ${isLiked
+                      ${isWishlisted
                           ? "bg-red-100 text-red-500 dark:bg-red-900/20 dark:text-red-400"
                           : "bg-gray-100 text-gray-600 dark:bg-neutral-900 dark:text-gray-300 hover:bg-white dark:hover:bg-neutral-900"
                         }`}
                     >
-                      <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
+                      <Heart className={`h-4 w-4 ${isWishlisted ? "fill-current" : ""}`} />
                     </button>
 
                     <button

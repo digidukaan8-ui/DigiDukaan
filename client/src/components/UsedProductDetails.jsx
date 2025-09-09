@@ -1,22 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Heart, Share2, Edit, Trash2, MessageCircle, ShoppingCart, ChevronLeft, ChevronRight, Play, MapPin, Truck, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/auth";
 import useUsedProductStore from "../store/usedProduct";
 import { toast } from "react-hot-toast";
-import { removeUsedProduct } from "../api/product";
+import { removeUsedProduct, addToWishlist, removeFromWishlist } from "../api/product";
 import useUsedCategoryProductStore from "../store/categoryUsedProduct";
+import useWishlistStore from "../store/wishlist";
+import useLoaderStore from '../store/loader'
 
 const UsedProductDetail = ({ id }) => {
     const navigate = useNavigate();
     let { user } = useAuthStore();
-    let product = useUsedProductStore.getState().getUsedProduct(id);
-    if (!product) {
-        product = useUsedCategoryProductStore.getState().getUsedProductById(id);
-    }
-
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-    const [isLiked, setIsLiked] = useState(false);
+    const { wishlist } = useWishlistStore();
+    const { startLoading, stopLoading } = useLoaderStore();
+    const [product, setProduct] = useState(
+        useUsedProductStore.getState().getUsedProduct(id) ||
+        useUsedCategoryProductStore.getState().getUsedProductById(id)
+    );
+
+    useEffect(() => {
+        if (!product) {
+            const fetchProduct = async () => {
+                startLoading("fetching");
+                try {
+                    const result = await getUsedProductById(id);
+                    if (result.success) {
+                        setProduct(result.data);
+                        useUsedProductStore.getState().addProduct(result.data);
+                    }
+                } finally {
+                    stopLoading();
+                }
+            };
+            fetchProduct();
+        }
+    }, [id, product, startLoading, stopLoading]);
 
     if (!product) {
         return (
@@ -36,6 +56,8 @@ const UsedProductDetail = ({ id }) => {
         );
     }
 
+    const productIds = useWishlistStore((state) => state.wishlist.productIds);
+    const isWishlisted = productIds.includes(product._id);
     const {
         title,
         description,
@@ -102,7 +124,7 @@ const UsedProductDetail = ({ id }) => {
         }
     };
 
-    const handleWishlist = (id) => {
+    const handleWishList = async () => {
         if (!user) {
             navigate(`/login`);
             toast.error("Login First");
@@ -111,7 +133,33 @@ const UsedProductDetail = ({ id }) => {
             toast.error("Only for buyer");
             return;
         }
-        setIsLiked(!isLiked);
+
+        if (isWishlisted) {
+            startLoading("removeFromWishlist");
+            try {
+                const result = await removeFromWishlist(wishlist._id, product._id);
+                if (result.success) {
+                    useWishlistStore.getState().removeFromWishlist(product._id);
+                    toast.success("Product removed from wishlist");
+                }
+            } finally {
+                stopLoading();
+            }
+        } else {
+            startLoading("addToWishlist");
+            try {
+                const result = await addToWishlist(product._id);
+                if (result.success) {
+                    useWishlistStore.getState().addToWishlist(
+                        result.data._id,
+                        product._id
+                    );
+                    toast.success("Product added to wishlist");
+                }
+            } finally {
+                stopLoading();
+            }
+        }
     };
 
     const handleChatSeller = () => {
@@ -413,14 +461,14 @@ const UsedProductDetail = ({ id }) => {
 
                                     <div className='flex justify-center items-center gap-3 w-[300px]'>
                                         <button
-                                            onClick={() => handleWishlist(product._id)}
+                                            onClick={() => handleWishList()}
                                             className={`w-10 h-10 flex items-center justify-center cursor-pointer rounded-full border border-black dark:border-white transition-colors
-                                                ${isLiked
+                                                ${isWishlisted
                                                     ? "bg-red-100 text-red-500 dark:bg-red-900/20 dark:text-red-400"
                                                     : "bg-gray-100 text-gray-600 dark:bg-neutral-900 dark:text-gray-300 hover:bg-white dark:hover:bg-neutral-900"
                                                 }`}
                                         >
-                                            <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
+                                            <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
                                         </button>
 
                                         <button className="w-10 h-10 flex items-center justify-center cursor-pointer rounded-full bg-gray-100 text-gray-600 dark:bg-neutral-900 border border-black dark:border-white dark:text-gray-300 hover:bg-white dark:hover:bg-neutral-900">

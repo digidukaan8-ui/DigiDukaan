@@ -4,24 +4,52 @@ import useCategoryProductStore from "../../store/categoryProducts";
 import useUsedCategoryProductStore from "../../store/categoryUsedProduct";
 import { Location, QuickView, Card, UsedProductCard } from "../../components/index";
 import useAuthStore from "../../store/auth";
+import { getCart, getWishlistProducts } from "../../api/product";
+import useCartStore from "../../store/cart";
+import useWishlistStore from "../../store/wishlist";
 
 const Home = () => {
   const categories = useCategoryProductStore((state) => state.categories);
   const usedProductCategories = useUsedCategoryProductStore((state) => state.usedProductCategories);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  let { user, isAuthenticated } = useAuthStore();
+  const { cart } = useCartStore();
+  const { wishlist } = useWishlistStore();
 
   useEffect(() => {
     if (!searchParams.get("show")) {
       searchParams.set("show", "new");
       setSearchParams(searchParams, { replace: true });
     }
-  }, []);
+
+    if (user && user.role === "buyer" && isAuthenticated) {
+      if (cart.length === 0) fetchCartItems();
+      if (!wishlist._id || wishlist.productIds.length === 0) {
+        fetchWishlist();
+      }
+    }
+  }, [user]);
+
+  const fetchCartItems = async () => {
+    const result = await getCart();
+    if (result.success) {
+      useCartStore.getState().clearCart();
+      useCartStore.getState().setCart(result.data || []);
+    }
+  };
+
+  const fetchWishlist = async () => {
+    const result = await getWishlistProducts();
+    if (result.success) {
+      useWishlistStore.getState().clearWishlist();
+      useWishlistStore.getState().setWishlist(result.data || []);
+    }
+  };
 
   const activeTab = searchParams.get("show") || "new";
   const currentCategories = activeTab === "used" ? usedProductCategories : categories;
 
-  let { user } = useAuthStore();
   if (!user) user = { role: "buyer" };
   else if (!user.role) user.role = "buyer";
 
@@ -39,11 +67,10 @@ const Home = () => {
                   searchParams.set("show", tab);
                   setSearchParams(searchParams, { replace: true });
                 }}
-                className={`text-sm sm:text-base px-5 py-2 rounded-lg border border-black dark:border-white font-semibold transition-colors duration-300 ${
-                  activeTab === tab
-                    ? "bg-blue-600 text-white shadow-lg"
-                    : "bg-white dark:bg-neutral-900 text-black dark:text-white"
-                }`}
+                className={`text-sm sm:text-base px-5 py-2 rounded-lg border border-black dark:border-white font-semibold transition-colors duration-300 ${activeTab === tab
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "bg-white dark:bg-neutral-900 text-black dark:text-white"
+                  }`}
               >
                 {tab === "new" ? "New Products" : "Used Products"}
               </button>
@@ -86,6 +113,7 @@ const Home = () => {
 
           <QuickView
             product={quickViewProduct}
+            type={activeTab}
             isOpen={!!quickViewProduct}
             onClose={() => setQuickViewProduct(null)}
           />

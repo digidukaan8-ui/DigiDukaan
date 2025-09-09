@@ -3,7 +3,11 @@ import Product from "../models/product.model.js";
 import DeliveryZone from "../models/deliveryzone.model.js";
 import UsedProduct from "../models/usedProduct.model.js";
 import Cart from "../models/cart.model.js"
+import Wishlist from "../models/wishlist.model.js";
+import View from "../models/view.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.config.js";
+
+const MAX_VIEWS = 150;
 
 const addProduct = async (req, res) => {
     try {
@@ -589,21 +593,43 @@ const getProductById = async (req, res) => {
 
 const getViewedProducts = async (req, res) => {
     try {
+        const user = req.user;
 
+        const view = await View.findOne({ userId: user._id })
+            .populate({
+                path: "productIds",
+                select: "storeId title description price img discount stock deliveryCharge"
+            });
+
+        if (!view) return res.json({ success: true, data: [] });
+
+        return res.json({ success: true, data: view.productIds });
     } catch (error) {
-        console.error('Error in Get Viewed Product controller: ', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        console.error("Error in getViewedProducts:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
-}
+};
 
 const getWishlistProducts = async (req, res) => {
     try {
+        const user = req.user;
 
+        const wishlist = await Wishlist.findOne({ userId: user._id });
+        if (!wishlist) {
+            return res.status(200).json({ success: true, productIds: [] });
+        }
+
+        const data = {
+            _id: wishlist._id,
+            productIds: wishlist.productIds
+        }
+
+        return res.status(200).json({ success: true, data });
     } catch (error) {
-        console.error('Error in Get Wishlist Product controller: ', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        console.error("Error in Get Wishlist Product IDs: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
-}
+};
 
 const getCartProducts = async (req, res) => {
     try {
@@ -641,21 +667,82 @@ const getReview = async (req, res) => {
 
 const addViewedProduct = async (req, res) => {
     try {
+        const user = req.user;
+        const { productId } = req.params;
 
+        if (!productId) {
+            return res.status(400).json({ success: false, message: 'Product id is required' });
+        }
+
+        let view = await View.findOne({ userId: user._id });
+
+        if (!view) {
+            view = await View.create({ userId: user._id, productIds: [productId] });
+        } else {
+            view.productIds = view.productIds.filter(
+                (id) => id.toString() !== productId
+            );
+
+            view.productIds.unshift(productId);
+
+            if (view.productIds.length > MAX_VIEWS) {
+                view.productIds = view.productIds.slice(0, MAX_VIEWS);
+            }
+
+            await view.save();
+        }
+
+        return res.json({ success: true, data: view });
     } catch (error) {
-        console.error('Error in Add Viewed Product controller: ', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        console.error("Error in addViewedProduct:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
-}
+};
 
 const addWishlistProduct = async (req, res) => {
     try {
+        const user = req.user;
+        const { productId } = req.params;
 
+        if (!productId) {
+            return res.status(400).json({ success: false, message: "Product id is required" });
+        }
+
+        let product = await Product.findById(productId);
+        if (!product) {
+            product = await UsedProduct.findById(productId);
+            if (!product) {
+                return res.status(404).json({ success: false, message: "Product not found" });
+            }
+        }
+
+        let wishlist = await Wishlist.findOne({ userId: user._id });
+
+        if (wishlist) {
+            if (wishlist.productIds.includes(productId)) {
+                return res.status(400).json({ success: false, message: "Product already in wishlist" });
+            }
+            wishlist.productIds.push(productId);
+            await wishlist.save();
+        } else {
+            wishlist = new Wishlist({
+                userId: user._id,
+                productIds: [productId],
+            });
+            await wishlist.save();
+        }
+
+        const data = {
+            _id: wishlist._id,
+            productIds: wishlist.productIds
+        }
+
+        return res.status(201).json({ success: true, message: "Product added to wishlist", data });
     } catch (error) {
-        console.error('Error in Add Wishlist Product controller: ', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        console.error("Error in Add Wishlist Product controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
-}
+};
 
 const addCartProduct = async (req, res) => {
     try {
@@ -702,21 +789,50 @@ const addReview = async (req, res) => {
 
 const removeViewedProduct = async (req, res) => {
     try {
+        const { viewId, productId } = req.params;
 
+        const view = await View.findById(viewId);
+        if (!view) return res.status(404).json({ success: false, message: "No viewed products found" });
+
+        view.productIds = view.productIds.filter(id => id.toString() !== productId);
+        await view.save();
+
+        return res.json({ success: true, data: view });
     } catch (error) {
-        console.error('Error in Remove Viewed Product controller: ', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        console.error("Error in removeViewedProduct:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
-}
+};
 
 const removeWishlistProduct = async (req, res) => {
     try {
+        const { wishlistId, productId } = req.params;
 
+        if (!productId || !wishlistId) {
+            return res.status(400).json({ success: false, message: "Product id is required" });
+        }
+
+        const wishlist = await Wishlist.findById(wishlistId);
+        if (!wishlist) {
+            return res.status(404).json({ success: false, message: "Wishlist not found" });
+        }
+
+        if (!wishlist.productIds.includes(productId)) {
+            return res.status(404).json({ success: false, message: "Product not in wishlist" });
+        }
+
+        wishlist.productIds = wishlist.productIds.filter(
+            (id) => id.toString() !== productId.toString()
+        );
+
+        await wishlist.save();
+
+        return res.status(200).json({ success: true, message: "Product removed from wishlist", data: wishlist, });
     } catch (error) {
-        console.error('Error in Remove Wishlist Product controller: ', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        console.error("Error in Remove Wishlist Product controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
-}
+};
 
 const removeCartProduct = async (req, res) => {
     try {

@@ -1,5 +1,5 @@
 import useStore from "../../store/store";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useSearchParams } from "react-router-dom";
 import { FiMapPin, FiHome, FiEdit3 } from "react-icons/fi";
 import Card from "../../components/Card";
 import UsedProductCard from "../../components/UsedProductCard";
@@ -11,14 +11,23 @@ import useUsedProductStore from "../../store/usedProduct";
 import { toast } from "react-hot-toast";
 import { QuickView } from "../../components/index";
 
-export default function StorePage() {
+export default function Store() {
   const { store } = useStore();
   const { startLoading, stopLoading } = useLoaderStore();
   const navigate = useNavigate();
   const { products } = useProductStore();
   const { usedProducts } = useUsedProductStore();
-  const [show, setShow] = useState("new");
   const [quickViewProduct, setQuickViewProduct] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (!searchParams.get("show")) {
+      searchParams.set("show", "new");
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, []);
+
+  const activeTab = searchParams.get("show") || "new";
 
   useEffect(() => {
     if (store) {
@@ -144,22 +153,25 @@ export default function StorePage() {
       </div>
 
       <div className="max-w-7xl mx-auto mt-8">
-        <div className="flex justify-center gap-4 mb-4">
-          <button
-            onClick={() => setShow("new")}
-            className={`px-4 py-2 rounded-lg cursor-pointer border border-black dark:border-white hover:scale-105 transition-all font-semibold ${show === "new" ? "bg-sky-600 text-white" : "bg-gray-200 dark:bg-neutral-800 text-gray-700 dark:text-gray-300"}`}
-          >
-            New Products
-          </button>
-          <button
-            onClick={() => setShow("old")}
-            className={`px-4 py-2 rounded-lg cursor-pointer border border-black dark:border-white hover:scale-105 transition-all font-semibold ${show === "old" ? "bg-emerald-600 text-white" : "bg-gray-200 dark:bg-neutral-800 text-gray-700 dark:text-gray-300"}`}
-          >
-            Used Products
-          </button>
+        <div className="flex justify-center gap-4 pb-3 bg-gray-100 dark:bg-neutral-950">
+          {["new", "used"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => {
+                searchParams.set("show", tab);
+                setSearchParams(searchParams, { replace: true });
+              }}
+              className={`text-sm sm:text-base px-5 py-2 rounded-lg border border-black dark:border-white font-semibold transition-colors duration-300 ${activeTab === tab
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "bg-white dark:bg-neutral-900 text-black dark:text-white"
+                }`}
+            >
+              {tab === "new" ? "New Products" : "Used Products"}
+            </button>
+          ))}
         </div>
         <div className="flex flex-wrap justify-around items-center gap-5 mt-10">
-          {show === "new" ? (
+          {activeTab === "new" ? (
             products.length === 0 ? (
               <p className="text-gray-600 dark:text-gray-400 text-center">No new products yet.</p>
             ) : (
@@ -191,6 +203,7 @@ export default function StorePage() {
         </div>
         <QuickView
           product={quickViewProduct}
+          type={activeTab}
           isOpen={!!quickViewProduct}
           onClose={() => setQuickViewProduct(null)}
         />

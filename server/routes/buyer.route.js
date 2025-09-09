@@ -26,8 +26,8 @@ buyerRouter.put('/cart/:cartId', authMiddleware('buyer'), handleUpdateCart, upda
 buyerRouter.put('/review/:reviewId', authMiddleware('buyer'), updateReview);
 
 buyerRouter.delete('/cart/:cartId', authMiddleware('buyer'), removeCartProduct);
-buyerRouter.delete('/wishlist/:productId', authMiddleware('buyer'), removeWishlistProduct);
-buyerRouter.delete('/viewed/:productId', authMiddleware('buyer'), removeViewedProduct);
+buyerRouter.delete('/wishlist/:wishlistId/:productId', authMiddleware('buyer'), removeWishlistProduct);
+buyerRouter.delete('/viewed/:viewId/:productId', authMiddleware('buyer'), removeViewedProduct);
 buyerRouter.delete('/review/:reviewId', authMiddleware('buyer'), removeReview);
 
 export default buyerRouter;

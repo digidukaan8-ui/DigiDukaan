@@ -1,19 +1,20 @@
 import { Heart, Truck, MessageCircle, Edit2, Trash2, Eye } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { removeUsedProduct } from "../api/product";
+import { removeUsedProduct, addToWishlist, removeFromWishlist } from "../api/product";
 import useLoaderStore from "../store/loader";
 import { toast } from "react-hot-toast";
 import useUsedProductStore from "../store/usedProduct";
 import useAuthStore from "../store/auth";
+import useWishlistStore from "../store/wishlist";
 
 export default function UsedProductCard({ product, userRole = "buyer", onQuickView }) {
   const navigate = useNavigate();
   const { startLoading, stopLoading } = useLoaderStore();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const { user } = useAuthStore();
+  const { wishlist } = useWishlistStore();
 
   const hasDiscount = product.discount?.percentage || product.discount?.amount;
   const finalPrice = hasDiscount
@@ -24,10 +25,12 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
   const discountValue = product.discount?.percentage || product.discount?.amount;
   const discountType = product.discount?.percentage ? "%" : "₹";
+  const productIds = useWishlistStore((state) => state.wishlist.productIds);
+  const isWishlisted = productIds.includes(product._id);
 
   const handleCardClick = () => navigate(`/used-product?productId=${product._id}`);
 
-  const handleWishlistToggle = (e) => {
+  const handleWishList = async (e) => {
     e.stopPropagation();
     if (!user) {
       navigate(`/login`);
@@ -37,7 +40,33 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
       toast.error("Only for buyer");
       return;
     }
-    setIsWishlisted(!isWishlisted);
+
+    if (isWishlisted) {
+      startLoading("removeFromWishlist");
+      try {
+        const result = await removeFromWishlist(wishlist._id, product._id);
+        if (result.success) {
+          useWishlistStore.getState().removeFromWishlist(product._id);
+          toast.success("Product removed from wishlist");
+        }
+      } finally {
+        stopLoading();
+      }
+    } else {
+      startLoading("addToWishlist");
+      try {
+        const result = await addToWishlist(product._id);
+        if (result.success) {
+          useWishlistStore.getState().addToWishlist(
+            result.data._id,
+            product._id
+          );
+          toast.success("Product added to wishlist");
+        }
+      } finally {
+        stopLoading();
+      }
+    }
   };
 
   const handleChatSeller = (e) => {
@@ -126,9 +155,9 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
           </div>
 
           {userRole === "buyer" && (
-            <div className="absolute top-4 right-4">
+            <div className="absolute top-4 right-4 z-20">
               <button
-                onClick={(e) => handleWishlistToggle(e)}
+                onClick={(e) => handleWishList(e)}
                 className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${isWishlisted
                   ? 'bg-red-500 text-white'
                   : 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'

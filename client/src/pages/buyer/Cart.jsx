@@ -43,7 +43,8 @@ function Cart() {
     setQuantities(q);
   }, [safeCart]);
 
-  const handleUpdate = async (id) => {
+  const handleUpdate = async (e, id) => {
+    e.stopPropagation();
     startLoading("updateCart");
     try {
       const result = await updateCart(id, { quantity: quantities[id] });
@@ -57,7 +58,8 @@ function Cart() {
     }
   };
 
-  const handleRemove = async (id) => {
+  const handleRemove = async (e, id) => {
+    e.stopPropagation();
     startLoading("removeCart");
     try {
       const result = await removeCart(id);
@@ -70,7 +72,8 @@ function Cart() {
     }
   };
 
-  const handleCancel = (id) => {
+  const handleCancel = (e, id) => {
+    e.stopPropagation();
     setQuantities({
       ...quantities,
       [id]: safeCart.find((i) => i._id === id).quantity,
@@ -144,7 +147,7 @@ function Cart() {
                 className="relative flex flex-wrap justify-between items-center p-4 rounded-xl shadow-md bg-white dark:bg-neutral-900 transition-transform transform hover:scale-[1.01] border border-black dark:border-white"
               >
                 <button
-                  onClick={() => handleRemove(item._id)}
+                  onClick={(e) => handleRemove(e, item._id)}
                   className="absolute top-2 right-2 p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors shadow-md border border-black dark:border-white"
                 >
                   <Trash2 size={16} />
@@ -186,20 +189,21 @@ function Cart() {
                     type="number"
                     min="1"
                     value={prices.qty}
-                    onChange={(e) => setQuantities({ ...quantities, [item._id]: parseInt(e.target.value) || 0 })}
-                    disabled={!editing[item._id]}
-                    className="w-14 md:w-20 px-2 py-1 text-center border rounded-lg bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onClick={(e) => e.stopPropagation()}
+                  onChange={(e) => setQuantities({ ...quantities, [item._id]: parseInt(e.target.value) || 0 })}
+                  disabled={!editing[item._id]}
+                  className="w-14 md:w-20 px-2 py-1 text-center border rounded-lg bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {editing[item._id] ? (
                     <>
                       <button
-                        onClick={() => handleUpdate(item._id)}
+                        onClick={(e) => handleUpdate(e, item._id)}
                         className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors border border-black dark:border-white"
                       >
                         <Check size={16} />
                       </button>
                       <button
-                        onClick={() => handleCancel(item._id)}
+                        onClick={(e) => handleCancel(e, item._id)}
                         className="p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors border border-black dark:border-white"
                       >
                         <X size={16} />
@@ -207,7 +211,10 @@ function Cart() {
                     </>
                   ) : (
                     <button
-                      onClick={() => setEditing({ ...editing, [item._id]: true })}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditing({ ...editing, [item._id]: true })
+                      }}
                       className="p-2 bg-gray-200 dark:bg-neutral-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-neutral-600 transition-colors border border-black dark:border-white"
                     >
                       <Pencil size={16} />

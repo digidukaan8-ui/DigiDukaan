@@ -518,9 +518,82 @@ const getCart = async () => {
     }
 }
 
+const addToWishlist = async (productId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/wishlist/${productId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            credentials: "include",
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to add product in wishlist");
+            throw new Error(result.message || "Failed to add product in wishlist");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in add to wishlist: ", error);
+        throw error;
+    }
+}
+
+const getWishlistProducts = async () => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/wishlist`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+            credentials: "include",
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get product from wishlist");
+            throw new Error(result.message || "Failed to get product from wishlist");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in add to wishlist: ", error);
+        throw error;
+    }
+}
+
+const removeFromWishlist = async (wishlistId, productId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/wishlist/${wishlistId}/${productId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'DELETE',
+            credentials: "include",
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to remove product from wishlist");
+            throw new Error(result.message || "Failed to remove product from wishlist");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in remove from wishlist: ", error);
+        throw error;
+    }
+}
+
 export {
     addProduct, getProduct, updateProduct, removeProduct, changeAvailability,
     addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct,
-    getProducts, getProductById,
-    addToCart, getCart, updateCart, removeCart
+    getProducts, getProductById, getWishlistProducts,
+    addToCart, getCart, updateCart, removeCart,
+    addToWishlist, removeFromWishlist
 };
