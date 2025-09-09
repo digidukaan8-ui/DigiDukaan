@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
 import connectDB from './db/connection.js'
 import userRouter from './routes/user.route.js';
 import buyerRouter from './routes/buyer.route.js';
@@ -27,6 +28,16 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, 
+  max: 100, 
+  message: { success: false, message: "Too many requests, try again later" },
+  standardHeaders: true, 
+  legacyHeaders: false,  
+});
+
+app.use(limiter);
 
 app.get('/', (req, res) => {
   res.send('API is running...');
