@@ -13,7 +13,8 @@ import Product from "./common/Product";
 import UsedProduct from "./common/UsedProduct";
 import Profile from "./buyer/Profile";
 import Cart from "./buyer/Cart"
+import Category from "./common/Catgeory"
 
 export {
-    Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct, Profile, Cart
+    Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct, Profile, Cart, Category
 };

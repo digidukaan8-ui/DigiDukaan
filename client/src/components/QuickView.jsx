@@ -26,7 +26,7 @@ export default function QuickView({ product, type, isOpen, onClose }) {
   const isWishlisted = productIds.includes(product._id);
 
   const handleWishList = async () => {
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -64,7 +64,7 @@ export default function QuickView({ product, type, isOpen, onClose }) {
   };
 
   const handleCart = async (id) => {
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -95,7 +95,7 @@ export default function QuickView({ product, type, isOpen, onClose }) {
   }
 
   const handleChatSeller = () => {
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;

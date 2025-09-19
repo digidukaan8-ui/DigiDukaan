@@ -2,7 +2,7 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import { handleLogin, handleRegister, handleMessage } from '../middlewares/user.middleware.js';
 import { loginUser, logoutUser, registerUser, sendOTP, verifyOTP, resetPassword, message } from '../controllers/user.controller.js';
-import { getProducts } from '../controllers/product.controller.js';
+import { getProducts, getProductByCategory, getProductById } from '../controllers/product.controller.js';
 import handleLocationAccess from '../middlewares/location.middleware.js';
 import openStreetMap from '../controllers/location.controller.js';
 
@@ -16,7 +16,7 @@ const registerLimiter = rateLimit({
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 50,
+    max: 5,
     message: { success: false, message: "Too many login attempts, try again later" },
 });
 
@@ -53,7 +53,7 @@ const messageLimiter = rateLimit({
 
 const productsLimiter = rateLimit({
     windowMs: 1 * 60 * 1000,
-    max: 5,
+    max: 10,
     message: { success: false, message: "Too many product requests, slow down" }
 });
 
@@ -70,5 +70,7 @@ userRouter.get('/reverse-geocode/:lat/:lon', locationLimiter, handleLocationAcce
 userRouter.post('/contact', messageLimiter, handleMessage, message);
 
 userRouter.post('/products', productsLimiter, getProducts);
+userRouter.get('/product/:productId', productsLimiter, getProductById);
+userRouter.get('/category-products/:category', productsLimiter, getProductByCategory);
 
 export default userRouter;

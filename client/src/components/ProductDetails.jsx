@@ -4,7 +4,7 @@ import useAuthStore from '../store/auth';
 import useProductStore from '../store/product';
 import { useNavigate } from 'react-router-dom';
 import useLoaderStore from '../store/loader';
-import { removeProduct, changeAvailability, getProductById, addToWishlist, removeFromWishlist } from '../api/product';
+import { removeProduct, changeAvailability, getProductById, addToWishlist, removeFromWishlist, addToCart } from '../api/product';
 import { toast } from 'react-hot-toast';
 import useCategoryProductStore from '../store/categoryProducts';
 import useCartStore from '../store/cart';
@@ -91,7 +91,7 @@ const ProductDetail = ({ id }) => {
   const prevImage = () => setSelectedImageIndex((prev) => (prev - 1 + img.length) % img.length);
 
   const handleAddToCart = async (id) => {
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -112,7 +112,7 @@ const ProductDetail = ({ id }) => {
   };
 
   const handleWishList = async () => {
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -150,7 +150,7 @@ const ProductDetail = ({ id }) => {
   };
 
   const handleUpdateDetails = (product) => {
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -162,7 +162,7 @@ const ProductDetail = ({ id }) => {
   };
 
   const handleToggleAvailability = async (id, available) => {
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -183,7 +183,7 @@ const ProductDetail = ({ id }) => {
   };
 
   const handleDelete = async (id) => {
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -206,7 +206,7 @@ const ProductDetail = ({ id }) => {
   };
 
   const handleManageVariant = () => {
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -433,7 +433,7 @@ const ProductDetail = ({ id }) => {
                   <div className='flex flex-col justify-between items-center gap-3 w-[300px]'>
                     <button
                       onClick={() => handleAddToCart(product._id)}
-                      disabled={handleCartBtn(product._id) || !isAvailable}
+                      disabled={handleCartBtn(product._id)}
                       className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
                     ${stock === 0 || !isAvailable
                           ? "bg-gray-400 text-gray-600 dark:bg-neutral-900 dark:text-gray-400 cursor-not-allowed"

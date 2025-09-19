@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
-import { Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct, Profile, Cart } from './pages/index.js'
+import { Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct, Profile, Cart,Category } from './pages/index.js'
 import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm } from './components/index.js'
 
 const router = createBrowserRouter(
@@ -20,6 +20,7 @@ const router = createBrowserRouter(
       <Route path='logout' element={<Logout />} />
       <Route path='product' element={<Product />} />
       <Route path='used-product' element={<UsedProduct />} />
+      <Route path='category-product' element={<Category />} />
 
       <Route path='buyer' element={<BuyerRoute />} >
         <Route path='profile' element={<Profile />} />

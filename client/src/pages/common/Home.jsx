@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import useCategoryProductStore from "../../store/categoryProducts";
 import useUsedCategoryProductStore from "../../store/categoryUsedProduct";
 import { Location, QuickView, Card, UsedProductCard } from "../../components/index";
@@ -7,6 +7,7 @@ import useAuthStore from "../../store/auth";
 import { getCart, getWishlistProducts } from "../../api/product";
 import useCartStore from "../../store/cart";
 import useWishlistStore from "../../store/wishlist";
+import { ArrowRight } from 'lucide-react';
 
 const Home = () => {
   const categories = useCategoryProductStore((state) => state.categories);
@@ -16,6 +17,7 @@ const Home = () => {
   let { user, isAuthenticated } = useAuthStore();
   const { cart } = useCartStore();
   const { wishlist } = useWishlistStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!searchParams.get("show")) {
@@ -59,7 +61,7 @@ const Home = () => {
         <>
           <Location />
 
-          <div className="flex justify-center gap-4 pb-3 bg-gray-100 dark:bg-neutral-950">
+          <div className="flex justify-center gap-4 pb-5 bg-gray-100 dark:bg-neutral-950">
             {["new", "used"].map((tab) => (
               <button
                 key={tab}
@@ -84,9 +86,16 @@ const Home = () => {
 
               return (
                 <div key={index} className="px-4">
-                  <h2 className="text-xl sm:text-2xl capitalize font-bold text-gray-900 dark:text-white mb-4 flex items-baseline gap-2">
-                    {categoryName}
-                  </h2>
+                  <div
+                    onClick={() => navigate(`/category-product?slug=${categoryName}&page=1&show=${activeTab}`)}
+                    className="flex w-full justify-between items-baseline text-gray-900 dark:text-white border-b p-4 mb-4 hover:bg-white dark:hover:bg-neutral-900">
+                    <h2 className="text-xl sm:text-2xl capitalize font-bold">
+                      {categoryName}
+                    </h2>
+                    <span className="text-xl sm:text-2xl capitalize font-bold">
+                      <ArrowRight />
+                    </span>
+                  </div>
                   <div className="flex gap-5 pt-2 sm:gap-8 overflow-x-auto hide-scrollbar scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent -mx-4 px-4">
                     {products.map((product) => (
                       <div key={product._id} className="flex-shrink-0 w-[300px]">

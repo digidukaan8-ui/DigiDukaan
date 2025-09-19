@@ -398,7 +398,7 @@ const getProducts = async (data) => {
 
 const getProductById = async (productId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/product/${productId}`, {
+        const response = await fetch(`http://localhost:3000/api/users/product/${productId}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -590,10 +590,34 @@ const removeFromWishlist = async (wishlistId, productId) => {
     }
 }
 
+const getProductByCategory = async (catgeory, page) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/users/category-products/${catgeory}?page=${page}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+            credentials: "include",
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to remove product from wishlist");
+            throw new Error(result.message || "Failed to remove product from wishlist");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in get category product: ", error);
+        throw error;
+    }
+}
+
 export {
     addProduct, getProduct, updateProduct, removeProduct, changeAvailability,
     addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct,
-    getProducts, getProductById, getWishlistProducts,
+    getProducts, getProductById, getWishlistProducts, getProductByCategory,
     addToCart, getCart, updateCart, removeCart,
     addToWishlist, removeFromWishlist
 };

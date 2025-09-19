@@ -37,7 +37,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
   const handleWishlistToggle = async (e) => {
     e.stopPropagation();
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -76,7 +76,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
   const handleAddToCart = async (e) => {
     e.stopPropagation();
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -106,7 +106,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
   const handleEdit = (e, product) => {
     e.stopPropagation();
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -119,7 +119,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
   const handleDelete = async (e, id) => {
     e.stopPropagation();
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -143,7 +143,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
   const toggleAvailability = async (e, id, available) => {
     e.stopPropagation();
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;

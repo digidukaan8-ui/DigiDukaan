@@ -90,7 +90,7 @@ const UsedProductDetail = ({ id }) => {
     const prevImage = () => setSelectedImageIndex((prev) => (prev - 1 + img.length) % img.length);
 
     const handleUpdate = (product) => {
-        if (!user) {
+        if (!user?._id || !user?.name) {
             navigate(`/login`);
             toast.error("Login First");
             return;
@@ -102,7 +102,7 @@ const UsedProductDetail = ({ id }) => {
     };
 
     const handleDelete = async (id) => {
-        if (!user) {
+        if (!user?._id || !user?.name) {
             navigate(`/login`);
             toast.error("Login First");
             return;
@@ -125,7 +125,7 @@ const UsedProductDetail = ({ id }) => {
     };
 
     const handleWishList = async () => {
-        if (!user) {
+        if (!user?._id || !user?.name) {
             navigate(`/login`);
             toast.error("Login First");
             return;
@@ -163,7 +163,7 @@ const UsedProductDetail = ({ id }) => {
     };
 
     const handleChatSeller = () => {
-        if (!user) {
+        if (!user?._id || !user?.name) {
             navigate(`/login`);
             toast.error("Login First");
             return;

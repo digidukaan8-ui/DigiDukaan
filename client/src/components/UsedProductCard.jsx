@@ -32,7 +32,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
   const handleWishList = async (e) => {
     e.stopPropagation();
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -71,7 +71,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
   const handleChatSeller = (e) => {
     e.stopPropagation();
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -83,7 +83,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
   const handleEditClick = (e) => {
     e.stopPropagation();
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;
@@ -96,7 +96,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
   const handleDeleteClick = async (e) => {
     e.stopPropagation();
-    if (!user) {
+    if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
       return;

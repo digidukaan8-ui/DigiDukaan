@@ -6,8 +6,9 @@ import Cart from "../models/cart.model.js"
 import Wishlist from "../models/wishlist.model.js";
 import View from "../models/view.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.config.js";
+import { isValidCategory, isValidUsedProductCategory, isValidSubCategory, isValidUsedProductSubCategory } from '../utils/category.util.js'
 
-const MAX_VIEWS = 150;
+const MAX_VIEWS = 100;
 
 const addProduct = async (req, res) => {
     try {
@@ -896,6 +897,50 @@ const updateReview = async (req, res) => {
     }
 }
 
+const getProductByCategory = async (req, res) => {
+    try {
+        const { category } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 20;
+
+        if (!category || typeof category !== "string") {
+            return res.status(400).json({ success: false, message: 'Category is required' })
+        }
+
+        let products = [];
+        let total = 0;
+        const capitalized = category.charAt(0).toUpperCase() + category.slice(1);
+
+        if (isValidCategory(capitalized)) {
+            total = await Product.countDocuments({ "category.slug": category });
+            products = await Product.find({ "category.slug": category })
+                .skip((page - 1) * limit)
+                .limit(limit);
+        } else if (isValidUsedProductCategory(category)) {
+            total = await UsedProduct.countDocuments({ "category.slug": category });
+            products = await UsedProduct.find({ "category.slug": category })
+                .skip((page - 1) * limit)
+                .limit(limit);
+        } else {
+            return res.status(400).json({ success: false, message: "Invalid category" });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Products fetched successfully',
+            data: products,
+            pagination: {
+                total,
+                page,
+                pages: Math.ceil(total / limit)
+            }
+        });
+    } catch (error) {
+        console.error('Error in Get Product by Category controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
 export {
     addProduct, getProduct, updateProduct, removeProduct, changeAvailability,
     addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct,
@@ -903,5 +948,5 @@ export {
     addViewedProduct, addWishlistProduct, addCartProduct, addReview,
     removeViewedProduct, removeWishlistProduct, removeCartProduct, removeReview,
     updateCart, updateReview,
-    getProductById
+    getProductById, getProductByCategory
 };

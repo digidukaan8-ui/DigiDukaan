@@ -4,8 +4,7 @@ import {
     getViewedProducts, getWishlistProducts, getCartProducts, getReview,
     addViewedProduct, addWishlistProduct, addCartProduct, addReview,
     removeViewedProduct, removeWishlistProduct, removeCartProduct, removeReview,
-    updateCart, updateReview,
-    getProductById
+    updateCart, updateReview
 } from '../controllers/product.controller.js';
 import { handleAddToCart, handleUpdateCart } from '../middlewares/product.middleware.js';
 
@@ -15,7 +14,6 @@ buyerRouter.get('/cart', authMiddleware('buyer'), getCartProducts);
 buyerRouter.get('/wishlist', authMiddleware('buyer'), getWishlistProducts);
 buyerRouter.get('/viewed', authMiddleware('buyer'), getViewedProducts);
 buyerRouter.get('/reviews', authMiddleware('buyer'), getReview);
-buyerRouter.get('/product/:productId', authMiddleware('buyer'), getProductById);
 
 buyerRouter.post('/cart/:productId', authMiddleware('buyer'), handleAddToCart, addCartProduct);
 buyerRouter.post('/wishlist/:productId', authMiddleware('buyer'), addWishlistProduct);
