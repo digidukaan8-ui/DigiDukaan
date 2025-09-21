@@ -5,8 +5,8 @@ import Card from "../../components/Card.jsx";
 import UsedProductCard from "../../components/UsedProductCard.jsx";
 import useAuthStore from "../../store/auth.js";
 import useCartStore from "../../store/cart.js";
-import { Heart, Package, ShoppingCart, Eye, Star, Clock, Edit3, ArrowRight, MessageSquare, User, ImageDown, XCircle } from "lucide-react";
-import { getWishlistProducts,getViewedProduct } from "../../api/product.js";
+import { Heart, Package, ShoppingCart, Eye, Star, Clock, Edit3, ArrowRight, MessageSquare, User, ImageDown, XCircle, MapPin } from "lucide-react";
+import { getWishlistProducts, getViewedProduct } from "../../api/product.js";
 import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
@@ -107,7 +107,7 @@ export default function Dashboard() {
   return (
     <div className="px-4 md:px-6 pt-30 pb-10 bg-gray-100 dark:bg-neutral-950 min-h-screen text-black dark:text-white">
       <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow mb-10 flex flex-col md:flex-row md:items-center gap-6 border border-black dark:border-white">
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:w-1/3 text-center md:text-left">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:w-1/3 text-center md:text-left relative">
           {buyerInfo.avatarUrl ? (
             <img
               src={buyerInfo.avatarUrl}
@@ -126,16 +126,16 @@ export default function Dashboard() {
             <h2 className="text-xl md:text-2xl font-bold truncate">{buyerInfo.name || "Unnamed User"}</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 truncate">@{buyerInfo.username || "username"}</p>
 
-            <div className="flex flex-col sm:items-start items-center gap-2 mt-3">
+            <div className="flex flex-col sm:items-center justify-center sm:justify-start gap-2 mt-3">
               <button
-                className="w-40 md:w-32 cursor-pointer bg-sky-500 hover:bg-sky-600 text-white py-2 rounded-md text-sm flex justify-center items-center gap-1 transition-colors border border-black dark:border-white"
-                onClick={() => setShowEditProfileModal(true)}
+                className="w-40 cursor-pointer bg-sky-500 hover:bg-sky-600 text-white py-2 px-4 rounded-md text-sm flex justify-center items-center gap-1 transition-colors border border-black dark:border-white"
+                onClick={() => navigate('/buyer/address')}
               >
-                <Edit3 size={14} />
-                <span>Edit Profile</span>
+                <MapPin size={14} />
+                <span>Manage Address</span>
               </button>
               <button
-                className="w-40 md:w-32 cursor-pointer bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-md text-sm flex justify-center items-center gap-1 transition-colors border border-black dark:border-white"
+                className="w-40 cursor-pointer bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-md text-sm flex justify-center items-center gap-1 transition-colors border border-black dark:border-white"
                 onClick={() => setShowChangeAvatarModal(true)}
               >
                 {buyerInfo.avatarUrl ? <ImageDown size={14} /> : <User size={14} />}
@@ -143,8 +143,13 @@ export default function Dashboard() {
               </button>
             </div>
           </div>
+          <button
+            className="absolute top-0 right-0 p-2 rounded-full bg-gray-200 dark:bg-neutral-800 text-sky-600 dark:text-sky-400 hover:bg-gray-300 dark:hover:bg-neutral-700 transition-colors"
+            onClick={() => setShowEditProfileModal(true)}
+          >
+            <Edit3 size={16} />
+          </button>
         </div>
-
 
         <div className="w-full h-px md:h-30 md:w-px bg-black dark:bg-white md:mx-4" />
 
@@ -395,6 +400,15 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="mt-6 flex justify-center gap-2">
+              {buyerInfo.avatarUrl && (
+                <button
+                  type="button"
+                  onClick={handleRemoveAvatar}
+                  className="w-32 py-2 rounded-lg cursor-pointer border border-black dark:border-white text-white bg-red-600 hover:bg-red-700 transition-colors"
+                >
+                  Remove Avatar
+                </button>
+              )}
               <button type="button" className="w-32 py-2 rounded-lg cursor-pointer border border-black dark:border-white text-white bg-red-600 hover:bg-red-700 transition-colors" onClick={() => setShowChangeAvatarModal(false)}>Cancel</button>
               <button type="submit" className="bg-sky-500 hover:bg-sky-600 text-white w-32 py-2 rounded-lg cursor-pointer transition-colors border border-black dark:border-white">Save Changes</button>
             </div>
