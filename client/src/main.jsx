@@ -2,9 +2,10 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
-import { Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct, Profile, Cart, Category, Chat } from './pages/index.js'
-import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm } from './components/index.js'
-import Dashboard from './pages/admin/Dashboard.jsx'
+import { Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct, Cart, Category, Chat, Dashboard } from './pages/index.js'
+import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm } from './components/index.js'; import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,7 +26,7 @@ const router = createBrowserRouter(
       <Route path='chat' element={<Chat />} />
 
       <Route path='buyer' element={<BuyerRoute />} >
-        <Route path='dashboard' element={<Profile />} />
+        <Route path='dashboard' element={<Dashboard />} />
         <Route path='cart' element={<Cart />} />
         <Route path='dashboard' element={<Dashboard />} />
       </Route>
@@ -46,5 +47,7 @@ const router = createBrowserRouter(
 )
 
 createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router} />
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={router} />
+  </QueryClientProvider>
 )

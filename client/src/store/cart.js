@@ -42,9 +42,9 @@ const useCartStore = create(
 
       clearCart: () => set({ cart: [] }),
 
-       getLength: () => get().cart.length,
+      getCartLength: () => { return get().cart.length },
     }),
-    
+
     {
       name: "cart-storage",
       partialize: (state) => ({ cart: state.cart }),

@@ -596,15 +596,20 @@ const getViewedProducts = async (req, res) => {
     try {
         const user = req.user;
 
-        const view = await View.findOne({ userId: user._id })
-            .populate({
-                path: "productIds",
-                select: "storeId title description price img discount stock deliveryCharge"
-            });
+        const view = await View.findOne({ userId: user._id });
+        if (!view || !view.productIds.length) {
+            return res.status(200).json({ success: true, newProductViewed: [], usedProductViewed: [] });
+        }
 
-        if (!view) return res.json({ success: true, data: [] });
+        const productIds = view.productIds;
+        const newProductViewed = await Product.find({ _id: { $in: productIds } });
+        const usedProductViewed = await UsedProduct.find({ _id: { $in: productIds } });
 
-        return res.json({ success: true, data: view.productIds });
+        return res.status(200).json({
+            success: true,
+            newProductViewed,
+            usedProductViewed,
+        });
     } catch (error) {
         console.error("Error in getViewedProducts:", error);
         return res.status(500).json({ success: false, message: "Internal server error" });
@@ -616,18 +621,24 @@ const getWishlistProducts = async (req, res) => {
         const user = req.user;
 
         const wishlist = await Wishlist.findOne({ userId: user._id });
-        if (!wishlist) {
-            return res.status(200).json({ success: true, productIds: [] });
+        if (!wishlist || !wishlist.productIds.length) {
+            return res.status(200).json({ success: true, newProductWishlist: [], usedProductWishlist: [] });
         }
 
-        const data = {
-            _id: wishlist._id,
-            productIds: wishlist.productIds
-        }
+        const productIds = wishlist.productIds;
+        const newProductWishlist = await Product.find({ _id: { $in: productIds } });
+        const usedProductWishlist = await UsedProduct.find({ _id: { $in: productIds } });
 
-        return res.status(200).json({ success: true, data });
+        const data = { _id: wishlist._id, productIds: wishlist.productIds }
+
+        return res.status(200).json({
+            success: true,
+            data,
+            newProductWishlist,
+            usedProductWishlist,
+        });
     } catch (error) {
-        console.error("Error in Get Wishlist Product IDs: ", error);
+        console.error("Error in Get Wishlist Products: ", error);
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };

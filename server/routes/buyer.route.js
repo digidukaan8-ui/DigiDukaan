@@ -6,9 +6,13 @@ import {
     removeViewedProduct, removeWishlistProduct, removeCartProduct, removeReview,
     updateCart, updateReview
 } from '../controllers/product.controller.js';
+import { userAvatar, removeUserAvatar } from '../controllers/user.controller.js';
 import { handleAddToCart, handleUpdateCart } from '../middlewares/product.middleware.js';
-
+import { uploadProductMedia, validateFileSizes } from '../middlewares/upload.middleware.js'
 const buyerRouter = express.Router();
+
+buyerRouter.put('/avatar', authMiddleware('buyer'), uploadProductMedia, validateFileSizes, userAvatar);
+buyerRouter.delete('/avatar', authMiddleware('buyer'), removeUserAvatar);
 
 buyerRouter.get('/cart', authMiddleware('buyer'), getCartProducts);
 buyerRouter.get('/wishlist', authMiddleware('buyer'), getWishlistProducts);

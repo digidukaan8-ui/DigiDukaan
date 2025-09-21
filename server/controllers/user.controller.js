@@ -329,4 +329,22 @@ const message = async (req, res) => {
     }
 }
 
-export { registerUser, loginUser, logoutUser, sendOTP, verifyOTP, resetPassword, message };
+const userAvatar = async (req, res) => {
+    try {
+
+    } catch (error) {
+        console.error("Error in user avatar controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error", error });
+    }
+}
+
+const removeUserAvatar = async (req, res) => {
+    try {
+
+    } catch (error) {
+        console.error("Error in remove user avatar controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error", error });
+    }
+}
+
+export { registerUser, loginUser, logoutUser, sendOTP, verifyOTP, resetPassword, message, userAvatar, removeUserAvatar };
