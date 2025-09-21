@@ -29,7 +29,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
   const discountValue = product.discount?.percentage || product.discount?.amount;
   const discountType = product.discount?.percentage ? "%" : "₹";
   const productIds = useWishlistStore((state) => state.wishlist.productIds);
-  const isWishlisted = productIds.includes(product._id);
+  const isWishlisted = productIds?.includes(product._id);
 
   const handleCardClick = (product) => {
     navigate(`/product?productId=${product._id}`);

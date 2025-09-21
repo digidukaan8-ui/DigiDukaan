@@ -35,7 +35,6 @@ const Register = () => {
 
     const finalData = {
       ...cleanData,
-      mobile: `+91${cleanData.mobile}`,
       captchaToken
     };
     try {
@@ -174,30 +173,6 @@ const Register = () => {
             <option value="seller">Seller</option>
           </select>
           {errors.role && <p className="text-red-500 text-sm">{errors.role.message}</p>}
-        </div>
-
-        <div>
-          <label htmlFor="mobile">Mobile Number</label>
-          <div className="flex items-center space-x-2">
-            <span className="p-2 border rounded bg-gray-100 dark:bg-neutral-950 select-none">+91</span>
-            <input
-              id="mobile"
-              name="mobile"
-              type="tel"
-              placeholder="1234567890"
-              autoComplete="tel"
-              maxLength={10}
-              {...register('mobile', {
-                required: 'Mobile number is required',
-                pattern: {
-                  value: /^[0-9]{10}$/,
-                  message: 'Must be 10 digits',
-                },
-              })}
-              className="w-full p-2 border rounded bg-gray-100 dark:bg-neutral-950"
-            />
-          </div>
-          {errors.mobile && <p className="text-red-500 text-sm">{errors.mobile.message}</p>}
         </div>
 
         <div className='flex justify-center items-center'>

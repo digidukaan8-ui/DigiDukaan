@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 
 const handleRegister = async (req, res, next) => {
     try {
-        const { name, username, email, password, role, mobile, captchaToken } = req.body;
+        const { name, username, email, password, role, captchaToken } = req.body;
 
         if (!captchaToken) {
             return res.status(400).json({ success: false, message: "Captcha token missing" });
@@ -20,7 +20,7 @@ const handleRegister = async (req, res, next) => {
             return res.status(400).json({ success: false, message: "Captcha verification failed" });
         }
 
-        if (!name || !username || !email || !password || !role || !mobile) {
+        if (!name || !username || !email || !password || !role) {
             return res.status(400).json({ success: false, message: 'All fields are required.' });
         }
 
@@ -29,8 +29,7 @@ const handleRegister = async (req, res, next) => {
             typeof username !== 'string' ||
             typeof email !== 'string' ||
             typeof password !== 'string' ||
-            typeof role !== 'string' ||
-            typeof mobile !== 'string'
+            typeof role !== 'string' 
         ) {
             return res.status(400).json({ success: false, message: 'Invalid input format.' });
         }
@@ -72,14 +71,6 @@ const handleRegister = async (req, res, next) => {
             return res.status(400).json({
                 success: false,
                 message: 'Invalid email format.',
-            });
-        }
-
-        const mobileRegex = /^\+91\d{10}$/;
-        if (!mobileRegex.test(mobile)) {
-            return res.status(400).json({
-                success: false,
-                message: 'mobile number must start with +91 and contain exactly 10 digits after.',
             });
         }
 

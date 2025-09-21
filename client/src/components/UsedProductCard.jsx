@@ -27,7 +27,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
   const discountValue = product.discount?.percentage || product.discount?.amount;
   const discountType = product.discount?.percentage ? "%" : "₹";
   const productIds = useWishlistStore((state) => state.wishlist.productIds);
-  const isWishlisted = productIds.includes(product._id);
+  const isWishlisted = productIds?.includes(product._id);
 
   const handleCardClick = () => navigate(`/used-product?productId=${product._id}`);
 

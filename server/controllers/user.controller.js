@@ -12,7 +12,7 @@ dotenv.config();
 
 const registerUser = async (req, res) => {
     try {
-        const { name, username, email, password, role, mobile } = req.body;
+        const { name, username, email, password, role } = req.body;
         const userExists = User.findOne({ email });
 
         if (userExists.lenght > 0) {
@@ -21,7 +21,7 @@ const registerUser = async (req, res) => {
 
         const hashedPassword = await bcryptjs.hash(password, 10);
 
-        await User.create({ name, username, email, password: hashedPassword, role, mobile });
+        await User.create({ name, username, email, password: hashedPassword, role });
 
         return res.status(201).json({ success: true, message: 'User registered successfully.' });
     } catch (error) {

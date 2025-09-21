@@ -36,11 +36,6 @@ const userSchema = new mongoose.Schema({
         trim: true,
         default: 'buyer'
     },
-    mobile: {
-        type: String,
-        required: true,
-        trim: true
-    },
     refreshToken: {
         type: String,
         default: null
