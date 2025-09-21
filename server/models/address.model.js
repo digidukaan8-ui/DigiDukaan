@@ -11,9 +11,25 @@ const addressSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  pincode: {
+  mobile: {
+    type: String,
+    required: true
+  },
+  addressType: {
+    type: String,
+    required: true
+  },
+  landmark: {
+    type: String,
+    default: null
+  },
+  addressLine1: {
     type: String,
     required: true,
+    trim: true
+  },
+  addressLine2: {
+    type: String,
     trim: true
   },
   city: {
@@ -26,24 +42,11 @@ const addressSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  street: {
+  pincode: {
     type: String,
     required: true,
     trim: true
   },
-  landmark: {
-    type: String,
-    trim: true
-  },
-  addressType: {
-    type: String,
-    enum: ['home', 'work', 'other'],
-    default: 'home'
-  },
-  isDefault: {
-    type: Boolean,
-    default: false
-  }
 }, { timestamps: true });
 
 const Address = mongoose.model('Address', addressSchema);

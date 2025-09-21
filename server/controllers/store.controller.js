@@ -54,7 +54,6 @@ const createStore = async (req, res) => {
 
         await store.save();
 
-
         return res.status(201).json({ success: true, message: 'Store created successfully', data: store });
     } catch (error) {
         console.error('Error in createStore controller: ', error);

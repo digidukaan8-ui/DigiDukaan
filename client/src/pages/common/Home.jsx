@@ -15,7 +15,7 @@ const Home = () => {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   let { user, isAuthenticated } = useAuthStore();
-  const { cart } = useCartStore();
+  const { cart, isFetched } = useCartStore();
   const { wishlist } = useWishlistStore();
   const navigate = useNavigate();
 
@@ -26,7 +26,7 @@ const Home = () => {
     }
 
     if (user && user.role === "buyer" && isAuthenticated) {
-      if (cart.length === 0) fetchCartItems();
+      if (cart.length === 0 && !isFetched) fetchCartItems();
       if (!wishlist._id || wishlist.productIds.length === 0) {
         fetchWishlist();
       }

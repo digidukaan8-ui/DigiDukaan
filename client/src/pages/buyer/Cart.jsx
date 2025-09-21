@@ -7,7 +7,7 @@ import { Pencil, X, Trash2, Check, ShoppingCart, RefreshCw, ArrowRight, } from "
 import { useNavigate } from 'react-router-dom'
 
 function Cart() {
-  const { cart } = useCartStore();
+  const { cart, isFetched } = useCartStore();
   const { startLoading, stopLoading } = useLoaderStore();
   const [quantities, setQuantities] = useState({});
   const [editing, setEditing] = useState({});
@@ -16,7 +16,7 @@ function Cart() {
   const safeCart = Array.isArray(cart) ? cart : [];
 
   useEffect(() => {
-    if (safeCart.length === 0) {
+    if (safeCart.length === 0 && !isFetched) {
       fetchCartItems();
     }
   }, []);
@@ -190,9 +190,9 @@ function Cart() {
                     min="1"
                     value={prices.qty}
                     onClick={(e) => e.stopPropagation()}
-                  onChange={(e) => setQuantities({ ...quantities, [item._id]: parseInt(e.target.value) || 0 })}
-                  disabled={!editing[item._id]}
-                  className="w-14 md:w-20 px-2 py-1 text-center border rounded-lg bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setQuantities({ ...quantities, [item._id]: parseInt(e.target.value) || 0 })}
+                    disabled={!editing[item._id]}
+                    className="w-14 md:w-20 px-2 py-1 text-center border rounded-lg bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {editing[item._id] ? (
                     <>

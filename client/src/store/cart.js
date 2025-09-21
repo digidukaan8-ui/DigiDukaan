@@ -5,8 +5,9 @@ const useCartStore = create(
   persist(
     (set, get) => ({
       cart: [],
+      isFetched: false,
 
-      setCart: (cart) => set({ cart }),
+      setCart: (cart) => set({ cart, isFetched: true }),
 
       addToCart: (product) => {
         const cart = get().cart;
@@ -40,14 +41,14 @@ const useCartStore = create(
         return get().cart.map(item => item.productId._id);
       },
 
-      clearCart: () => set({ cart: [] }),
+      clearCart: () => set({ cart: [], isFetched: false }),
 
       getCartLength: () => { return get().cart.length },
     }),
 
     {
       name: "cart-storage",
-      partialize: (state) => ({ cart: state.cart }),
+      partialize: (state) => ({ cart: state.cart, isFetched: state.isFetched }),
     }
   )
 );

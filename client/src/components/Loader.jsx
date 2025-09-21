@@ -45,6 +45,10 @@ export default function Loader() {
     updateCart: "Updating cart details...",
     removeCart: "Removing product from cart...",
     fetchCart: "Fetching cart details...",
+    fetchAddress: "Fetching Addresses...",
+    addAddress: "Adding Address...",
+    updateAddress: "Updating Address...",
+    removeAddress: "Removing Address...",
     default: "Loading...",
   };
 
@@ -78,6 +82,10 @@ export default function Loader() {
     updateCart: "text-purple-500",
     removeCart: "text-purple-500",
     fetchCart: "text-purple-500",
+    fetchAddress: "text-purple-500",
+    addAddress: "text-purple-500",
+    updateAddress: "text-purple-500",
+    getAddress: "text-purple-500",
     default: "text-gray-500",
   };
 

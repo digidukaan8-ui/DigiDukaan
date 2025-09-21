@@ -24,6 +24,7 @@ const authMiddleware = (...allowedRoles) => {
           refreshToken,
           process.env.REFRESH_TOKEN_SECRET
         );
+        console.log(refreshDecoded)
         const user = await User.findById(refreshDecoded._id);
 
         if (!user || user.refreshToken !== refreshToken) {
