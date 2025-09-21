@@ -8,7 +8,6 @@ import { getProduct, getUsedProduct } from "../../api/product";
 import useLoaderStore from "../../store/loader";
 import useProductStore from "../../store/product";
 import useUsedProductStore from "../../store/usedProduct";
-import { toast } from "react-hot-toast";
 import { QuickView } from "../../components/index";
 
 export default function Store() {
@@ -38,7 +37,6 @@ export default function Store() {
             const data = await getProduct(store._id);
             if (data.length > 0) {
               data.forEach(product => useProductStore.getState().addProduct(product));
-              toast.success("Products fetched successfully");
             }
           } finally {
             stopLoading();
@@ -54,7 +52,6 @@ export default function Store() {
             const data = await getUsedProduct(store._id);
             if (data.length > 0) {
               data.forEach(product => useUsedProductStore.getState().addUsedProduct(product));
-              toast.success("Used products fetched successfully");
             }
           } finally {
             stopLoading();

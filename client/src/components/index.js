@@ -15,5 +15,6 @@ import QuickView from "./QuickView";
 import UsedProductDetails from "./UsedProductDetails";
 import Location from "./Location";
 import Recaptcha from "./forms/Recaptcha";
+import ScrollToTop from "./ScrollToTop.jsx";
 
-export { Header, Footer, Card, UsedProductCard, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, ProductDetails, QuickView, UsedProductDetails, Location, Recaptcha };
+export { Header, Footer, Card, UsedProductCard, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, ProductDetails, QuickView, UsedProductDetails, Location, Recaptcha, ScrollToTop };

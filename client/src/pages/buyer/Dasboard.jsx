@@ -40,8 +40,6 @@ export default function Dashboard() {
     queryFn: getWishlistProducts,
     enabled: !!isAuthenticated,
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
   });
 
   const { data: viewedData = { newProductViewed: [], usedProductViewed: [] } } = useQuery({
@@ -49,8 +47,6 @@ export default function Dashboard() {
     queryFn: getViewedProduct,
     enabled: !!isAuthenticated,
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
   });
 
   const { register: registerProfile, handleSubmit: handleSubmitProfile, reset: resetProfile } = useForm();

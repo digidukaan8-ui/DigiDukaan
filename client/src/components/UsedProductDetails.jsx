@@ -97,8 +97,7 @@ const UsedProductDetail = ({ id }) => {
                 navigate(`/login`);
                 toast.error("Login First");
                 return;
-            } else if (user?.role === "buyer" || user?.role === "admin") {
-                toast.error("Only for seller");
+            } else if (user?.role === "seller" || user?.role === "admin") {
                 return;
             }
             try {

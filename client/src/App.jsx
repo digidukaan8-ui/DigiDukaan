@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom"
-import { Header, Footer } from "./components/index.js"
+import { Header, Footer, ScrollToTop } from "./components/index.js"
 import { Toaster } from 'react-hot-toast';
 import useThemeStore from "./store/theme.js";
 import { useEffect } from "react";
@@ -30,6 +30,7 @@ function App() {
         }}
       />
       <Loader />
+      <ScrollToTop />
       <Outlet />
       <Footer />
     </>
