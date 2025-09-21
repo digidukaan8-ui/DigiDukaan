@@ -17,9 +17,19 @@ const useAuthStore = create(
         set((state) => ({
           user: { ...state.user, ...userData },
         })),
+
+      changeAvatar: (avatar) =>
+        set((state) => ({
+          user: { ...state.user, avatar },
+        })),
+
+      updateProfile: (data) =>
+        set((state) => ({
+          user: { ...state.user, ...data }
+        }))
     }),
     {
-      name: "auth-storage", 
+      name: "auth-storage",
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,

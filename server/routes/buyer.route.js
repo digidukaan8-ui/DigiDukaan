@@ -6,15 +6,13 @@ import {
     removeViewedProduct, removeWishlistProduct, removeCartProduct, removeReview,
     updateCart, updateReview
 } from '../controllers/product.controller.js';
-import { userAvatar, removeUserAvatar } from '../controllers/user.controller.js';
+import { userAvatar, removeUserAvatar, updateProfile } from '../controllers/user.controller.js';
 import { handleAddToCart, handleUpdateCart } from '../middlewares/product.middleware.js';
 import { uploadProductMedia, validateFileSizes } from '../middlewares/upload.middleware.js';
 import { addAddress, updateAddress, removeAddress, getAddresses } from '../controllers/address.controller.js';
 import { handleAddAddress, handleUpdateAddress } from '../middlewares/address.middleware.js';
 const buyerRouter = express.Router();
 
-buyerRouter.put('/avatar', authMiddleware('buyer'), uploadProductMedia, validateFileSizes, userAvatar);
-buyerRouter.delete('/avatar', authMiddleware('buyer'), removeUserAvatar);
 
 buyerRouter.get('/cart', authMiddleware('buyer'), getCartProducts);
 buyerRouter.get('/wishlist', authMiddleware('buyer'), getWishlistProducts);
@@ -30,12 +28,15 @@ buyerRouter.post('/address', authMiddleware('buyer'), handleAddAddress, addAddre
 
 buyerRouter.put('/cart/:cartId', authMiddleware('buyer'), handleUpdateCart, updateCart);
 buyerRouter.put('/review/:reviewId', authMiddleware('buyer'), updateReview);
+buyerRouter.put('/avatar', authMiddleware('buyer'), uploadProductMedia, validateFileSizes, userAvatar);
+buyerRouter.put('/update', authMiddleware('buyer'), updateProfile);
 buyerRouter.put('/address/:addressId', authMiddleware('buyer'), handleUpdateAddress, updateAddress);
 
 buyerRouter.delete('/cart/:cartId', authMiddleware('buyer'), removeCartProduct);
 buyerRouter.delete('/wishlist/:wishlistId/:productId', authMiddleware('buyer'), removeWishlistProduct);
 buyerRouter.delete('/viewed/:viewId/:productId', authMiddleware('buyer'), removeViewedProduct);
 buyerRouter.delete('/review/:reviewId', authMiddleware('buyer'), removeReview);
+buyerRouter.delete('/avatar', authMiddleware('buyer'), removeUserAvatar);
 buyerRouter.delete('/address/:addressId', authMiddleware('buyer'), removeAddress);
 
 export default buyerRouter;

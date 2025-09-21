@@ -93,6 +93,14 @@ const UsedProductDetail = ({ id }) => {
         if (!product?._id) return;
 
         const addToRecentlyViewed = async () => {
+            if (!user?._id || !user?.name) {
+                navigate(`/login`);
+                toast.error("Login First");
+                return;
+            } else if (user?.role === "buyer" || user?.role === "admin") {
+                toast.error("Only for seller");
+                return;
+            }
             try {
                 await addToViewed(product._id);
             } catch (err) {

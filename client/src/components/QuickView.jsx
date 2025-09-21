@@ -31,6 +31,14 @@ export default function QuickView({ product, type, isOpen, onClose }) {
 
     const addToRecentlyViewed = async () => {
       try {
+        if (!user?._id || !user?.name) {
+          navigate(`/login`);
+          toast.error("Login First");
+          return;
+        } else if (user?.role === "buyer" || user?.role === "admin") {
+          toast.error("Only for seller");
+          return;
+        }
         await addToViewed(product._id);
       } catch (err) {
         console.error("Error adding to viewed:", err);

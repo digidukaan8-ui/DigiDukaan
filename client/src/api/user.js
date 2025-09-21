@@ -183,4 +183,71 @@ const sendMessage = async (message) => {
     }
 }
 
-export { registerUser, loginUser, logoutUser, sendOtp, verifyOtp, resetPassword, sendMessage };
+const changeAvatar = async (img) => {
+    try {
+        const formData = new FormData();
+        formData.append('img', img);
+        const response = await fetch('http://localhost:3000/api/buyers/avatar', {
+            method: 'PUT',
+            credentials: 'include',
+            body: formData
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            toast.error(result.message || 'Failed to change avatar');
+            throw new Error(result.message || 'Failed to change avatar');
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in changing avatar: ", error);
+        throw error;
+    }
+}
+
+const removeAvatar = async () => {
+    try {
+        const response = await fetch('http://localhost:3000/api/buyers/avatar', {
+            method: 'DELETE',
+            credentials: 'include',
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            toast.error(result.message || 'Failed to remove avatar');
+            throw new Error(result.message || 'Failed to remove avatar');
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in removing avatar: ", error);
+        throw error;
+    }
+}
+
+const updateProfile = async (data) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/buyers/update', {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'PUT',
+            credentials: 'include',
+            body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            toast.error(result.message || 'Failed to update profile');
+            throw new Error(result.message || 'Failed to update profile');
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in update profile: ", error);
+        throw error;
+    }
+}
+
+export { registerUser, loginUser, logoutUser, sendOtp, verifyOtp, resetPassword, sendMessage, changeAvatar, removeAvatar, updateProfile };

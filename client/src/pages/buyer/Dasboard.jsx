@@ -8,11 +8,15 @@ import useCartStore from "../../store/cart.js";
 import { Heart, Package, ShoppingCart, Eye, Star, Clock, Edit3, ArrowRight, MessageSquare, User, ImageDown, XCircle, MapPin } from "lucide-react";
 import { getWishlistProducts, getViewedProduct } from "../../api/product.js";
 import { useNavigate } from "react-router-dom";
+import useLoaderStore from "../../store/loader.js";
+import { toast } from 'react-hot-toast';
+import { changeAvatar, removeAvatar, updateProfile } from "../../api/user.js";
 
 export default function Dashboard() {
   const { user, isAuthenticated } = useAuthStore();
   const { getCartLength } = useCartStore();
   const navigate = useNavigate();
+  const { startLoading, stopLoading } = useLoaderStore();
 
   const [buyerInfo, setBuyerInfo] = useState({
     name: "",
@@ -25,16 +29,28 @@ export default function Dashboard() {
   const { data: orders = [] } = useQuery({
     queryKey: ["orders"],
     queryFn: () => fetch("/api/orders").then((res) => res.json()),
+    enabled: !!isAuthenticated,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   const { data: wishlistData = { newProductWishlist: [], usedProductWishlist: [] } } = useQuery({
     queryKey: ["wishlist"],
     queryFn: getWishlistProducts,
+    enabled: !!isAuthenticated,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   const { data: viewedData = { newProductViewed: [], usedProductViewed: [] } } = useQuery({
     queryKey: ["recentlyViewed"],
     queryFn: getViewedProduct,
+    enabled: !!isAuthenticated,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   const { register: registerProfile, handleSubmit: handleSubmitProfile, reset: resetProfile } = useForm();
@@ -71,25 +87,55 @@ export default function Dashboard() {
     return avatarColors[code % avatarColors.length];
   };
 
-  const onProfileSubmit = (data) => {
-    setBuyerInfo((prev) => ({ ...prev, name: data.name, username: data.username }));
-    setShowEditProfileModal(false);
+  const onProfileSubmit = async (data) => {
+    startLoading('updateProfile')
+    try {
+      const result = await updateProfile(data);
+      if (result.success) {
+        toast.success("Updated profile successfully");
+        useAuthStore.getState().updateProfile(result.data)
+        setBuyerInfo((prev) => ({ ...prev, name: result.data.name, username: result.data.username }));
+        setShowEditProfileModal(false);
+      }
+    } finally {
+      stopLoading()
+    }
   };
 
-  const onAvatarSubmit = (data) => {
+  const onAvatarSubmit = async (data) => {
     const file = data.avatar[0];
     if (file) {
-      const preview = URL.createObjectURL(file);
-      setBuyerInfo((p) => ({ ...p, avatarUrl: preview }));
+      startLoading('changeAvatar')
+      try {
+        const result = await changeAvatar(file);
+        if (result.success) {
+          toast.success("Avatar changed successfully");
+          useAuthStore.getState().changeAvatar(result.data)
+          const preview = result.data;
+          setBuyerInfo((p) => ({ ...p, avatarUrl: preview }));
+        }
+      } finally {
+        stopLoading()
+      }
     }
     setShowChangeAvatarModal(false);
   };
 
-  const handleRemoveAvatar = () => {
+  const handleRemoveAvatar = async () => {
     if (window.confirm("Are you sure you want to remove your avatar?")) {
-      setBuyerInfo((p) => ({ ...p, avatarUrl: "" }));
-      resetAvatar({ avatar: null });
-      setShowChangeAvatarModal(false);
+      startLoading('removeAvatar')
+      try {
+        const result = await removeAvatar();
+        if (result.success) {
+          toast.success("Avatar removed successfully");
+          useAuthStore.getState().changeAvatar(result.data)
+          setBuyerInfo((p) => ({ ...p, avatarUrl: "" }));
+          resetAvatar({ avatar: null });
+          setShowChangeAvatarModal(false);
+        }
+      } finally {
+        stopLoading()
+      }
     }
   };
 
@@ -345,7 +391,7 @@ export default function Dashboard() {
       </div>
 
       {showEditProfileModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-30 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowEditProfileModal(false)} />
           <form onSubmit={handleSubmitProfile(onProfileSubmit)} className="relative max-w-md w-full bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-lg z-10 border border-black dark:border-white">
             <h3 className="text-xl font-bold mb-4">Edit Profile</h3>
@@ -368,7 +414,7 @@ export default function Dashboard() {
       )}
 
       {showChangeAvatarModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-30 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowChangeAvatarModal(false)} />
           <form onSubmit={handleSubmitAvatar(onAvatarSubmit)} className="relative max-w-md w-full bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-lg z-10 border border-black dark:border-white">
             <h3 className="text-xl font-bold mb-4">Change Avatar</h3>

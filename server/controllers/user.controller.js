@@ -7,6 +7,7 @@ import DeliveryZone from '../models/deliveryzone.model.js';
 import nodemailer from 'nodemailer';
 import OTP from '../models/otp.model.js';
 import Feedback from '../models/feedback.model.js';
+import { uploadToCloudinary, deleteFromCloudinary } from '../utils/cloudinary.config.js';
 
 dotenv.config();
 
@@ -72,7 +73,8 @@ const loginUser = async (req, res) => {
             _id: user._id,
             name: user.name,
             username: user.username,
-            role: user.role
+            role: user.role,
+            avatar: user.avatar
         }
 
         const storeData = await Store.findOne({ userId: user._id });
@@ -331,20 +333,89 @@ const message = async (req, res) => {
 
 const userAvatar = async (req, res) => {
     try {
+        const userId = req.user._id;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
 
+        let updatedImg;
+        if (req.files?.img && req.files.img.length > 0) {
+            const filePath = req.files.img[0].path;
+
+            if (user.avatar?.publicId) {
+                await deleteFromCloudinary(user.avatar.publicId);
+            }
+
+            const result = await uploadToCloudinary(filePath);
+            if (!result) {
+                return res.status(501).json({ success: false, message: "Failed to upload image" });
+            }
+
+            updatedImg = {
+                url: result.secure_url,
+                publicId: result.public_id,
+            };
+        }
+        user.avatar = updatedImg;
+        await user.save();
+
+        return res.status(200).json({ success: true, message: 'Avatar changed successfully', data: user.avatar });
     } catch (error) {
         console.error("Error in user avatar controller: ", error);
-        return res.status(500).json({ success: false, message: "Internal server error", error });
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
 
 const removeUserAvatar = async (req, res) => {
     try {
+        const userId = req.user._id;
 
+        const user = await User.findById(userId);
+        try {
+            await deleteFromCloudinary(user.avatar?.publicId);
+        } catch (error) {
+            return res.status(400).json({ success: false, message: "Error in removing image" });
+        }
+
+        user.avatar = {};
+        await user.save();
+
+        return res.status(200).json({ success: true, message: 'Avatar removed successfully', data: {} });
     } catch (error) {
         console.error("Error in remove user avatar controller: ", error);
         return res.status(500).json({ success: false, message: "Internal server error", error });
     }
 }
 
-export { registerUser, loginUser, logoutUser, sendOTP, verifyOTP, resetPassword, message, userAvatar, removeUserAvatar };
+const updateProfile = async (req, res) => {
+    try {
+        const { name, username } = req.body;
+        const userId = req.user._id;
+
+        if (!name || !username) {
+            return res.status(400).json({ success: false, message: 'All fields are required' });
+        }
+
+        if (typeof name !== 'string' || typeof username !== 'string') {
+            return res.status(400).json({ success: false, message: 'Invalid input format' });
+        }
+
+        const user = await User.findById(userId);
+        const usernameExists = await User.findOne({ username, _id: { $ne: userId } });
+        if (usernameExists) {
+            return res.status(400).json({ success: false, message: 'Username already exists' });
+        }
+
+        user.name = name.trim();
+        user.username = username.trim();
+        await user.save();
+
+        return res.status(200).json({ success: true, message: 'Profile updated successfully', data: { name, username } });
+    } catch (error) {
+        console.error("Error in update profile controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error", error });
+    }
+}
+
+export { registerUser, loginUser, logoutUser, sendOTP, verifyOTP, resetPassword, message, userAvatar, removeUserAvatar, updateProfile };
