@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 const useStores = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       stores: [],
 
       addStores: (data) => set({ stores: data }),
@@ -24,6 +24,10 @@ const useStores = create(
         set((state) => ({
           stores: state.stores.filter((s) => s._id !== id),
         })),
+
+      getStore: (id) => {
+        return get().stores.filter((s) => s._id === id)
+      },
 
       clearStores: () => set({ stores: [] }),
     }),

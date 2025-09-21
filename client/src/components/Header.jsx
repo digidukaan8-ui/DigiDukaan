@@ -18,16 +18,18 @@ export default function Header() {
       return [
         { to: '/', label: 'Home' },
         { to: '/buyer/cart', label: 'Cart' },
+        { to: '/chat', label: 'Chat' },
         { to: '/buyer/notification', label: 'Notification' },
-        { to: '/buyer/profile', label: 'Profile' },
+        { to: '/buyer/dashboard', label: 'Dashboard' },
         { to: '/logout', label: 'Logout' },
       ];
     } else if (isAuthenticated && user.role === 'seller') {
       return [
         { to: '/seller/store', label: 'Store' },
         { to: '/order', label: 'Orders' },
+        { to: '/chat', label: 'Chat' },
         { to: '/notification', label: 'Notification' },
-        { to: '/profile', label: 'Profile' },
+        { to: '/seller/dashboard', label: 'Dashboard' },
         { to: '/logout', label: 'Logout' },
       ];
     } else {

@@ -7,6 +7,7 @@ import { toast } from "react-hot-toast";
 import useUsedProductStore from "../store/usedProduct";
 import useAuthStore from "../store/auth";
 import useWishlistStore from "../store/wishlist";
+import useStores from "../store/stores";
 
 export default function UsedProductCard({ product, userRole = "buyer", onQuickView }) {
   const navigate = useNavigate();
@@ -69,7 +70,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
     }
   };
 
-  const handleChatSeller = (e) => {
+  const handleChatSeller = (e, storeId) => {
     e.stopPropagation();
     if (!user?._id || !user?.name) {
       navigate(`/login`);
@@ -79,6 +80,15 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
       toast.error("Only for buyer");
       return;
     }
+
+    const store = useStores.getState().getStore(storeId);
+    navigate(`/chat?storeId=${storeId}`, {
+      state: {
+        img: store[0]?.img?.url,
+        name: store[0]?.name,
+        seller: store[0]?.userId
+      }
+    });
   };
 
   const handleEditClick = (e) => {
@@ -247,7 +257,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
           {userRole === "buyer" && (
             <button
-              onClick={handleChatSeller}
+              onClick={(e) => handleChatSeller(e, product.storeId)}
               className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
             >
               <MessageCircle className="h-5 w-5" />
