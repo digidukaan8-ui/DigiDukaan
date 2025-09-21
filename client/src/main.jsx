@@ -4,6 +4,7 @@ import App from './App.jsx'
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
 import { Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct, Profile, Cart,Category } from './pages/index.js'
 import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm } from './components/index.js'
+import Dashboard from './pages/admin/Dashboard.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,6 +26,7 @@ const router = createBrowserRouter(
       <Route path='buyer' element={<BuyerRoute />} >
         <Route path='profile' element={<Profile />} />
         <Route path='cart' element={<Cart />} />
+        <Route path='dashboard' element={<Dashboard />} />
       </Route>
 
       <Route path='seller' element={<SellerRoute />} >

@@ -17,6 +17,7 @@ export default function Header() {
     if (isAuthenticated && user.role === 'buyer') {
       return [
         { to: '/', label: 'Home' },
+        { to: '/buyer/dashboard', label: 'Dashboard' },
         { to: '/buyer/cart', label: 'Cart' },
         { to: '/buyer/notification', label: 'Notification' },
         { to: '/buyer/profile', label: 'Profile' },
