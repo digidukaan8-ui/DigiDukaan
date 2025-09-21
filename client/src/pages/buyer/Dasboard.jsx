@@ -6,7 +6,7 @@ import UsedProductCard from "../../components/UsedProductCard.jsx";
 import useAuthStore from "../../store/auth.js";
 import useCartStore from "../../store/cart.js";
 import { Heart, Package, ShoppingCart, Eye, Star, Clock, Edit3, ArrowRight, MessageSquare, User, ImageDown, XCircle } from "lucide-react";
-import { getWishlistProducts } from "../../api/product.js";
+import { getWishlistProducts,getViewedProduct } from "../../api/product.js";
 import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
@@ -34,7 +34,7 @@ export default function Dashboard() {
 
   const { data: viewedData = { newProductViewed: [], usedProductViewed: [] } } = useQuery({
     queryKey: ["recentlyViewed"],
-    queryFn: () => fetch("/api/recently-viewed").then((res) => res.json()),
+    queryFn: getViewedProduct,
   });
 
   const { register: registerProfile, handleSubmit: handleSubmitProfile, reset: resetProfile } = useForm();

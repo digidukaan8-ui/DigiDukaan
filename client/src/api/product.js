@@ -561,7 +561,7 @@ const getWishlistProducts = async () => {
 
         return result;
     } catch (error) {
-        console.error("Error in add to wishlist: ", error);
+        console.error("Error in get wishlist: ", error);
         throw error;
     }
 }
@@ -586,6 +586,54 @@ const removeFromWishlist = async (wishlistId, productId) => {
         return result;
     } catch (error) {
         console.error("Error in remove from wishlist: ", error);
+        throw error;
+    }
+}
+
+const addToViewed = async (productId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/viewed/${productId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            credentials: "include",
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to add product in viewed");
+            throw new Error(result.message || "Failed to add product in viewed");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in add to viewed: ", error);
+        throw error;
+    }
+}
+
+const getViewedProduct = async () => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/viewed`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+            credentials: "include",
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get product from viewed");
+            throw new Error(result.message || "Failed to get product from viewed");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in get viewed viewed: ", error);
         throw error;
     }
 }
@@ -619,5 +667,6 @@ export {
     addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct,
     getProducts, getProductById, getWishlistProducts, getProductByCategory,
     addToCart, getCart, updateCart, removeCart,
-    addToWishlist, removeFromWishlist
+    addToWishlist, removeFromWishlist,
+    addToViewed, getViewedProduct
 };

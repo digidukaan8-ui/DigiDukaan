@@ -4,7 +4,7 @@ import useAuthStore from '../store/auth';
 import useProductStore from '../store/product';
 import { useNavigate } from 'react-router-dom';
 import useLoaderStore from '../store/loader';
-import { removeProduct, changeAvailability, getProductById, addToWishlist, removeFromWishlist, addToCart } from '../api/product';
+import { removeProduct, changeAvailability, getProductById, addToWishlist, removeFromWishlist, addToCart, addToViewed } from '../api/product';
 import { toast } from 'react-hot-toast';
 import useCategoryProductStore from '../store/categoryProducts';
 import useCartStore from '../store/cart';
@@ -89,6 +89,20 @@ const ProductDetail = ({ id }) => {
 
   const nextImage = () => setSelectedImageIndex((prev) => (prev + 1) % img.length);
   const prevImage = () => setSelectedImageIndex((prev) => (prev - 1 + img.length) % img.length);
+
+  useEffect(() => {
+    if (!product?._id) return;
+
+    const addToRecentlyViewed = async () => {
+      try {
+        await addToViewed(product._id);
+      } catch (err) {
+        console.error("Error adding to viewed:", err);
+      }
+    };
+
+    addToRecentlyViewed();
+  }, [product?._id]);
 
   const handleAddToCart = async (id) => {
     if (!user?._id || !user?.name) {

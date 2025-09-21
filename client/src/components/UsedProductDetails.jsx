@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Heart, Share2, Edit, Trash2, MessageCircle, ShoppingCart, ChevronLeft, ChevronRight, Play, MapPin, Truck, Package } from "lucide-react";
+import { Heart, Share2, Edit, Trash2, MessageCircle, ShoppingCart, ChevronLeft, ChevronRight, Play, Truck, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/auth";
 import useUsedProductStore from "../store/usedProduct";
 import { toast } from "react-hot-toast";
-import { removeUsedProduct, addToWishlist, removeFromWishlist } from "../api/product";
+import { removeUsedProduct, addToWishlist, removeFromWishlist, addToViewed } from "../api/product";
 import useUsedCategoryProductStore from "../store/categoryUsedProduct";
 import useWishlistStore from "../store/wishlist";
 import useLoaderStore from '../store/loader'
@@ -88,6 +88,20 @@ const UsedProductDetail = ({ id }) => {
 
     const nextImage = () => setSelectedImageIndex((prev) => (prev + 1) % img.length);
     const prevImage = () => setSelectedImageIndex((prev) => (prev - 1 + img.length) % img.length);
+
+    useEffect(() => {
+        if (!product?._id) return;
+
+        const addToRecentlyViewed = async () => {
+            try {
+                await addToViewed(product._id);
+            } catch (err) {
+                console.error("Error adding to viewed:", err);
+            }
+        };
+
+        addToRecentlyViewed();
+    }, [product?._id]);
 
     const handleUpdate = (product) => {
         if (!user?._id || !user?.name) {

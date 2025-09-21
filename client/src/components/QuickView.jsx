@@ -1,11 +1,12 @@
 import { X, ShoppingCart, Heart, Star, MessageCircle } from "lucide-react";
-import { addToCart, addToWishlist, removeFromWishlist } from "../api/product";
+import { addToCart, addToWishlist, removeFromWishlist, addToViewed } from "../api/product";
 import useCartStore from "../store/cart";
 import useAuthStore from "../store/auth";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-hot-toast';
 import useLoaderStore from "../store/loader";
 import useWishlistStore from "../store/wishlist";
+import { useEffect } from "react";
 
 export default function QuickView({ product, type, isOpen, onClose }) {
   if (!isOpen || !product) return null;
@@ -24,6 +25,20 @@ export default function QuickView({ product, type, isOpen, onClose }) {
   const rating = product.rating || 0;
   const productIds = useWishlistStore((state) => state.wishlist.productIds);
   const isWishlisted = productIds.includes(product._id);
+
+  useEffect(() => {
+    if (!product?._id) return;
+
+    const addToRecentlyViewed = async () => {
+      try {
+        await addToViewed(product._id);
+      } catch (err) {
+        console.error("Error adding to viewed:", err);
+      }
+    };
+
+    addToRecentlyViewed();
+  }, [product?._id]);
 
   const handleWishList = async () => {
     if (!user?._id || !user?.name) {
