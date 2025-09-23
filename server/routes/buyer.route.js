@@ -13,7 +13,6 @@ import { addAddress, updateAddress, removeAddress, getAddresses } from '../contr
 import { handleAddAddress, handleUpdateAddress } from '../middlewares/address.middleware.js';
 const buyerRouter = express.Router();
 
-
 buyerRouter.get('/cart', authMiddleware('buyer'), getCartProducts);
 buyerRouter.get('/wishlist', authMiddleware('buyer'), getWishlistProducts);
 buyerRouter.get('/viewed', authMiddleware('buyer'), getViewedProducts);
