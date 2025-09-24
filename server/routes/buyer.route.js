@@ -27,7 +27,7 @@ buyerRouter.post('/address', authMiddleware('buyer'), handleAddAddress, addAddre
 
 buyerRouter.put('/cart/:cartId', authMiddleware('buyer'), handleUpdateCart, updateCart);
 buyerRouter.put('/review/:reviewId', authMiddleware('buyer'), updateReview);
-buyerRouter.put('/avatar', authMiddleware('buyer'), uploadProductMedia, validateFileSizes, userAvatar);
+buyerRouter.put('/avatar', authMiddleware('buyer'), validateFileSizes, uploadProductMedia, userAvatar);
 buyerRouter.put('/update', authMiddleware('buyer'), updateProfile);
 buyerRouter.put('/address/:addressId', authMiddleware('buyer'), handleUpdateAddress, updateAddress);
 

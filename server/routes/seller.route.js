@@ -8,22 +8,22 @@ import { addProduct, getProduct, updateProduct, removeProduct, changeAvailabilit
 
 const sellerRouter = express.Router();
 
-sellerRouter.post('/stores', authMiddleware('seller'), uploadProductMedia, validateFileSizes, handleCreateStore, createStore);
-sellerRouter.patch('/stores/:storeId', authMiddleware('seller'), uploadProductMedia, validateFileSizes, handleUpdateStore, updateStore);
+sellerRouter.post('/stores', authMiddleware('seller'), validateFileSizes, uploadProductMedia, handleCreateStore, createStore);
+sellerRouter.patch('/stores/:storeId', authMiddleware('seller'), validateFileSizes, uploadProductMedia, handleUpdateStore, updateStore);
 
 sellerRouter.post('/stores/:storeId/delivery-zones', authMiddleware('seller'), handleDeliveryZone, addDeliveryZone);
 sellerRouter.patch('/delivery-zones/:zoneId', authMiddleware('seller'), handleUpdateDeliveryZone, updateDeliveryZone);
 sellerRouter.delete('/delivery-zones/:zoneId', authMiddleware('seller'), removeDeliveryZone);
 
 sellerRouter.get('/stores/:storeId/products', authMiddleware('seller'), getProduct);
-sellerRouter.post('/stores/:storeId/products', authMiddleware('seller'), uploadProductMedia, validateFileSizes, handleAddProduct, addProduct);
-sellerRouter.patch('/products/:productId', authMiddleware('seller'), uploadProductMedia, validateFileSizes, handleUpdateProduct, updateProduct);
+sellerRouter.post('/stores/:storeId/products', authMiddleware('seller'), validateFileSizes, uploadProductMedia, handleAddProduct, addProduct);
+sellerRouter.patch('/products/:productId', authMiddleware('seller'), validateFileSizes, uploadProductMedia, handleUpdateProduct, updateProduct);
 sellerRouter.delete('/products/:productId', authMiddleware('seller'), removeProduct);
 sellerRouter.patch('/products/:productId/availability', authMiddleware('seller'), changeAvailability);
 
 sellerRouter.get('/stores/:storeId/used-products', authMiddleware('seller'), getUsedProduct);
-sellerRouter.post('/stores/:storeId/used-products', authMiddleware('seller'), uploadProductMedia, validateFileSizes, handleAddUsedProduct, addUsedProduct);
-sellerRouter.patch('/used-products/:usedProductId', authMiddleware('seller'), uploadProductMedia, validateFileSizes, handleUpdateUsedProduct, updateUsedProduct);
+sellerRouter.post('/stores/:storeId/used-products', authMiddleware('seller'), validateFileSizes, uploadProductMedia, handleAddUsedProduct, addUsedProduct);
+sellerRouter.patch('/used-products/:usedProductId', authMiddleware('seller'), validateFileSizes, uploadProductMedia, handleUpdateUsedProduct, updateUsedProduct);
 sellerRouter.delete('/used-products/:usedProductId', authMiddleware('seller'), removeUsedProduct);
 
 export default sellerRouter;

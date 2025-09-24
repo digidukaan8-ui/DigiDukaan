@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { LucideArrowLeft, SendHorizontalIcon, Paperclip, CheckIcon, LoaderIcon, RotateCcw, Download, Trash2, Edit3, X } from 'lucide-react';
-import { getChats, getChatMessages, addMessage } from "../../api/chat";
+import { getChats, getChatMessages, addMessage, updateMessage, removeMessage } from "../../api/chat";
 import useAuthStore from "../../store/auth";
 import { FileText, FileImage, FileVideo } from 'lucide-react';
 
@@ -32,6 +32,9 @@ function Chat() {
   const [sendingMessageId, setSendingMessageId] = useState(null);
   const [failedMessageId, setFailedMessageId] = useState(null);
   const [messageToEdit, setMessageToEdit] = useState(null);
+  const [editMessage, setEditMessage] = useState("");
+  const [disableTextbox, setDisabeTextbox] = useState(false);
+  const [canEditMessage, setCanEditMessage] = useState(false);
 
   const containerRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -40,6 +43,7 @@ function Chat() {
     queryKey: ["chatsList"],
     queryFn: getChats,
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   const { data: messagesData, fetchNextPage, hasNextPage, isFetchingNextPage } = useQuery({
@@ -95,6 +99,11 @@ function Chat() {
   const handleSend = async (isRetry = false) => {
     if (!selectedChat) return;
     if (!message.trim() && !file) return;
+
+    if (messageToEdit) {
+      await handleEdit();
+      return;
+    }
 
     let tempId;
     if (isRetry && failedMessageId) {
@@ -214,23 +223,82 @@ function Chat() {
     return chat?.otherPartyDetails?.name || chat?.name || state?.name;
   };
 
-  const handleDoubleClick = (chatId) => {
-    if (isSender(chatId)) {
-      setMessageToEdit(chatId);
+  const handleDoubleClick = (chat) => {
+    if (isSender(chat)) {
+      if (canEdit(chat) && chat.type === "text") {
+        setCanEditMessage(true);
+      } else {
+        setCanEditMessage(false);
+      }
+      setMessageToEdit(chat._id);
+      setEditMessage(chat.message);
+      setDisabeTextbox(true);
     }
   };
 
-  const handleEdit = () => {
-    if (messageToEdit) {
-      console.log("Editing message with ID:", messageToEdit);
+  const handleClickOnEdit = () => {
+    setDisabeTextbox(false);
+    setMessage(editMessage);
+  }
+
+  const canEdit = (chat) => {
+    if (chat.sender !== user._id || chat.type !== "text") return false;
+    const createdAt = new Date(chat.createdAt);
+    const now = new Date();
+    const diffMinutes = (now - createdAt) / 1000 / 60;
+    return diffMinutes <= 15;
+  };
+
+  const handleEdit = async () => {
+    if (!messageToEdit || !message.trim()) return;
+
+    try {
+      const res = await updateMessage(messageToEdit, message);
+
+      queryClient.setQueryData(
+        ["chatMessages", selectedChat._id],
+        (old) => ({
+          ...old,
+          data: {
+            ...old?.data,
+            messages: old?.data?.messages?.map((m) =>
+              m._id === messageToEdit ? res.data : m
+            ),
+          },
+        })
+      );
+
+      setMessage("");
       setMessageToEdit(null);
+    } catch (err) {
+      console.error("Error editing message:", err);
     }
   };
 
-  const handleDelete = () => {
-    if (messageToEdit) {
-      console.log("Deleting message with ID:", messageToEdit);
+  const handleDelete = async () => {
+    setDisabeTextbox(false);
+    if (!messageToEdit) return;
+
+    try {
+      await removeMessage(messageToEdit);
+
+      queryClient.setQueryData(
+        ["chatMessages", selectedChat._id],
+        (old) => ({
+          ...old,
+          data: {
+            ...old?.data,
+            messages: old?.data?.messages?.filter(
+              (m) => m._id !== messageToEdit
+            ),
+          },
+        })
+      );
+
+      setMessage("");
       setMessageToEdit(null);
+    } catch (err) {
+      console.error("Error deleting message:", err);
     }
   };
 
@@ -275,7 +343,7 @@ function Chat() {
           <>
             <div className="p-4 flex items-center gap-3 border-b border-black dark:border-white bg-white dark:bg-neutral-900">
               <button className="text-sky-600 cursor-pointer text-xs md:text-sm" onClick={() => setSelectedChat(null)}>
-                <LucideArrowLeft />
+                <LucideArrowLeft size={20} />
               </button>
               {!getChatImgSrc(selectedChat) ?
                 (
@@ -289,17 +357,22 @@ function Chat() {
                   />
                 )
               }
-              <span className="font-medium text-sm md:text-base">{getChatName(selectedChat)}</span>
+              <span className="font-medium text-sm md:text-base truncate">{getChatName(selectedChat)}</span>
               {messageToEdit && (
-                <div className="flex items-center gap-2 ml-auto">
-                  <button onClick={handleEdit} className="text-sky-600">
-                    <Edit3 size={18} />
+                <div className="flex items-center gap-5 ml-auto">
+                  <button onClick={handleClickOnEdit} className="text-sky-600">
+                    {canEditMessage ? (<Edit3 size={16} />) : (<></>)}
                   </button>
                   <button onClick={handleDelete} className="text-red-500">
-                    <Trash2 size={18} />
+                    <Trash2 size={16} />
                   </button>
-                  <button onClick={() => setMessageToEdit(null)} className="text-gray-500">
-                    <X size={18} />
+                  <button onClick={() => {
+                    setMessageToEdit(null)
+                    setEditMessage("")
+                    setMessage("")
+                    setDisabeTextbox(false)
+                  }} className="text-gray-500">
+                    <X size={16} />
                   </button>
                 </div>
               )}
@@ -310,13 +383,13 @@ function Chat() {
               {chatMessages.map(chat => (
                 <div key={chat._id} className={`flex ${isSender(chat) ? "justify-end" : "justify-start"} relative`}>
                   <div
-                    onDoubleClick={() => handleDoubleClick(chat._id)}
+                    onDoubleClick={() => handleDoubleClick(chat)}
                     className={`max-w-xs p-2 rounded break-words relative border border-black dark:border-white cursor-pointer transition-all duration-200
                       ${isSender(chat)
                         ? "bg-sky-600 text-white"
                         : "bg-white dark:bg-neutral-900 text-black dark:text-white"
                       }
-                      ${messageToEdit === chat._id ? "ring-2 ring-sky-300" : ""}
+                      ${messageToEdit === chat._id ? "bg-sky-950" : ""}
                       `}
                   >
                     {chat.type === "text" ? chat.message : (
@@ -345,9 +418,9 @@ function Chat() {
                         )}
                       </div>
                     )}
-                    {chat.edited && <div className="text-xs mt-1">edited</div>}
 
                     <div className="text-[10px] flex justify-end items-center mt-1">
+                      {chat.edited && <div className="text-xs mr-1">edited</div>}
                       <span>{new Date(chat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       {isSender(chat) && (
                         chat._id === sendingMessageId ? (
@@ -379,7 +452,8 @@ function Chat() {
                 id="message"
                 value={message}
                 onChange={e => setMessage(e.target.value)}
-                placeholder="Type a message"
+                placeholder={"Type a message"}
+                disabled={disableTextbox}
                 rows={2.5}
                 className="w-full resize-none hide-scrollbar border rounded px-3 py-2 bg-gray-100 dark:bg-neutral-950"
               />

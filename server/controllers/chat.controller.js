@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import Chat from "../models/chat.model.js";
 import Message from "../models/message.model.js";
 import Store from "../models/store.model.js";
-import { uploadToCloudinary } from "../utils/cloudinary.config.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.config.js";
 
 const handleFirstChat = async (userId, storeId, storeUserId) => {
   const existingChat = await Chat.findOne({ userId, storeId });
@@ -162,4 +162,78 @@ const getChatMessages = async (req, res) => {
   }
 };
 
-export { addMessage, getChats, getChatMessages };
+const updateMessage = async (req, res) => {
+  try {
+    const { message } = req.body;
+    const { messageId } = req.params;
+    const userId = req.user._id;
+
+    if (!messageId || !message) {
+      return res.status(400).json({ success: false, message: 'Message ID and new text are required' });
+    }
+
+    if (typeof message !== 'string' || typeof messageId !== 'string') {
+      return res.status(400).json({ success: false, message: 'Invalid input format' });
+    }
+
+    const messageExist = await Message.findById(messageId);
+    if (!messageExist) {
+      return res.status(404).json({ success: false, message: 'Message not found' });
+    }
+
+    if (messageExist.sender.toString() !== userId.toString()) {
+      return res.status(403).json({ success: false, message: 'Not authorized to edit this message' });
+    }
+
+    if (messageExist.type !== "text") {
+      return res.status(400).json({ success: false, message: 'Only text messages can be edited' });
+    }
+
+    messageExist.message = message.trim();
+    messageExist.edited = true;
+
+    await messageExist.save();
+
+    return res.status(200).json({ success: true, message: 'Message updated successfully', data: messageExist });
+  } catch (error) {
+    console.error("Error in Update Messages controller: ", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+const removeMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const userId = req.user._id;
+
+    if (!messageId) {
+      return res.status(400).json({ success: false, message: "Message ID is required" });
+    }
+
+    const message = await Message.findById(messageId);
+    if (!message) {
+      return res.status(404).json({ success: false, message: "Message not found" });
+    }
+
+    if (message.sender.toString() !== userId.toString()) {
+      return res.status(403).json({ success: false, message: "Not authorized to delete this message" });
+    }
+
+    if (message.type !== "text" && message.fileUrl?.publicId) {
+      try {
+        await deleteFromCloudinary(message.fileUrl.publicId);
+      } catch (error) {
+        console.error("Cloudinary delete error:", error);
+      }
+    }
+
+    await message.deleteOne();
+
+    return res.status(200).json({ success: true, message: "Message removed successfully" });
+  } catch (error) {
+    console.error("Error in Remove Message controller:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export { addMessage, getChats, getChatMessages, updateMessage, removeMessage };

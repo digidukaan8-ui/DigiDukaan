@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import useAuthStore from '../store/auth';
 import useStore from '../store/store';
 import useProductStore from '../store/product';

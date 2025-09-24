@@ -1,4 +1,5 @@
 import logoutHelper from '../utils/logoutHelper';
+import { toast } from 'react-hot-toast';
 
 const addMessage = async (type, data) => {
     try {
@@ -13,8 +14,8 @@ const addMessage = async (type, data) => {
             bodyData.append("file", data.img || data.video || data.file);
             bodyData.append('sender', data.sender);
             bodyData.append('receiver', data.receiver);
-            if (data.chatId) bodyData.append('chatId',data.chatId);
-            if (data.storeId) bodyData.append('storeId',data.storeId);
+            if (data.chatId) bodyData.append('chatId', data.chatId);
+            if (data.storeId) bodyData.append('storeId', data.storeId);
         }
 
         const response = await fetch('http://localhost:3000/api/chats/add', {
@@ -46,38 +47,95 @@ const addMessage = async (type, data) => {
 
 const getChatMessages = async (chatId, skip = 0) => {
     try {
-        const res = await fetch(`http://localhost:3000/api/chats/messages/${chatId}?skip=${skip}`, {
+        const response = await fetch(`http://localhost:3000/api/chats/messages/${chatId}?skip=${skip}`, {
             credentials: "include",
         });
 
-        if (!res.ok) throw new Error("Failed to fetch messages");
+        const result = await response.json();
 
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message || "Failed to fetch messages");
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get messages");
+            throw new Error(result.message || "Failed to get messages");
+        }
 
-        return data;
+        return result;
     } catch (err) {
-        console.error("Error fetching chat messages:", err);
+        console.error("Error in fetching chat messages:", err);
         throw err;
     }
 };
 
 const getChats = async () => {
     try {
-        const res = await fetch(`http://localhost:3000/api/chats`, {
+        const response = await fetch(`http://localhost:3000/api/chats`, {
             credentials: "include",
         });
 
-        if (!res.ok) throw new Error("Failed to fetch chats");
+        const result = await response.json();
 
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message || "Failed to fetch chats");
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get chats");
+            throw new Error(result.message || "Failed to get chats");
+        }
 
-        return data;
+        return result;
     } catch (err) {
-        console.error("Error fetching chats:", err);
+        console.error("Error in fetching chats:", err);
         throw err;
     }
 };
 
-export { addMessage, getChats, getChatMessages };
+const updateMessage = async (messageId, message) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/chats/messages/${messageId}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'PUT',
+            credentials: 'include',
+            body: JSON.stringify({ message }),
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to update message");
+            throw new Error(result.message || "Failed to update message");
+        }
+
+        return result;
+    } catch (err) {
+        console.error("Error in updating message:", err);
+        throw err;
+    }
+}
+
+const removeMessage = async (messageId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/chats/messages/${messageId}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'DELETE',
+            credentials: 'include',
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to remove message");
+            throw new Error(result.message || "Failed to remove message");
+        }
+
+        return result;
+    } catch (err) {
+        console.error("Error in removing message:", err);
+        throw err;
+    }
+}
+
+export { addMessage, getChats, getChatMessages, updateMessage, removeMessage };
