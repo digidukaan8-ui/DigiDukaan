@@ -12,6 +12,8 @@ import buyerRouter from './routes/buyer.route.js';
 import sellerRouter from './routes/seller.route.js';
 import adminRouter from './routes/admin.route.js';
 import chatRouter from './routes/chat.route.js';
+import http from "http";
+import { initSocket } from "./socket.js";
 
 dotenv.config();
 const app = express();
@@ -55,6 +57,13 @@ app.use('/api/chats', chatRouter);
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ success: false, message: 'Something went wrong!' });
+});
+
+const server = http.createServer(app);
+initSocket(server);
+
+server.listen(4000, () => {
+  console.log("Server running on port 3000");
 });
 
 app.listen(PORT, () => {

@@ -3,6 +3,7 @@ import Chat from "../models/chat.model.js";
 import Message from "../models/message.model.js";
 import Store from "../models/store.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.config.js";
+import { getIO } from "../socket.js";
 
 const handleFirstChat = async (userId, storeId, storeUserId) => {
   const existingChat = await Chat.findOne({ userId, storeId });
@@ -74,6 +75,8 @@ const addMessage = async (req, res) => {
       fileUrl: fileData,
     });
 
+    getIO().to(chatId).emit("message:new", data);
+
     return res.status(201).json({
       success: true,
       message: "Message sent successfully",
@@ -97,10 +100,11 @@ const getChats = async (req, res) => {
       chats.map(async (chat) => {
         let otherPartyDetails = null;
         if (chat.userId.toString() === userId) {
-          const store = await Store.findById(chat.storeId.toString()).select("_id name img");
+          const store = await Store.findById(chat.storeId.toString()).select("_id userId name img");
           if (store) {
             otherPartyDetails = {
               _id: store._id,
+              userId: store.userId,
               name: store.name,
               img: store.img,
             };
@@ -193,6 +197,7 @@ const updateMessage = async (req, res) => {
     messageExist.edited = true;
 
     await messageExist.save();
+    getIO().to(messageExist.chatId.toString()).emit("message:update", messageExist);
 
     return res.status(200).json({ success: true, message: 'Message updated successfully', data: messageExist });
   } catch (error) {
@@ -228,6 +233,7 @@ const removeMessage = async (req, res) => {
     }
 
     await message.deleteOne();
+    getIO().to(message.chatId.toString()).emit("message:delete", { messageId });
 
     return res.status(200).json({ success: true, message: "Message removed successfully" });
   } catch (error) {
@@ -236,4 +242,75 @@ const removeMessage = async (req, res) => {
   }
 };
 
-export { addMessage, getChats, getChatMessages, updateMessage, removeMessage };
+const markMessageSeen = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const userId = req.user._id;
+
+    const message = await Message.findById(messageId);
+    if (!message) {
+      return res.status(404).json({ success: false, message: "Message not found" });
+    }
+
+    if (message.receiver.toString() !== userId.toString()) {
+      return res.status(403).json({ success: false, message: "Not authorized" });
+    }
+
+    if (!message.seen) {
+      message.seen = true;
+      await message.save();
+
+      getIO().to(message.chatId.toString()).emit("message:seen", {
+        messageId: message._id,
+        chatId: message.chatId,
+        seenBy: userId,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Message marked as seen",
+      data: message
+    });
+  } catch (error) {
+    console.error("Error in markMessageSeen:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+const markAllMessagesSeen = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    const userId = req.user._id;
+
+    if (!chatId) {
+      return res.status(400).json({ success: false, message: "Chat ID is required" });
+    }
+
+    const result = await Message.updateMany(
+      {
+        chatId,
+        receiver: userId,
+        seen: false
+      },
+      { $set: { seen: true } }
+    );
+
+    if (result.modifiedCount > 0) {
+      getIO().to(chatId).emit("chat:seen-all", {
+        chatId: chatId,
+        seenBy: userId,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `${result.modifiedCount} messages marked as seen`,
+    });
+  } catch (error) {
+    console.error("Error in markAllMessagesSeen:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export { addMessage, getChats, getChatMessages, updateMessage, removeMessage, markMessageSeen, markAllMessagesSeen };

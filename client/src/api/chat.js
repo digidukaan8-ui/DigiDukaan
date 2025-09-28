@@ -138,4 +138,29 @@ const removeMessage = async (messageId) => {
     }
 }
 
-export { addMessage, getChats, getChatMessages, updateMessage, removeMessage };
+const markAllMessagesSeen = async (chatId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/chats/messages/seen/${chatId}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'PUT',
+            credentials: 'include',
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to mark all message seen");
+            throw new Error(result.message || "Failed to mark all message seen");
+        }
+
+        return result;
+    } catch (err) {
+        console.error("Error in mark all message seen:", err);
+        throw err;
+    }
+}
+
+export { addMessage, getChats, getChatMessages, updateMessage, removeMessage, markAllMessagesSeen };

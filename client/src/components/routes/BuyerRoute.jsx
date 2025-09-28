@@ -1,7 +1,7 @@
 import { Outlet, Navigate } from "react-router-dom";
 import useAuthStore from "../../store/auth"; 
 
-function SellerRoute() {
+function BuyerRoute() {
   const { user } = useAuthStore(); 
 
   if (!user) {
@@ -15,4 +15,4 @@ function SellerRoute() {
   return <Outlet />;
 }
 
-export default SellerRoute;
+export default BuyerRoute;
