@@ -591,9 +591,12 @@ const getProductById = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Product id is required' });
         }
 
-        const product = await Product.findById(productId);
+        let product = await Product.findById(productId);
         if (!product) {
-            return res.status(404).json({ success: false, message: 'Product not found' });
+            product = await UsedProduct.findById(productId);
+            if (!product) {
+                return res.status(404).json({ success: false, message: 'Product not found' });
+            }
         }
 
         return res.status(200).json({ success: true, message: 'Product fetched successfully', data: product })
@@ -934,13 +937,13 @@ const getProductByCategory = async (req, res) => {
         const capitalized = category.charAt(0).toUpperCase() + category.slice(1);
 
         if (isValidCategory(capitalized)) {
-            total = await Product.countDocuments({ "category.slug": category });
-            products = await Product.find({ "category.slug": category })
+            total = await Product.countDocuments({ "category.slug": category, "isAvailable": true });
+            products = await Product.find({ "category.slug": category, "isAvailable": true })
                 .skip((page - 1) * limit)
                 .limit(limit);
         } else if (isValidUsedProductCategory(category)) {
-            total = await UsedProduct.countDocuments({ "category.slug": category });
-            products = await UsedProduct.find({ "category.slug": category })
+            total = await UsedProduct.countDocuments({ "category.slug": category, "isSold": false, "paid": true });
+            products = await UsedProduct.find({ "category.slug": category, "isSold": false, "paid": true })
                 .skip((page - 1) * limit)
                 .limit(limit);
         } else {

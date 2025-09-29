@@ -15,7 +15,7 @@ const DeliveryForm = () => {
   const [editId, setEditId] = useState(null);
 
   const options = [
-    "country", "state", "district", "city", "town", "village",
+    "state", "district", "city", "town", "village",
     "suburb", "area", "taluka", "tehsil", "locality", "street",
     "landmark", "pincode"
   ];

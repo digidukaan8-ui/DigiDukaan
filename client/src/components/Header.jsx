@@ -44,7 +44,7 @@ export default function Header() {
 
 
   return (
-    <header className="bg-white dark:bg-neutral-900 w-full shadow-md fixed top-0 z-50 transition-all duration-300">
+    <header className="bg-white dark:bg-neutral-900 w-full shadow-md fixed top-0 z-[100] transition-all duration-300">
       <motion.div
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

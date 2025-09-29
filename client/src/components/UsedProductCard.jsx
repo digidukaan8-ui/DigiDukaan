@@ -1,4 +1,4 @@
-import { Heart, Truck, MessageCircle, Edit2, Trash2, Eye, CheckCircle, DollarSign, FileText } from "lucide-react";
+import { Heart, Truck, MessageCircle, Edit2, Trash2, Eye, CheckCircle, DollarSign, FileText, MoreVertical, Currency, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { removeUsedProduct, addToWishlist, removeFromWishlist } from "../api/product";
@@ -14,6 +14,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
   const { startLoading, stopLoading } = useLoaderStore();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isSellerMenuOpen, setIsSellerMenuOpen] = useState(false);
   const { user } = useAuthStore();
   const { wishlist } = useWishlistStore();
 
@@ -29,6 +30,9 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
   const productIds = useWishlistStore((state) => state.wishlist.productIds);
   const isWishlisted = productIds?.includes(product._id);
 
+  const isSold = product.isSold;
+  const isPaid = product.isPaid;
+
   const handleCardClick = () => navigate(`/used-product?productId=${product._id}`);
 
   const handleWishList = async (e) => {
@@ -39,6 +43,11 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
       return;
     } else if (user?.role === "seller" || user?.role === "admin") {
       toast.error("Only for buyer");
+      return;
+    }
+
+    if (isSold) {
+      toast.error("Item is already sold!");
       return;
     }
 
@@ -93,27 +102,15 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
   const handleEditClick = (e) => {
     e.stopPropagation();
-    if (!user?._id || !user?.name) {
-      navigate(`/login`);
-      toast.error("Login First");
-      return;
-    } else if (user?.role === "buyer" || user?.role === "admin") {
-      toast.error("Only for seller");
-      return;
-    }
+    if (userRole !== "seller") return;
+    setIsSellerMenuOpen(false);
     navigate("/seller/used-product", { state: { initialData: product } });
   };
 
   const handleDeleteClick = async (e) => {
     e.stopPropagation();
-    if (!user?._id || !user?.name) {
-      navigate(`/login`);
-      toast.error("Login First");
-      return;
-    } else if (user?.role === "buyer" || user?.role === "admin") {
-      toast.error("Only for seller");
-      return;
-    }
+    if (userRole !== "seller") return;
+    setIsSellerMenuOpen(false);
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     startLoading("removeUsedProduct");
     try {
@@ -132,11 +129,43 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
     onQuickView();
   };
 
+  const toggleSellerMenu = (e) => {
+    e.stopPropagation();
+    setIsSellerMenuOpen(prev => !prev);
+  };
+
+  const getSellerButtonClass = (color) => {
+    return `flex cursor-pointer items-center gap-2 px-3 py-2 rounded-lg font-medium transition-colors duration-200 w-full text-sm transform hover:scale-[1.02] 
+      ${color === 'edit'
+        ? 'bg-sky-100 text-sky-700 hover:bg-sky-200 dark:bg-sky-900/50 dark:text-sky-300 dark:hover:bg-sky-700 border border-black dark:border-white'
+        : ''
+      }
+      ${color === 'delete'
+        ? 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 dark:hover:bg-red-700 border border-black dark:border-white'
+        : ''
+      }
+      ${color === 'pay'
+        ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:hover:bg-yellow-700 border border-black dark:border-white'
+        : ''
+      }
+        `;
+  };
+
+  let overlayStatus = null;
+  if (isSold) {
+    overlayStatus = { text: "SOLD", color: "bg-green-900/70" };
+  } else if (!isPaid) {
+    overlayStatus = { text: "PAYMENT DUE", color: "bg-yellow-600/70" };
+  }
+
   return (
     <div
-      className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden flex flex-col w-full max-w-[320px] relative border border-black dark:border-white transition-all duration-300 cursor-pointer group transform hover:-translate-y-2"
+      className={`bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden flex flex-col w-full max-w-[320px] relative border border-black dark:border-white transition-all duration-300 cursor-pointer group transform hover:-translate-y-2`}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setIsSellerMenuOpen(false);
+      }}
       onClick={handleCardClick}
     >
       <div className="relative w-full h-64 overflow-hidden border-b border-b-black dark:border-b-white">
@@ -155,22 +184,43 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
             </div>
           )}
 
-          <div className="absolute top-4 left-4">
+          {overlayStatus && (
+            <div className={`absolute inset-0 bg-gray-900/70 backdrop-blur-sm flex items-center justify-center z-40`}>
+              <div className={`text-white ${overlayStatus.color} transform -rotate-12 flex flex-col items-center justify-center p-6 border-4 border-white border-dashed rounded-xl shadow-2xl`}>
+                <AlertTriangle className="h-10 w-10 mb-2" />
+                <span className="text-2xl w-62 text-center font-extrabold uppercase tracking-widest">
+                  {overlayStatus.text}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <div className="absolute top-4 left-4 z-10">
             {hasDiscount > 0 && (
-              <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
+              <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
                 -{discountType === "₹" && "₹"}{discountValue}
                 {discountType === "%" && "%"} OFF
               </span>
             )}
           </div>
 
-          {userRole === "buyer" && (
+          {product.deliveryCharge === 0 && (
+            <div className="absolute bottom-4 left-4 z-10">
+              <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+                <Truck size={12} />
+                Free Delivery
+              </span>
+            </div>
+          )}
+
+          {userRole === "buyer" && !isSold && (
             <div className="absolute top-4 right-4 z-20">
               <button
                 onClick={(e) => handleWishList(e)}
-                className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${isWishlisted
-                  ? 'bg-red-500 text-white'
-                  : 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'
+                className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 
+                                    ${isWishlisted
+                    ? 'bg-red-500 text-white'
+                    : 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'
                   }`}
               >
                 <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`} />
@@ -178,8 +228,42 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
             </div>
           )}
 
+          {userRole === "seller" && (
+            <div className="absolute top-4 right-4 z-[60]" onClick={e => e.stopPropagation()}>
+              <button
+                onClick={toggleSellerMenu}
+                className={`p-2.5 rounded-full shadow-lg cursor-pointer backdrop-blur-sm transition-all duration-300 
+                                    ${isSellerMenuOpen
+                    ? "bg-sky-600 text-white"
+                    : "bg-white/90 text-gray-700 hover:bg-sky-500/90 hover:text-white"
+                  }`}
+              >
+                <MoreVertical className="h-4 w-4" />
+              </button>
+
+              {isSellerMenuOpen && (
+                <div
+                  className="absolute right-0 mt-2 w-48 bg-white dark:bg-neutral-800 rounded-lg shadow-2xl p-3 space-y-2 border border-black dark:border-white z-[65]"
+                  onMouseLeave={() => setIsSellerMenuOpen(false)}
+                >
+                  <button onClick={handleEditClick} className={getSellerButtonClass('edit')}>
+                    <Edit2 className="h-4 w-4" /> Edit Listing
+                  </button>
+                  <button onClick={handleDeleteClick} className={getSellerButtonClass('delete')}>
+                    <Trash2 className="h-4 w-4" /> Delete Listing
+                  </button>
+                  {!product?.paid && (
+                    <button onClick={handleDeleteClick} className={getSellerButtonClass('pay')}>
+                      <Currency className="h-4 w-4" /> Pay Amount
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           <div
-            className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end justify-center pb-6 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'
+            className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end justify-center pb-6 transition-opacity duration-300 z-50 ${isHovered ? 'opacity-100' : 'opacity-0'
               }`}
           >
             <button
@@ -191,15 +275,6 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
               Quick View
             </button>
           </div>
-
-          {product.deliveryCharge === 0 && (
-            <div className="absolute bottom-4 left-4">
-              <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
-                <Truck size={12} />
-                Free Delivery
-              </span>
-            </div>
-          )}
         </div>
       </div>
 
@@ -267,30 +342,12 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
           {userRole === "buyer" && (
             <button
               onClick={(e) => handleChatSeller(e, product.storeId)}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
+              disabled={isSold}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 disabled:cursor-not-allowed"
             >
               <MessageCircle className="h-5 w-5" />
-              Chat with Seller
+              {isSold ? "SOLD" : "Chat with Seller"}
             </button>
-          )}
-
-          {userRole === "seller" && (
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleEditClick}
-                className="flex cursor-pointer items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95 border"
-              >
-                <Edit2 className="h-4 w-4" />
-                Edit
-              </button>
-              <button
-                onClick={handleDeleteClick}
-                className="flex cursor-pointer items-center gap-2 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95 border"
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete
-              </button>
-            </div>
           )}
         </div>
       </div>

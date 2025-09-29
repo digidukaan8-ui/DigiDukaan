@@ -1,13 +1,13 @@
-import { ShoppingCart, Star, Edit2, Trash2, Eye, Heart, Truck } from "lucide-react";
+import { ShoppingCart, Star, Edit2, Trash2, Eye, Heart, Truck, X, AlertTriangle, MoreVertical, Layers } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { removeProduct, changeAvailability, removeFromWishlist } from "../api/product";
+import { removeProduct, changeAvailability, removeFromWishlist, addToWishlist } from "../api/product";
 import useLoaderStore from "../store/loader";
 import { toast } from "react-hot-toast";
 import useProductStore from "../store/product";
 import useAuthStore from "../store/auth";
 import useWishlistStore from "../store/wishlist";
-import { addToCart, addToWishlist } from "../api/product";
+import { addToCart } from "../api/product";
 import useCartStore from "../store/cart";
 
 export default function Card({ product, userRole = "buyer", onQuickView }) {
@@ -15,6 +15,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
   const { startLoading, stopLoading } = useLoaderStore();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isSellerMenuOpen, setIsSellerMenuOpen] = useState(false);
   const { user } = useAuthStore();
   const { wishlist } = useWishlistStore();
 
@@ -30,6 +31,8 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
   const discountType = product.discount?.percentage ? "%" : "₹";
   const productIds = useWishlistStore((state) => state.wishlist.productIds);
   const isWishlisted = productIds?.includes(product._id);
+  const isAvailable = product.isAvailable;
+  const stock = product.stock;
 
   const handleCardClick = (product) => {
     navigate(`/product?productId=${product._id}`);
@@ -76,6 +79,11 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
   const handleAddToCart = async (e) => {
     e.stopPropagation();
+    if (!isAvailable || stock <= 0) {
+      toast.error("Product is currently unavailable or out of stock.");
+      return;
+    }
+
     if (!user?._id || !user?.name) {
       navigate(`/login`);
       toast.error("Login First");
@@ -98,7 +106,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
   const handleCartBtn = (id) => {
     let productId = useCartStore.getState().getIdFromCart() || [];
-    if (productId.includes(id) && product.isAvailable) {
+    if (productId.includes(id) && isAvailable && stock > 0) {
       return true;
     }
     return false;
@@ -106,27 +114,15 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
   const handleEdit = (e, product) => {
     e.stopPropagation();
-    if (!user?._id || !user?.name) {
-      navigate(`/login`);
-      toast.error("Login First");
-      return;
-    } else if (user?.role === "buyer" || user?.role === "admin") {
-      toast.error("Only for seller");
-      return;
-    }
+    if (userRole !== "seller") return;
+    setIsSellerMenuOpen(false);
     navigate("/seller/new-product", { state: { initialData: product } });
   };
 
   const handleDelete = async (e, id) => {
     e.stopPropagation();
-    if (!user?._id || !user?.name) {
-      navigate(`/login`);
-      toast.error("Login First");
-      return;
-    } else if (user?.role === "buyer" || user?.role === "admin") {
-      toast.error("Only for seller");
-      return;
-    }
+    if (userRole !== "seller") return;
+    setIsSellerMenuOpen(false);
     if (window.confirm("Are you sure you want to delete this product?")) {
       startLoading("removeProduct");
       try {
@@ -143,14 +139,8 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
   const toggleAvailability = async (e, id, available) => {
     e.stopPropagation();
-    if (!user?._id || !user?.name) {
-      navigate(`/login`);
-      toast.error("Login First");
-      return;
-    } else if (user?.role === "buyer" || user?.role === "admin") {
-      toast.error("Only for seller");
-      return;
-    }
+    if (userRole !== "seller") return;
+    setIsSellerMenuOpen(false);
     startLoading("changeAval");
     try {
       const result = await changeAvailability(id, available);
@@ -165,6 +155,8 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
   const manageVariants = (e, product) => {
     e.stopPropagation();
+    if (userRole !== "seller") return;
+    setIsSellerMenuOpen(false);
     navigate("/seller/add-variants", { state: { product } });
   };
 
@@ -173,11 +165,42 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
     onQuickView();
   };
 
+  const toggleSellerMenu = (e) => {
+    e.stopPropagation();
+    setIsSellerMenuOpen(prev => !prev);
+  };
+
+  const getSellerButtonClass = (color) => {
+    return `flex cursor-pointer items-center gap-2 px-3 py-2 rounded-lg font-medium transition-colors duration-200 w-full text-sm transform hover:scale-[1.02] 
+        ${color === 'edit'
+        ? 'bg-sky-100 text-sky-700 hover:bg-sky-200 dark:bg-sky-900/50 dark:text-sky-300 dark:hover:bg-sky-700 border border-black dark:border-white'
+        : ''
+      }
+        ${color === 'delete'
+        ? 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 dark:hover:bg-red-700 border border-black dark:border-white'
+        : ''
+      }
+        ${color === 'variants'
+        ? 'bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/50 dark:text-purple-300 dark:hover:bg-purple-700 border border-black dark:border-white'
+        : ''
+      }
+        ${color === 'avail'
+        ? (isAvailable
+          ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:hover:bg-yellow-700 border border-black dark:border-white'
+          : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/50 dark:text-green-300 dark:hover:bg-green-700 border border-black dark:border-white')
+        : ''
+      }
+    `;
+  };
+
   return (
     <div
-      className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden flex flex-col w-[300px] relative border border-black dark:border-white transition-all duration-300 cursor-pointer group transform hover:-translate-y-2"
+      className={`bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden flex flex-col w-full max-w-[320px] relative border border-black dark:border-white transition-all duration-300 cursor-pointer group transform hover:-translate-y-2`}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setIsSellerMenuOpen(false);
+      }}
       onClick={() => handleCardClick(product)}
     >
       <div className="relative w-full h-64 overflow-hidden border-b border-b-black dark:border-b-white">
@@ -194,27 +217,37 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
               <div className="w-16 h-16 bg-gray-300 dark:bg-neutral-700 rounded-full animate-pulse"></div>
             </div>
           )}
-          <div className="absolute top-4 left-4 flex flex-col gap-2">
+
+          {(!isAvailable || stock <= 0) && (
+            <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm flex items-center justify-center z-40">
+              <div className="text-white bg-red-900/80 transform -rotate-12 flex flex-col items-center justify-center p-6 border-4 border-white border-dashed rounded-xl shadow-2xl">
+                <AlertTriangle className="h-10 w-10 mb-2" />
+                <span className="text-2xl w-62 text-center font-extrabold uppercase tracking-widest">
+                  {!isAvailable ? "Not Available" : "Out of Stock"}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
             {hasDiscount > 0 && (
-              <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
+              <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
                 -{discountType === "₹" && "₹"}{discountValue}
                 {discountType === "%" && "%"} OFF
               </span>
             )}
-            {product.stock <= 0 && (
-              <span className="bg-gray-800 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">Out of Stock</span>
-            )}
-            {product.isAvailable && product.stock > 0 && product.stock <= 5 && (
+            {isAvailable && stock > 0 && stock <= 5 && (
               <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-bounce">
-                Only {product.stock} left
+                Only {stock} left
               </span>
             )}
           </div>
-          {userRole === "buyer" && (
+
+          {userRole === "buyer" && isAvailable && stock > 0 && (
             <div className="absolute top-4 right-4 z-20">
               <button
                 onClick={(e) => handleWishlistToggle(e)}
-                className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${isWishlisted
+                className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-105 ${isWishlisted
                   ? "bg-red-500 text-white"
                   : "bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500"
                   }`}
@@ -223,8 +256,44 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
               </button>
             </div>
           )}
+
+          {userRole === "seller" && (
+            <div className="absolute top-4 right-4 z-[60]" onClick={e => e.stopPropagation()}>
+              <button
+                onClick={toggleSellerMenu}
+                className={`p-2.5 rounded-full shadow-lg cursor-pointer backdrop-blur-sm transition-all duration-300 
+                ${isSellerMenuOpen
+                    ? "bg-sky-600 text-white"
+                    : "bg-white/90 text-gray-700 hover:bg-sky-500/90 hover:text-white"
+                  }`}
+              >
+                <MoreVertical className="h-4 w-4" />
+              </button>
+
+              {isSellerMenuOpen && (
+                <div
+                  className="absolute right-0 mt-1 w-52 bg-white dark:bg-neutral-800 rounded-lg shadow-2xl p-3 space-y-2 border border-black dark:border-white z-[65]"
+                  onMouseLeave={() => setIsSellerMenuOpen(false)}
+                >
+                  <button onClick={(e) => handleEdit(e, product)} className={getSellerButtonClass('edit')}>
+                    <Edit2 className="h-4 w-4" /> Edit Product
+                  </button>
+                  <button onClick={(e) => toggleAvailability(e, product._id, !isAvailable)} className={getSellerButtonClass('avail')}>
+                    <AlertTriangle className="h-4 w-4" /> {isAvailable ? "Mark Unavailable" : "Mark Available"}
+                  </button>
+                  <button onClick={(e) => manageVariants(e, product)} className={getSellerButtonClass('variants')}>
+                    <Layers className="h-4 w-4" /> Manage Variants
+                  </button>
+                  <button onClick={(e) => handleDelete(e, product._id)} className={getSellerButtonClass('delete')}>
+                    <Trash2 className="h-4 w-4" /> Delete Product
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           <div
-            className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end justify-center pb-6 transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"
+            className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end justify-center pb-6 transition-opacity duration-300 z-50 ${isHovered ? "opacity-100" : "opacity-0"
               }`}
           >
             <button
@@ -285,67 +354,19 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
               <span>Delivery: Free</span>
             </div>
           )}
+          {userRole === "seller" && (
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">Stock: {stock}</span>
+          )
+          }
           {userRole === "buyer" && (
             <button
               onClick={handleAddToCart}
-              disabled={handleCartBtn(product._id)}
+              disabled={handleCartBtn(product._id) || !isAvailable || stock <= 0}
               className="w-full border border-black dark:border-white flex items-center cursor-pointer justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
             >
               <ShoppingCart className="h-5 w-5" />
-              {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+              {handleCartBtn(product._id) ? "Added to Cart" : (!isAvailable || stock <= 0 ? "Out of Stock" : "Add to Cart")}
             </button>
-          )}
-          {userRole === "seller" && (
-            <div className="flex flex-col gap-2">
-              <div className="flex w-full justify-around items-center gap-3">
-                <span className="w-full cursor-auto text-center px-4 py-2.5 text-sm font-semibold rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 shadow-sm border border-emerald-200 dark:border-emerald-800">
-                  Stock: {product.stock}
-                </span>
-
-                <span
-                  className={`w-full cursor-auto text-center px-4 py-2.5 text-sm font-semibold rounded-md shadow-sm border 
-                  ${product.isAvailable
-                      ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 border-green-200 dark:border-green-800"
-                      : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800"
-                    }`}
-                >
-                  {product.isAvailable ? "Available" : "Not Available"}
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={(e) => handleEdit(e, product)}
-                  className="flex cursor-pointer items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95 border"
-                >
-                  <Edit2 className="h-4 w-4" />
-                  Edit
-                </button>
-                <button
-                  onClick={(e) => handleDelete(e, product._id)}
-                  className="flex cursor-pointer items-center gap-2 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95 border"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete
-                </button>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={(e) => toggleAvailability(e, product._id, !product.isAvailable)}
-                  className={`flex cursor-pointer items-center gap-2 px-4 py-2.5 border rounded-xl text-[11px] font-medium flex-1 justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 ${product.isAvailable
-                    ? "bg-yellow-100 dark:bg-yellow-900/30 hover:bg-yellow-200 dark:hover:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400"
-                    : "bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-700 dark:text-green-400"
-                    }`}
-                >
-                  {product.isAvailable ? "Mark Unavailable" : "Mark Available"}
-                </button>
-                <button
-                  onClick={(e) => manageVariants(e, product)}
-                  className="flex cursor-pointer items-center gap-2 bg-sky-100 dark:bg-sky-900/30 text-[11px] hover:bg-sky-200 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-400 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 flex-1 justify-center transform hover:scale-105 active:scale-95 border"
-                >
-                  Manage Variants
-                </button>
-              </div>
-            </div>
           )}
         </div>
       </div>

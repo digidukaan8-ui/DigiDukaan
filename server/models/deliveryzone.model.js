@@ -16,7 +16,6 @@ const deliveryZoneSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: [
-        "Country",
         "State",
         "District",
         "City",

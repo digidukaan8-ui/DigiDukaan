@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Heart, Share2, Edit, Trash2, MessageCircle, ShoppingCart, ChevronLeft, ChevronRight, Play, Truck, Package, CheckCircle, XCircle, FileText, } from "lucide-react";
+import { Heart, Share2, Edit, Trash2, MessageCircle, ShoppingCart, ChevronLeft, ChevronRight, Play, Truck, Package, CheckCircle, XCircle, FileText, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/auth";
 import useUsedProductStore from "../store/usedProduct";
 import { toast } from "react-hot-toast";
-import { removeUsedProduct, addToWishlist, removeFromWishlist, addToViewed } from "../api/product";
+import { removeUsedProduct, addToWishlist, removeFromWishlist, addToViewed, getProductById } from "../api/product";
 import useUsedCategoryProductStore from "../store/categoryUsedProduct";
 import useWishlistStore from "../store/wishlist";
 import useLoaderStore from '../store/loader'
@@ -25,7 +25,7 @@ const UsedProductDetail = ({ id }) => {
             const fetchProduct = async () => {
                 startLoading("fetching");
                 try {
-                    const result = await getUsedProductById(id);
+                    const result = await getProductById(id);
                     if (result.success) {
                         setProduct(result.data);
                         useUsedProductStore.getState().addProduct(result.data);
@@ -37,6 +37,24 @@ const UsedProductDetail = ({ id }) => {
             fetchProduct();
         }
     }, [id, product, startLoading, stopLoading]);
+
+    useEffect(() => {
+        if (!product?._id) return;
+
+        const addToRecentlyViewed = async () => {
+            if (!user?._id || !user?.name || user?.role === "seller" || user?.role === "admin") {
+                return;
+            }
+            try {
+                await addToViewed(product._id);
+            } catch (err) {
+                console.error("Error adding to viewed:", err);
+            }
+        };
+
+        addToRecentlyViewed();
+    }, [product?._id, user?.role, user?._id, user?.name]);
+
 
     if (!product) {
         return (
@@ -75,6 +93,7 @@ const UsedProductDetail = ({ id }) => {
         video,
         tags,
         isSold,
+        isPaid,
     } = product;
 
     const hasDiscount = discount?.percentage || discount?.amount;
@@ -88,27 +107,6 @@ const UsedProductDetail = ({ id }) => {
 
     const nextImage = () => setSelectedImageIndex((prev) => (prev + 1) % img.length);
     const prevImage = () => setSelectedImageIndex((prev) => (prev - 1 + img.length) % img.length);
-
-    useEffect(() => {
-        if (!product?._id) return;
-
-        const addToRecentlyViewed = async () => {
-            if (!user?._id || !user?.name) {
-                navigate(`/login`);
-                toast.error("Login First");
-                return;
-            } else if (user?.role === "seller" || user?.role === "admin") {
-                return;
-            }
-            try {
-                await addToViewed(product._id);
-            } catch (err) {
-                console.error("Error adding to viewed:", err);
-            }
-        };
-
-        addToRecentlyViewed();
-    }, [product?._id]);
 
     const handleUpdate = (product) => {
         if (!user?._id || !user?.name) {
@@ -138,6 +136,7 @@ const UsedProductDetail = ({ id }) => {
                 if (result.success) {
                     useUsedProductStore.getState().removeUsedProduct(id);
                     toast.success("Product removed successfully");
+                    navigate("/seller/store");
                 }
             } finally {
                 stopLoading();
@@ -215,9 +214,28 @@ const UsedProductDetail = ({ id }) => {
         user.role = "buyer";
     }
 
+    const showSellerWarning = user.role === "seller" && (isSold || !isPaid);
+
+    let warningMessage = "";
+    if (isSold) {
+        warningMessage = "This product is NOT VISIBLE to buyers because it is already SOLD.";
+    } else if (!isPaid) {
+        warningMessage = "This product is NOT VISIBLE to buyers because PAYMENT IS PENDING.";
+    }
+
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-32 pb-10">
             <div className="container mx-auto px-4 py-6 sm:py-8">
+
+                {showSellerWarning && (
+                    <div className="p-4 mb-6 rounded-lg bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 shadow-md flex items-center gap-3">
+                        <AlertTriangle className="w-6 h-6 text-red-700 dark:text-red-400 flex-shrink-0" />
+                        <p className="text-sm font-medium text-red-900 dark:text-red-200">
+                            {warningMessage}
+                        </p>
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
                     <div className="flex flex-col">
                         <div className="relative w-full mx-auto rounded-lg overflow-hidden shadow-md mb-4 flex items-center justify-center">
@@ -239,13 +257,13 @@ const UsedProductDetail = ({ id }) => {
                                 <>
                                     <button
                                         onClick={prevImage}
-                                        className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/70 dark:bg-neutral-900/70 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-colors z-10"
+                                        className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/70 dark:bg-neutral-900/70 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-colors z-10 border border-black dark:border-white"
                                     >
                                         <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
                                     </button>
                                     <button
                                         onClick={nextImage}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/70 dark:bg-neutral-900/70 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-colors z-10"
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/70 dark:bg-neutral-900/70 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-colors z-10 border border-black dark:border-white"
                                     >
                                         <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                                     </button>
@@ -385,9 +403,9 @@ const UsedProductDetail = ({ id }) => {
                                             <Truck className="w-5 h-5 text-sky-600" />
                                             <div className="text-sm w-full">
                                                 <span className="font-semibold">Shipping Available</span>
-                                                <ul className="mt-2 space-y-1 w-full">
+                                                <ul className="mt-2 space-y-1 w-full max-h-32 overflow-y-auto">
                                                     {delivery.shippingLocations.map((loc, idx) => (
-                                                        <li key={idx} className="flex justify-between items-center py-1">
+                                                        <li key={idx} className="flex justify-between items-center py-1 border-t border-gray-100 dark:border-neutral-800">
                                                             <span className="text-gray-600 dark:text-gray-400">
                                                                 {loc.areaName} ({loc.shippingArea})
                                                             </span>
@@ -420,9 +438,9 @@ const UsedProductDetail = ({ id }) => {
                                                     <Truck className="w-5 h-5 text-sky-600" />
                                                     <div className="text-sm w-full">
                                                         <span className="font-semibold">Shipping Available</span>
-                                                        <ul className="mt-2 space-y-1 w-full">
+                                                        <ul className="mt-2 space-y-1 w-full max-h-32 overflow-y-auto">
                                                             {delivery.shippingLocations.map((loc, idx) => (
-                                                                <li key={idx} className="flex justify-between items-center py-1">
+                                                                <li key={idx} className="flex justify-between items-center py-1 border-t border-gray-100 dark:border-neutral-800">
                                                                     <span className="text-gray-600 dark:text-gray-400">
                                                                         {loc.areaName} ({loc.shippingArea})
                                                                     </span>
@@ -510,21 +528,24 @@ const UsedProductDetail = ({ id }) => {
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex flex-wrap justify-center items-center gap-3 mt-4">
-                                <button
-                                    onClick={() => handleUpdate(product)}
-                                    className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-sky-600 text-white font-semibold text-sm transition-all hover:bg-sky-700 border border-black dark:border-white"
-                                >
-                                    <Edit className="w-4 h-4" />
-                                    Edit Product
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(product._id)}
-                                    className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-red-600 text-white font-semibold text-sm transition-all hover:bg-red-700 border border-black dark:border-white"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                    Delete Product
-                                </button>
+                            <div className="border-y border-gray-200 dark:border-neutral-800 py-4 space-y-3">
+                                <h2 className="text-lg font-bold">Seller Actions</h2>
+                                <div className="flex flex-wrap justify-center items-center gap-3">
+                                    <button
+                                        onClick={() => handleUpdate(product)}
+                                        className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-sky-600 text-white font-semibold text-sm transition-all hover:bg-sky-700 border border-black dark:border-white"
+                                    >
+                                        <Edit className="w-4 h-4" />
+                                        Edit Product
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(product._id)}
+                                        className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-red-600 text-white font-semibold text-sm transition-all hover:bg-red-700 border border-black dark:border-white"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                        Delete Product
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>

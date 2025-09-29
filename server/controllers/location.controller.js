@@ -21,13 +21,8 @@ const openStreetMap = async (req, res) => {
         const address = data.address || {};
 
         const result = {
-            country: address.country || '',
             state: address.state || '',
-            district: address.county || '',
-            city: address.city || address.town || address.village || '',
-            town: address.town || '',
-            village: address.village || '',
-            locality: address.suburb || address.neighbourhood || '',
+            city: address.city || '',
             pincode: address.postcode || ''
         };
 

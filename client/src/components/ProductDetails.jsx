@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Heart, Share2, Star, ShoppingCart, ChevronLeft, ChevronRight, Play, Edit, Trash2, Plus, Minus } from 'lucide-react';
+import { Heart, Share2, Star, ShoppingCart, ChevronLeft, ChevronRight, Play, Edit, Trash2, Plus, Minus, AlertTriangle } from 'lucide-react';
 import useAuthStore from '../store/auth';
 import useProductStore from '../store/product';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +39,23 @@ const ProductDetail = ({ id }) => {
       fetchProduct();
     }
   }, [id, product, startLoading, stopLoading]);
+
+  useEffect(() => {
+    if (!product?._id) return;
+
+    const addToRecentlyViewed = async () => {
+      try {
+        if (!user?._id || !user?.name || user?.role === "seller" || user?.role === "admin") {
+          return;
+        }
+        await addToViewed(product._id);
+      } catch (err) {
+        console.error("Error adding to viewed:", err);
+      }
+    };
+
+    addToRecentlyViewed();
+  }, [product?._id, user?.role, user?._id, user?.name]);
 
   if (!product) {
     return (
@@ -89,27 +106,6 @@ const ProductDetail = ({ id }) => {
 
   const nextImage = () => setSelectedImageIndex((prev) => (prev + 1) % img.length);
   const prevImage = () => setSelectedImageIndex((prev) => (prev - 1 + img.length) % img.length);
-
-  useEffect(() => {
-    if (!product?._id) return;
-
-    const addToRecentlyViewed = async () => {
-      try {
-        if (!user?._id || !user?.name) {
-          navigate(`/login`);
-          toast.error("Login First");
-          return;
-        } else if (user?.role === "seller" || user?.role === "admin") {
-          return;
-        }
-        await addToViewed(product._id);
-      } catch (err) {
-        console.error("Error adding to viewed:", err);
-      }
-    };
-
-    addToRecentlyViewed();
-  }, [product?._id]);
 
   const handleAddToCart = async (id) => {
     if (!user?._id || !user?.name) {
@@ -195,6 +191,7 @@ const ProductDetail = ({ id }) => {
     try {
       const result = await changeAvailability(id, available);
       if (result.success) {
+        setProduct(prev => ({ ...prev, isAvailable: result.data.isAvailable }));
         useProductStore.getState().updateProduct(result.data);
         toast.success("Availability changed successfully");
       }
@@ -219,6 +216,7 @@ const ProductDetail = ({ id }) => {
         if (result.success) {
           useProductStore.getState().removeProduct(id);
           toast.success("Product removed successfully");
+          navigate("/seller/store");
         }
       } finally {
         stopLoading();
@@ -240,7 +238,7 @@ const ProductDetail = ({ id }) => {
 
   const handleCartBtn = (id) => {
     let productId = useCartStore.getState().getIdFromCart() || [];
-    if (productId.includes(id) && product.isAvailable) {
+    if (productId.includes(id) && isAvailable) {
       return true;
     }
     return false;
@@ -252,9 +250,21 @@ const ProductDetail = ({ id }) => {
     user.role = "buyer";
   }
 
+  const showSellerWarning = user.role === "seller" && (!isAvailable || stock <= 0);
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-32 pb-10">
       <div className="container mx-auto px-4 py-6 sm:py-8">
+
+        {showSellerWarning && (
+          <div className="p-4 mb-6 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 shadow-md flex items-center gap-3">
+            <AlertTriangle className="w-6 h-6 text-yellow-700 dark:text-yellow-400 flex-shrink-0" />
+            <p className="text-sm font-medium text-yellow-900 dark:text-yellow-200">
+              This product is NOT VISIBLE to buyers because it is currently {!isAvailable ? 'Unavailable' : 'Out of Stock'}.
+            </p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10">
           <div className="flex flex-col">
             <div className="relative w-full max-w-2xl mx-auto rounded-lg overflow-hidden shadow-md mb-4 flex items-center justify-center">
@@ -276,13 +286,13 @@ const ProductDetail = ({ id }) => {
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/70 dark:bg-neutral-900/70 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-colors z-10"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/70 dark:bg-neutral-900/70 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-colors z-10 border border-black dark:border-white"
                   >
                     <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/70 dark:bg-neutral-900/70 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-colors z-10"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/70 dark:bg-neutral-900/70 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-colors z-10 border border-black dark:border-white"
                   >
                     <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                   </button>
@@ -309,7 +319,8 @@ const ProductDetail = ({ id }) => {
               ))}
               {video && (
                 <div
-                  className="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 bg-white dark:bg-neutral-900 flex items-center justify-center rounded-md border-2 border-gray-300 dark:border-neutral-700 cursor-pointer transition-transform hover:scale-105"
+                  className={`w-16 h-16 md:w-20 md:h-20 flex-shrink-0 bg-white dark:bg-neutral-900 flex items-center justify-center rounded-md border-2 cursor-pointer transition-transform hover:scale-105 
+                                    ${selectedImageIndex === -1 ? 'border-sky-500 ring-2 ring-sky-500' : 'border-gray-300 dark:border-neutral-700'}`}
                   onClick={() => setSelectedImageIndex(-1)}
                 >
                   <Play className="w-5 h-5 md:w-6 md:h-6 text-gray-500" />
@@ -324,7 +335,7 @@ const ProductDetail = ({ id }) => {
                 {title}
               </h1>
 
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -431,7 +442,7 @@ const ProductDetail = ({ id }) => {
 
             {user.role === "buyer" && (
               <div className="border-y border-gray-200 dark:border-neutral-800 py-4 space-y-4">
-                <div className="flex items-center justify-around w-[300px] gap-5">
+                <div className="flex items-center justify-around w-full max-w-[300px] mx-auto gap-5">
                   <span className="font-medium text-sm md:text-base">Quantity:</span>
                   <div className="flex items-center gap-2">
                     <button
@@ -451,22 +462,22 @@ const ProductDetail = ({ id }) => {
                 </div>
 
                 <div className="flex flex-col justify-center items-center sm:items-baseline gap-5">
-                  <div className='flex flex-col justify-between items-center gap-3 w-[300px]'>
+                  <div className='flex flex-col justify-between items-center gap-3 w-full max-w-[300px] mx-auto'>
                     <button
                       onClick={() => handleAddToCart(product._id)}
-                      disabled={handleCartBtn(product._id)}
-                      className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
-                    ${stock === 0 || !isAvailable
+                      disabled={handleCartBtn(product._id) || stock === 0 || !isAvailable}
+                      className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-full gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
+                                        ${stock === 0 || !isAvailable
                           ? "bg-gray-400 text-gray-600 dark:bg-neutral-900 dark:text-gray-400 cursor-not-allowed"
                           : "bg-sky-500 text-white hover:bg-sky-600"}`}
                     >
                       <ShoppingCart className="w-4 h-4" />
-                      Add to Cart
+                      {stock === 0 || !isAvailable ? 'Out of Stock' : handleCartBtn(product._id) ? 'Added to Cart' : 'Add to Cart'}
                     </button>
                     <button
-                      disabled={!isAvailable}
-                      className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
-                    ${stock === 0 || !isAvailable
+                      disabled={stock === 0 || !isAvailable}
+                      className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-full gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
+                                        ${stock === 0 || !isAvailable
                           ? "bg-gray-400 text-gray-600 dark:bg-neutral-900 dark:text-gray-400 cursor-not-allowed"
                           : "bg-sky-500 text-white hover:bg-sky-600"}`}
                     >
@@ -475,11 +486,11 @@ const ProductDetail = ({ id }) => {
                     </button>
                   </div>
 
-                  <div className='flex justify-center items-center gap-3 w-[300px]'>
+                  <div className='flex justify-center items-center gap-3 w-full max-w-[300px] mx-auto'>
                     <button
                       onClick={() => handleWishList(product._id)}
                       className={`w-10 h-10 flex items-center justify-center cursor-pointer rounded-full border border-black dark:border-white transition-colors
-                      ${isWishlisted
+                                        ${isWishlisted
                           ? "bg-red-100 text-red-500 dark:bg-red-900/20 dark:text-red-400"
                           : "bg-gray-100 text-gray-600 dark:bg-neutral-900 dark:text-gray-300 hover:bg-white dark:hover:bg-neutral-900"
                         }`}
@@ -498,36 +509,39 @@ const ProductDetail = ({ id }) => {
             )}
 
             {user.role === "seller" && (
-              <div className="flex flex-wrap justify-center items-center gap-3 mt-4">
-                <button
-                  onClick={() => handleUpdateDetails(product)}
-                  className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-sky-600 text-white font-semibold text-sm transition-all hover:bg-sky-700 border border-black dark:border-white"
-                >
-                  <Edit className="w-4 h-4" />
-                  Edit Product
-                </button>
-                <button
-                  onClick={() => handleToggleAvailability(product._id, !product.isAvailable)}
-                  className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 font-semibold text-sm transition-all border border-black dark:border-white ${isAvailable
-                    ? 'bg-red-600 text-white hover:bg-red-700'
-                    : 'bg-green-600 text-white hover:bg-green-700'
-                    }`}
-                >
-                  {isAvailable ? 'Mark Unavailable' : 'Mark Available'}
-                </button>
-                <button
-                  onClick={handleManageVariant}
-                  className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-purple-600 text-white font-semibold text-sm transition-all hover:bg-purple-700 border border-black dark:border-white"
-                >
-                  Manage Variant
-                </button>
-                <button
-                  onClick={() => handleDelete(product._id)}
-                  className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-red-600 text-white font-semibold text-sm transition-all hover:bg-red-700 border border-black dark:border-white"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Delete Product
-                </button>
+              <div className="border-y border-gray-200 dark:border-neutral-800 py-4 space-y-3">
+                <h2 className="text-lg font-bold">Seller Actions</h2>
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={() => handleUpdateDetails(product)}
+                    className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-sky-600 text-white font-semibold text-sm transition-all hover:bg-sky-700 border border-black dark:border-white"
+                  >
+                    <Edit className="w-4 h-4" />
+                    Edit Product
+                  </button>
+                  <button
+                    onClick={() => handleToggleAvailability(product._id, !product.isAvailable)}
+                    className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 font-semibold text-sm transition-all border border-black dark:border-white ${isAvailable
+                      ? 'bg-red-600 text-white hover:bg-red-700'
+                      : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}
+                  >
+                    {isAvailable ? 'Mark Unavailable' : 'Mark Available'}
+                  </button>
+                  <button
+                    onClick={handleManageVariant}
+                    className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-purple-600 text-white font-semibold text-sm transition-all hover:bg-purple-700 border border-black dark:border-white"
+                  >
+                    Manage Variant
+                  </button>
+                  <button
+                    onClick={() => handleDelete(product._id)}
+                    className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-red-600 text-white font-semibold text-sm transition-all hover:bg-red-700 border border-black dark:border-white"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete Product
+                  </button>
+                </div>
               </div>
             )}
           </div>
