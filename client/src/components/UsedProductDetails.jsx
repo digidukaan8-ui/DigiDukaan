@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, Share2, Edit, Trash2, MessageCircle, ShoppingCart, ChevronLeft, ChevronRight, Play, Truck, Package } from "lucide-react";
+import { Heart, Share2, Edit, Trash2, MessageCircle, ShoppingCart, ChevronLeft, ChevronRight, Play, Truck, Package, CheckCircle, XCircle, FileText, } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/auth";
 import useUsedProductStore from "../store/usedProduct";
@@ -288,17 +288,28 @@ const UsedProductDetail = ({ id }) => {
                             </h1>
 
                             <div className="flex flex-wrap items-center gap-2 mb-2">
-                                <span className={`px-3 py-1 text-sm font-semibold rounded-full border border-black dark:border-white ${getConditionColor(condition)}`}>
-                                    {condition}
-                                </span>
+                                {condition && (
+                                    <span className={`flex items-center gap-1 px-3 py-1 text-sm font-semibold rounded-full border dark:border-white ${getConditionColor(condition)} shadow-sm hover:scale-105 transition-transform`}>
+                                        <CheckCircle className="w-4 h-4" />
+                                        {condition}
+                                    </span>
+                                )}
                                 {isSold && (
-                                    <span className="px-3 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200 border border-black dark:border-white">
+                                    <span className="flex items-center gap-1 px-3 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200 border border-black dark:border-white shadow-sm hover:scale-105 transition-transform">
+                                        <XCircle className="w-4 h-4" />
                                         SOLD
                                     </span>
                                 )}
                                 {billAvailable && (
-                                    <span className="px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-200 border border-black dark:border-white">
+                                    <span className="flex items-center gap-1 px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-200 border border-black dark:border-white shadow-sm hover:scale-105 transition-transform">
+                                        <FileText className="w-4 h-4" />
                                         Bill Available
+                                    </span>
+                                )}
+                                {delivery?.shippingLocations?.length > 0 && (
+                                    <span className="flex items-center gap-1 px-3 py-1 text-sm font-semibold rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-200 border border-black dark:border-white shadow-sm hover:scale-105 transition-transform">
+                                        <Truck className="w-4 h-4" />
+                                        Shipping Available
                                     </span>
                                 )}
                             </div>

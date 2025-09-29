@@ -1,6 +1,6 @@
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen px-4 sm:px-6 md:px-12 py-10 bg-gray-100 dark:bg-neutral-800 text-gray-800 dark:text-gray-100">
+    <div className="min-h-screen px-4 sm:px-6 md:px-12 pb-20 pt-40 bg-gray-100 dark:bg-neutral-800 text-gray-800 dark:text-gray-100">
       <div className="max-w-5xl mx-auto space-y-10">
 
         <header className="text-center space-y-2">

@@ -1,4 +1,4 @@
-import { Heart, Truck, MessageCircle, Edit2, Trash2, Eye } from "lucide-react";
+import { Heart, Truck, MessageCircle, Edit2, Trash2, Eye, CheckCircle, DollarSign, FileText } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { removeUsedProduct, addToWishlist, removeFromWishlist } from "../api/product";
@@ -205,20 +205,29 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
       <div className="flex flex-col flex-grow p-5">
         <div className="mb-3">
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
+          <div className="flex flex-wrap gap-2 mb-2">
             {product.condition && (
-              <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-full">
+              <span className="flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-full shadow-sm hover:scale-105 transition-transform">
+                <CheckCircle className="w-3 h-3" />
                 {product.condition}
               </span>
             )}
             {product.isNegotiable && (
-              <span className="text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded-full">
+              <span className="flex items-center gap-1 text-xs font-semibold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full shadow-sm hover:scale-105 transition-transform">
+                <DollarSign className="w-3 h-3" />
                 Negotiable
               </span>
             )}
             {product.billAvailable && (
-              <span className="text-xs font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30 px-2 py-1 rounded-full">
+              <span className="flex items-center gap-1 text-xs font-semibold text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded-full shadow-sm hover:scale-105 transition-transform">
+                <FileText className="w-3 h-3" />
                 Bill Available
+              </span>
+            )}
+            {product?.delivery?.shippingLocations?.length > 0 && (
+              <span className="flex items-center gap-1 text-xs font-semibold text-purple-700 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded-full shadow-sm hover:scale-105 transition-transform">
+                <Truck className="w-3 h-3" />
+                Shipping Available
               </span>
             )}
           </div>

@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 export default function Support() {
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-neutral-800 px-4 py-10 sm:px-10 text-gray-800 dark:text-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-800 px-4 pb-20 pt-40 sm:px-10 text-gray-800 dark:text-gray-100">
       <div className="max-w-5xl mx-auto space-y-14">
         <section className="text-center space-y-4">
           <h1 className="text-4xl sm:text-5xl font-bold text-sky-600">Need Help? We're Here!</h1>

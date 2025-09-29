@@ -60,7 +60,7 @@ export default function Faq() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-neutral-800 px-4 py-12 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-800 px-4 pb-20 pt-40 text-gray-900 dark:text-gray-100">
       <div className="max-w-4xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-10">Frequently Asked Questions</h2>
         <div className="space-y-4">

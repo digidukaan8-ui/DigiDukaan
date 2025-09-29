@@ -502,7 +502,12 @@ const getProducts = async (req, res) => {
         }
 
         const productPipeline = [
-            { $match: { storeId: { $in: storeIds } } },
+            {
+                $match: {
+                    storeId: { $in: storeIds },
+                    isAvailable: true
+                }
+            },
             { $sort: { createdAt: -1 } },
             {
                 $group: {
@@ -520,11 +525,17 @@ const getProducts = async (req, res) => {
         const usedProductPipeline = [
             {
                 $match: {
-                    $or: [
-                        { "delivery.pickupLocation.state": { $in: locations } },
-                        { "delivery.pickupLocation.city": { $in: locations } },
-                        { "delivery.pickupLocation.pincode": { $in: locations } },
-                        { "delivery.shippingLocations.areaName": { $in: locations } }
+                    $and: [
+                        { isSold: false },
+                        { paid: true },
+                        {
+                            $or: [
+                                { "delivery.pickupLocation.state": { $in: locations } },
+                                { "delivery.pickupLocation.city": { $in: locations } },
+                                { "delivery.pickupLocation.pincode": { $in: locations } },
+                                { "delivery.shippingLocations.areaName": { $in: locations } }
+                            ]
+                        }
                     ]
                 }
             },

@@ -22,7 +22,7 @@ const fadeUp = {
 
 export default function About() {
   return (
-    <div className="min-h-screen w-full px-6 py-14 sm:px-10 md:px-20 bg-gradient-to-b from-gray-100 via-white to-gray-100 dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-900 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen w-full px-6 pb-20 pt-40 sm:px-10 md:px-20 bg-gradient-to-b from-gray-100 via-white to-gray-100 dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-900 text-gray-900 dark:text-gray-100">
       <div className="max-w-6xl mx-auto space-y-24">
 
         <motion.section

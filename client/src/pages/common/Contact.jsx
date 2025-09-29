@@ -39,7 +39,7 @@ export default function Contact() {
   }
 
   return (
-    <div className="min-h-screen py-20 flex justify-center items-center bg-gray-100 text-black dark:bg-neutral-950 dark:text-white">
+    <div className="min-h-screen pb-20 pt-40 flex justify-center items-center bg-gray-100 text-black dark:bg-neutral-950 dark:text-white">
       <motion.div
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

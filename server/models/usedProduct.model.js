@@ -138,7 +138,12 @@ const usedProductSchema = new mongoose.Schema({
     ]
   },
 
-  tags: { type: [String], default: [] }
+  tags: { type: [String], default: [] },
+
+  paid: {
+    type: Boolean,
+    default: false,
+  }
 }, { timestamps: true });
 
 usedProductSchema.index({
