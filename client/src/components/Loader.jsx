@@ -70,34 +70,34 @@ export default function Loader() {
     fetching: "text-sky-500",
     product: "text-cyan-500",
     updateProduct: "text-cyan-500",
-    removeProduct: "text-cyan-500",
+    removeProduct: "text-red-500",
     changeAval: "text-cyan-500",
     usedProduct: "text-cyan-500",
     updateUsedProduct: "text-cyan-500",
-    removeUsedProduct: "text-cyan-500",
+    removeUsedProduct: "text-red-500",
     fetchLoc: "text-purple-500",
     fetchLocIp: "text-purple-500",
     zone: "text-purple-500",
     updateZone: "text-purple-500",
-    removeZone: "text-purple-500",
+    removeZone: "text-red-500",
     message: "text-sky-500",
     orders: "text-sky-500",
-    addToWishlist: "text-sky-500",
-    removeFromWishlist: "text-sky-500",
+    addToWishlist: "text-pink-500",
+    removeFromWishlist: "text-red-500",
     addToCart: "text-purple-500",
     updateCart: "text-purple-500",
-    removeCart: "text-purple-500",
+    removeCart: "text-red-500",
     fetchCart: "text-purple-500",
     fetchAddress: "text-purple-500",
     addAddress: "text-purple-500",
     updateAddress: "text-purple-500",
-    getAddress: "text-purple-500",
+    removeAddress: "text-red-500",
     changeAvatar: "text-purple-500",
-    removeAvatar: "text-purple-500",
+    removeAvatar: "text-red-500",
     updateProfile: "text-purple-500",
     creatingOrder: "text-blue-500",
     redirecting: "text-blue-500",
-    confirmingPayment: "text-blue-500",
+    confirmingPayment: "text-emerald-500",
     default: "text-gray-500",
   };
 
@@ -111,14 +111,14 @@ export default function Loader() {
           exit={{ opacity: 0 }}
         >
           <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className={`flex flex-col items-center space-y-3 p-6 rounded-2xl shadow-xl bg-white dark:bg-neutral-900 ${colors[variant]}`}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className={`flex flex-col items-center gap-4 p-6 rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 ${colors[variant] || colors.default}`}
           >
             <Loader2 className="animate-spin h-10 w-10" />
-            <span className="font-medium text-base">
+            <span className="font-semibold text-base text-gray-800 dark:text-gray-200">
               {messages[variant] || messages.default}
             </span>
           </motion.div>

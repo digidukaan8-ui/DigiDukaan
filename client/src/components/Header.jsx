@@ -4,7 +4,6 @@ import { FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
 import logo from '../assets/logo.webp'
 import useThemeStore from '../store/theme';
 import useAuthStore from '../store/auth';
-import { motion } from 'framer-motion'
 
 export default function Header() {
   const { isDark, toggleMode } = useThemeStore();
@@ -41,84 +40,86 @@ export default function Header() {
     }
   }
 
-
   return (
-    <header className="bg-white dark:bg-neutral-900 w-full shadow-md fixed top-0 z-[100] transition-all duration-300">
-      <motion.div
-        initial={{ y: -40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        style={{ willChange: "transform, opacity" }}
-        className="w-full mx-auto px-5 md:px-10 py-4 flex justify-between items-center">
-        <div className='flex justify-center items-center'>
-          <img src={logo} alt="DigiDukaan" className='w-10 sm:w-12 h-fit object-cover' />
-        </div>
+    <header className="bg-white dark:bg-neutral-900 w-full shadow-lg border-b border-gray-200 dark:border-neutral-800 fixed top-0 z-[100] h-20">
+      <div className="w-full max-w-7xl mx-auto px-5 md:px-10 h-full flex justify-between items-center">
+        <NavLink to="/" className="flex justify-center items-center gap-3 group">
+          <img
+            src={logo}
+            alt="DigiDukaan"
+            className="w-11 sm:w-12 h-fit object-cover transition-transform duration-200 group-hover:scale-105"
+          />
+          <span className="hidden sm:block text-xl md:text-2xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-400 dark:to-blue-400 bg-clip-text text-transparent">
+            DigiDukaan
+          </span>
+        </NavLink>
 
-        <nav className="hidden md:flex items-center gap-10" aria-label="Main Navigation">
-          {links().map(link => (
+        <nav className="hidden md:flex items-center gap-2" aria-label="Main Navigation">
+          {links().map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
               className={({ isActive }) =>
-                `relative text-lg font-medium transition-colors after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-sky-500 hover:after:w-full after:transition-all
-                 ${isActive ? 'text-sky-500 after:w-full' : 'text-gray-700 dark:text-gray-300 hover:text-sky-500'}`
-              }
-            >
-              {link.label}
-            </NavLink>
-          ))}
-
-          <button
-            onClick={toggleMode}
-            className="text-xl text-gray-700 dark:text-gray-300 hover:text-sky-500 transition"
-            aria-label="Toggle Theme"
-          >
-            {isDark ? <FiSun /> : <FiMoon />}
-          </button>
-        </nav>
-
-        <div className="md:hidden flex items-center gap-5">
-          <button
-            onClick={toggleMode}
-            className="text-2xl text-gray-700 dark:text-gray-300 hover:text-sky-500 transition"
-            aria-label="Toggle Theme"
-          >
-            {isDark ? <FiSun /> : <FiMoon />}
-          </button>
-
-          <button
-            onClick={toggleMenu}
-            className="text-2xl text-gray-700 dark:text-gray-300 hover:text-sky-500 transition"
-            aria-label="Toggle Mobile Menu"
-          >
-            {menuOpen ? <FiX /> : <FiMenu />}
-          </button>
-        </div>
-      </motion.div>
-
-      {menuOpen && (
-        <motion.div
-          initial={{ y: 40, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          style={{ willChange: "transform, opacity" }}
-          className="md:hidden animate-slide-down origin-top bg-white dark:bg-neutral-900 border-t px-4 pt-3 pb-4 rounded-b-xl shadow-md">
-          {links().map(link => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              onClick={() => setMenuOpen(false)}
-              className={({ isActive }) =>
-                `block text-base font-medium py-2 transition-colors ${isActive
-                  ? 'text-sky-500'
-                  : 'text-gray-700 dark:text-gray-300 hover:text-sky-500'
+                `text-sm font-semibold transition-all duration-200 py-2 px-4 rounded-lg
+                 ${isActive
+                  ? 'text-white bg-gradient-to-r from-sky-500 to-blue-600 shadow-md'
+                  : 'text-gray-700 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-gray-100 dark:hover:bg-neutral-800'
                 }`
               }
             >
               {link.label}
             </NavLink>
           ))}
-        </motion.div>
+
+          <button
+            onClick={toggleMode}
+            className="ml-2 p-2.5 rounded-lg bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 hover:bg-sky-100 dark:hover:bg-sky-900/30 hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-200"
+            aria-label="Toggle Theme"
+          >
+            {isDark ? <FiSun className="text-lg" /> : <FiMoon className="text-lg" />}
+          </button>
+        </nav>
+
+        <div className="md:hidden flex items-center gap-3">
+          <button
+            onClick={toggleMode}
+            className="p-2 rounded-lg bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 hover:bg-sky-100 dark:hover:bg-sky-900/30 hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-200"
+            aria-label="Toggle Theme"
+          >
+            {isDark ? <FiSun className="text-lg" /> : <FiMoon className="text-lg" />}
+          </button>
+
+          <button
+            onClick={toggleMenu}
+            className="p-2 rounded-lg bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 hover:bg-sky-100 dark:hover:bg-sky-900/30 hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-200"
+            aria-label="Toggle Mobile Menu"
+          >
+            {menuOpen ? <FiX className="text-lg" /> : <FiMenu className="text-lg" />}
+          </button>
+        </div>
+      </div>
+
+      {menuOpen && (
+        <div className="md:hidden bg-white dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-800 shadow-lg">
+          <div className="px-5 py-4 space-y-1">
+            {links().map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  `block text-sm font-semibold py-3 px-4 rounded-lg transition-all duration-200
+                   ${isActive
+                    ? 'text-white bg-gradient-to-r from-sky-500 to-blue-600 shadow-md'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-gray-100 dark:hover:bg-neutral-800'
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </div>
+        </div>
       )}
     </header>
   );
