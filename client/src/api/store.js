@@ -154,4 +154,29 @@ const removeDeliveryZone = async (zoneId) => {
     }
 };
 
-export { createStore, updateStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone };
+const getStoreInfo = async (storeId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/sellers/stores/${storeId}/info`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get store info");
+            throw new Error(result.message || "Failed to get store info");
+        }
+
+        return result.data;
+    } catch (error) {
+        console.error("Error in get store info: ", error);
+        throw error;
+    }
+};
+
+export { createStore, updateStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone, getStoreInfo };

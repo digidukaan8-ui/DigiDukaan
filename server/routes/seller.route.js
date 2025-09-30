@@ -2,11 +2,13 @@ import express from 'express'
 import { authMiddleware } from '../middlewares/auth.middleware.js'
 import { handleCreateStore, handleUpdateStore, handleDeliveryZone, handleUpdateDeliveryZone } from '../middlewares/store.middleware.js';
 import { uploadProductMedia, validateFileSizes } from '../middlewares/upload.middleware.js';
-import { createStore, updateStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone } from '../controllers/store.controller.js';
+import { createStore, updateStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone, getStoreInfo } from '../controllers/store.controller.js';
 import { handleAddProduct, handleUpdateProduct, handleAddUsedProduct, handleUpdateUsedProduct } from '../middlewares/product.middleware.js';
 import { addProduct, getProduct, updateProduct, removeProduct, changeAvailability, addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct } from '../controllers/product.controller.js';
 
 const sellerRouter = express.Router();
+
+sellerRouter.get('/stores/:storeId/info', authMiddleware('seller'), getStoreInfo);
 
 sellerRouter.post('/stores', authMiddleware('seller'), validateFileSizes, uploadProductMedia, handleCreateStore, createStore);
 sellerRouter.patch('/stores/:storeId', authMiddleware('seller'), validateFileSizes, uploadProductMedia, handleUpdateStore, updateStore);

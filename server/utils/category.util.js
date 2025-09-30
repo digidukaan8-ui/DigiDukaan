@@ -157,7 +157,7 @@ const isValidUsedProductCategory = (category) => {
 
 const isValidUsedProductSubCategory = (category, subCategory) => {
   const categoryObj = usedProductCategories.find(cat => cat.name.toLowerCase() === category.toLowerCase());
-  return categoryObj && categoryObj.subCategories.some(sub => sub.toLowerCase() === subCategory.toLowerCase());
+  return categoryObj && categoryObj.subCategories.some(sub => sub.name.toLowerCase() === subCategory.toLowerCase());
 };
 
 export { categories, isValidCategory, isValidSubCategory, usedProductCategories, isValidUsedProductCategory, isValidUsedProductSubCategory, getPriceForUsedProduct };

@@ -9,6 +9,7 @@ import useAuthStore from "../store/auth";
 import useWishlistStore from "../store/wishlist";
 import useStores from "../store/stores";
 import { payNow } from "../api/payment";
+import { getPriceForUsedProduct } from "../utils/category";
 
 export default function UsedProductCard({ product, userRole = "buyer", onQuickView }) {
   const navigate = useNavigate();
@@ -171,7 +172,8 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
   if (isSold) {
     overlayStatus = { text: "SOLD", color: "bg-green-900/70" };
   } else if (!product?.paid) {
-    overlayStatus = { text: "PAYMENT DUE", color: "bg-yellow-600/70" };
+    const amount = getPriceForUsedProduct(product.category?.name, product.subCategory?.name);
+    overlayStatus = { text: `PAYMENT DUE ₹ ${amount}`, color: "bg-yellow-600/70" };
   }
 
   return (
@@ -204,7 +206,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
             <div className={`absolute inset-0 bg-gray-900/70 backdrop-blur-sm flex items-center justify-center z-40`}>
               <div className={`text-white ${overlayStatus.color} transform -rotate-12 flex flex-col items-center justify-center p-6 border-4 border-white border-dashed rounded-xl shadow-2xl`}>
                 <AlertTriangle className="h-10 w-10 mb-2" />
-                <span className="text-2xl w-62 text-center font-extrabold uppercase tracking-widest">
+                <span className="text-xl w-62 text-center font-extrabold uppercase tracking-widest">
                   {overlayStatus.text}
                 </span>
               </div>

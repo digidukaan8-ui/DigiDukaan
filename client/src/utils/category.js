@@ -41,47 +41,113 @@ export const getSubCategories = (categoryName) => {
 export const usedProductCategories = [
   {
     name: "Mobiles",
-    subCategories: ["Smartphones", "Feature Phones", "Accessories"]
+    subCategories: [
+      { name: "Smartphones", price: 50 },
+      { name: "Feature Phones", price: 30 },
+      { name: "Accessories", price: 20 }
+    ]
   },
   {
     name: "Electronics",
-    subCategories: ["Laptops", "Cameras", "Headphones", "TV & Audio", "Other Electronics"]
+    subCategories: [
+      { name: "Laptops", price: 100 },
+      { name: "Cameras", price: 80 },
+      { name: "Headphones", price: 30 },
+      { name: "TV & Audio", price: 120 },
+      { name: "Other Electronics", price: 50 }
+    ]
   },
   {
     name: "Cars",
-    subCategories: ["Sedan", "SUV", "Hatchback", "Luxury", "Other Vehicles"]
+    subCategories: [
+      { name: "Sedan", price: 500 },
+      { name: "SUV", price: 700 },
+      { name: "Hatchback", price: 400 },
+      { name: "Luxury", price: 1000 },
+      { name: "Other Vehicles", price: 300 }
+    ]
   },
   {
     name: "Motorcycles",
-    subCategories: ["Bike", "Scooter", "Bicycle", "Accessories"]
+    subCategories: [
+      { name: "Bike", price: 150 },
+      { name: "Scooter", price: 100 },
+      { name: "Bicycle", price: 50 },
+      { name: "Accessories", price: 20 }
+    ]
   },
   {
     name: "Furniture",
-    subCategories: ["Sofas", "Beds", "Tables & Chairs", "Cabinets", "Other Furniture"]
+    subCategories: [
+      { name: "Sofas", price: 200 },
+      { name: "Beds", price: 250 },
+      { name: "Tables & Chairs", price: 150 },
+      { name: "Cabinets", price: 100 },
+      { name: "Other Furniture", price: 80 }
+    ]
   },
   {
     name: "Home Appliances",
-    subCategories: ["Refrigerator", "Washing Machine", "Microwave", "Air Conditioner", "Other Appliances"]
+    subCategories: [
+      { name: "Refrigerator", price: 300 },
+      { name: "Washing Machine", price: 250 },
+      { name: "Microwave", price: 100 },
+      { name: "Air Conditioner", price: 350 },
+      { name: "Other Appliances", price: 80 }
+    ]
   },
   {
     name: "Fashion",
-    subCategories: ["Men's Clothing", "Women's Clothing", "Footwear", "Watches & Accessories"]
+    subCategories: [
+      { name: "Men's Clothing", price: 30 },
+      { name: "Women's Clothing", price: 30 },
+      { name: "Footwear", price: 20 },
+      { name: "Watches & Accessories", price: 50 }
+    ]
   },
   {
     name: "Books",
-    subCategories: ["Educational", "Fiction", "Non-Fiction", "Comics"]
+    subCategories: [
+      { name: "Educational", price: 10 },
+      { name: "Fiction", price: 15 },
+      { name: "Non-Fiction", price: 15 },
+      { name: "Comics", price: 10 }
+    ]
   },
   {
     name: "Sports & Fitness",
-    subCategories: ["Gym Equipment", "Bicycles", "Sports Gear", "Outdoor Games"]
+    subCategories: [
+      { name: "Gym Equipment", price: 100 },
+      { name: "Bicycles", price: 80 },
+      { name: "Sports Gear", price: 40 },
+      { name: "Outdoor Games", price: 30 }
+    ]
   },
   {
     name: "Toys & Baby Products",
-    subCategories: ["Toys", "Baby Care", "Feeding", "Diapers", "Clothing"]
+    subCategories: [
+      { name: "Toys", price: 20 },
+      { name: "Baby Care", price: 25 },
+      { name: "Feeding", price: 15 },
+      { name: "Diapers", price: 10 },
+      { name: "Clothing", price: 20 }
+    ]
   }
 ];
 
+export const getPriceForUsedProduct = (categoryName, subCategoryName) => {
+  const categoryObj = usedProductCategories.find(
+    cat => cat.name.toLowerCase() === categoryName?.toLowerCase()
+  );
+  if (!categoryObj) return null;
+
+  const subCategoryObj = categoryObj.subCategories.find(
+    sub => sub.name.toLowerCase() === subCategoryName?.toLowerCase()
+  );
+  return subCategoryObj ? subCategoryObj.price : null;
+};
+
 export const getUsedProductSubCategories = (categoryName) => {
   const category = usedProductCategories.find(cat => cat.name === categoryName);
-  return category ? category.subCategories : [];
+  return category ? category.subCategories.name : [];
 };

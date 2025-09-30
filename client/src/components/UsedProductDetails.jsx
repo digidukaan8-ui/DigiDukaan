@@ -9,6 +9,7 @@ import useUsedCategoryProductStore from "../store/categoryUsedProduct";
 import useWishlistStore from "../store/wishlist";
 import useLoaderStore from '../store/loader'
 import { payNow, verifyPayment } from "../api/payment";
+import { getPriceForUsedProduct } from "../utils/category";
 
 const UsedProductDetail = ({ id }) => {
     const navigate = useNavigate();
@@ -259,7 +260,7 @@ const UsedProductDetail = ({ id }) => {
     if (isSold) {
         warningMessage = "This product is NOT VISIBLE to buyers because it is already SOLD.";
     } else if (!paid) {
-        warningMessage = "This product is NOT VISIBLE to buyers because PAYMENT IS PENDING.";
+        warningMessage = `Payment of ₹${getPriceForUsedProduct(category.name,subCategory.name)} is pending. This product will become visible to buyers once the payment is complete.`;
     }
 
     return (

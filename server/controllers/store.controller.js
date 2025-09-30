@@ -1,5 +1,10 @@
 import DeliveryZone from '../models/deliveryzone.model.js';
 import Store from '../models/store.model.js';
+import Product from '../models/product.model.js';
+import UsedProduct from '../models/usedProduct.model.js';
+import Order from '../models/order.model.js';
+import Review from '../models/review.model.js';
+import View from '../models/view.model.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../utils/cloudinary.config.js';
 
 const createStore = async (req, res) => {
@@ -196,4 +201,48 @@ const removeDeliveryZone = async (req, res) => {
     }
 };
 
-export { createStore, updateStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone };
+const getStoreInfo = async (req, res) => {
+    try {
+        const { storeId } = req.params;
+        if (!storeId) {
+            return res.status(400).json({ success: false, message: 'Store Id is required' });
+        }
+
+        const newProductCount = await Product.countDocuments({ storeId });
+        const usedProductCount = await UsedProduct.countDocuments({ storeId });
+        const orderCount = await Order.countDocuments({ storeId });
+        const reviewCount = await Review.countDocuments({ storeId });
+
+        const newProducts = await Product.find({ storeId }, { _id: 1 });
+        const usedProducts = await UsedProduct.find({ storeId }, { _id: 1 });
+
+        const allProductIds = [
+            ...newProducts.map(p => p._id),
+            ...usedProducts.map(p => p._id),
+        ];
+
+        let viewCount = 0;
+        if (allProductIds.length > 0) {
+            viewCount = await View.countDocuments({
+                productIds: { $in: allProductIds }
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Store information fetched successfully',
+            data: {
+                newProductCount,
+                usedProductCount,
+                viewCount,
+                orderCount,
+                reviewCount
+            }
+        });
+    } catch (error) {
+        console.error('Error in Get Store Info controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+export { createStore, updateStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone,getStoreInfo };

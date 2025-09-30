@@ -27,7 +27,6 @@ export default function Header() {
         { to: '/seller/store', label: 'Store' },
         { to: '/order', label: 'Orders' },
         { to: '/chat', label: 'Chat' },
-        { to: '/notification', label: 'Notification' },
         { to: '/seller/dashboard', label: 'Dashboard' },
         { to: '/logout', label: 'Logout' },
       ];
