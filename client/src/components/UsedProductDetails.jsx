@@ -63,9 +63,9 @@ const UsedProductDetail = ({ id }) => {
     if (!product) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-neutral-950">
-                <div className="text-center p-6">
-                    <div className="w-16 h-16 bg-red-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                        <ShoppingCart className="w-8 h-8 text-white" />
+                <div className="text-center p-8 bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-200 dark:border-neutral-800 max-w-md">
+                    <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <ShoppingCart className="w-8 h-8 text-red-500 dark:text-red-400" />
                     </div>
                     <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
                         Product Not Found
@@ -236,15 +236,15 @@ const UsedProductDetail = ({ id }) => {
     const getConditionColor = (condition) => {
         switch (condition?.toLowerCase()) {
             case 'new':
-                return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-200';
+                return 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 border-green-200 dark:border-green-800/50';
             case 'like new':
-                return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200';
+                return 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border-blue-200 dark:border-blue-800/50';
             case 'used':
-                return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-200';
+                return 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/50';
             case 'refurbished':
-                return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200';
+                return 'bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400 border-purple-200 dark:border-purple-800/50';
             default:
-                return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200';
+                return 'bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400 border-gray-200 dark:border-gray-800/50';
         }
     };
 
@@ -260,36 +260,36 @@ const UsedProductDetail = ({ id }) => {
     if (isSold) {
         warningMessage = "This product is NOT VISIBLE to buyers because it is already SOLD.";
     } else if (!paid) {
-        warningMessage = `Payment of ₹${getPriceForUsedProduct(category.name,subCategory.name)} is pending. This product will become visible to buyers once the payment is complete.`;
+        warningMessage = `Payment of ₹${getPriceForUsedProduct(category.name, subCategory.name)} is pending. This product will become visible to buyers once the payment is complete.`;
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-32 pb-10">
-            <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-28 pb-10">
+            <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
 
                 {showSellerWarning && (
-                    <div className="p-4 mb-6 rounded-lg bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 shadow-md flex items-center gap-3">
-                        <AlertTriangle className="w-6 h-6 text-red-700 dark:text-red-400 flex-shrink-0" />
-                        <p className="text-sm font-medium text-red-900 dark:text-red-200">
+                    <div className="p-4 mb-6 rounded-xl bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800/30 shadow-sm flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" />
+                        <p className="text-sm font-medium text-yellow-900 dark:text-yellow-200">
                             {warningMessage}
                         </p>
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                     <div className="flex flex-col">
-                        <div className="relative w-full mx-auto rounded-lg overflow-hidden shadow-md mb-4 flex items-center justify-center">
+                        <div className="relative w-full mx-auto rounded-2xl overflow-hidden shadow-md bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 mb-4 flex items-center justify-center">
                             {video?.url ? (
                                 <video
                                     src={video.url}
                                     controls
-                                    className="w-full h-auto object-contain max-h-[500px] md:max-h-[60vh]"
+                                    className="w-full h-auto object-contain max-h-[70vh]"
                                 />
                             ) : (
                                 <img
                                     src={img?.[selectedImageIndex]?.url}
                                     alt={title}
-                                    className="w-full h-auto object-contain max-h-[500px] md:max-h-[60vh]"
+                                    className="w-full h-auto object-contain max-h-[70vh]"
                                 />
                             )}
 
@@ -297,13 +297,13 @@ const UsedProductDetail = ({ id }) => {
                                 <>
                                     <button
                                         onClick={prevImage}
-                                        className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/70 dark:bg-neutral-900/70 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-colors z-10 border border-black dark:border-white"
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-neutral-900/90 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-all hover:scale-110 z-10 border border-gray-200 dark:border-neutral-800"
                                     >
                                         <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
                                     </button>
                                     <button
                                         onClick={nextImage}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/70 dark:bg-neutral-900/70 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-colors z-10 border border-black dark:border-white"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-neutral-900/90 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-all hover:scale-110 z-10 border border-gray-200 dark:border-neutral-800"
                                     >
                                         <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                                     </button>
@@ -311,14 +311,14 @@ const UsedProductDetail = ({ id }) => {
                             )}
                         </div>
 
-                        <div className="flex justify-start w-full mx-auto overflow-x-auto gap-2 px-2">
+                        <div className="flex justify-start w-full overflow-x-auto gap-2 px-1 pb-2">
                             {img?.map((image, idx) => (
                                 <button
                                     key={idx}
                                     onClick={() => setSelectedImageIndex(idx)}
-                                    className={`w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-md overflow-hidden border-2 transition-transform hover:scale-105 ${selectedImageIndex === idx
-                                        ? 'border-sky-500 ring-2 ring-sky-500'
-                                        : 'border-gray-300 dark:border-neutral-700'
+                                    className={`w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all hover:scale-105 ${selectedImageIndex === idx
+                                        ? 'border-sky-500 ring-2 ring-sky-500 shadow-md'
+                                        : 'border-gray-200 dark:border-neutral-800'
                                         }`}
                                 >
                                     <img
@@ -330,42 +330,43 @@ const UsedProductDetail = ({ id }) => {
                             ))}
                             {video?.url && (
                                 <div
-                                    className="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 bg-white dark:bg-neutral-900 flex items-center justify-center rounded-md border-2 border-gray-300 dark:border-neutral-700 cursor-pointer transition-transform hover:scale-105"
+                                    className={`w-20 h-20 md:w-24 md:h-24 flex-shrink-0 bg-white dark:bg-neutral-900 flex items-center justify-center rounded-xl border-2 cursor-pointer transition-all hover:scale-105 
+                                    ${selectedImageIndex === -1 ? 'border-sky-500 ring-2 ring-sky-500 shadow-md' : 'border-gray-200 dark:border-neutral-800'}`}
                                     onClick={() => setSelectedImageIndex(-1)}
                                 >
-                                    <Play className="w-5 h-5 md:w-6 md:h-6 text-gray-500" />
+                                    <Play className="w-6 h-6 md:w-8 md:h-8 text-gray-500 dark:text-gray-400" />
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    <div className="lg:pr-10 space-y-5">
+                    <div className="space-y-6">
                         <div>
-                            <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-2">
+                            <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-3">
                                 {title}
                             </h1>
 
-                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <div className="flex flex-wrap items-center gap-3 mb-3">
                                 {condition && (
-                                    <span className={`flex items-center gap-1 px-3 py-1 text-sm font-semibold rounded-full border dark:border-white ${getConditionColor(condition)} shadow-sm hover:scale-105 transition-transform`}>
+                                    <span className={`flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full border ${getConditionColor(condition)}`}>
                                         <CheckCircle className="w-4 h-4" />
                                         {condition}
                                     </span>
                                 )}
                                 {isSold && (
-                                    <span className="flex items-center gap-1 px-3 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200 border border-black dark:border-white shadow-sm hover:scale-105 transition-transform">
+                                    <span className="flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800/50">
                                         <XCircle className="w-4 h-4" />
                                         SOLD
                                     </span>
                                 )}
                                 {billAvailable && (
-                                    <span className="flex items-center gap-1 px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-200 border border-black dark:border-white shadow-sm hover:scale-105 transition-transform">
+                                    <span className="flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 border border-green-200 dark:border-green-800/50">
                                         <FileText className="w-4 h-4" />
                                         Bill Available
                                     </span>
                                 )}
                                 {delivery?.shippingLocations?.length > 0 && (
-                                    <span className="flex items-center gap-1 px-3 py-1 text-sm font-semibold rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-200 border border-black dark:border-white shadow-sm hover:scale-105 transition-transform">
+                                    <span className="flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400 border border-purple-200 dark:border-purple-800/50">
                                         <Truck className="w-4 h-4" />
                                         Shipping Available
                                     </span>
@@ -373,64 +374,68 @@ const UsedProductDetail = ({ id }) => {
                             </div>
                         </div>
 
-                        <div className="border-y border-gray-200 dark:border-neutral-800 py-4 space-y-4">
+                        <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-5 space-y-4 shadow-sm">
                             {hasDiscount > 0 && (
-                                <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
-                                    -{discountType === "₹" && "₹"}{discountValue}
-                                    {discountType === "%" && "%"} OFF
+                                <span className="inline-block bg-gradient-to-r from-sky-500 to-sky-600 text-white text-sm font-bold px-4 py-2 rounded-full shadow-md">
+                                    {discountType === "₹" && "₹"}{discountValue}{discountType === "%" && "%"} OFF
                                 </span>
                             )}
-                            <div className="flex items-baseline gap-2 mt-2">
-                                <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">₹{finalPrice.toFixed(2)}</span>
+                            <div className="flex items-baseline gap-3">
+                                <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">₹{finalPrice.toFixed(2)}</span>
                                 {hasDiscount > 0 && (
-                                    <span className="line-through text-gray-500 dark:text-gray-400 text-base">₹{price.toFixed(2)}</span>
-                                )}
-                                {hasDiscount > 0 && (
-                                    <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">Save ₹{(price - finalPrice).toFixed(2)}</span>
+                                    <>
+                                        <span className="line-through text-gray-500 dark:text-gray-400 text-lg">₹{price.toFixed(2)}</span>
+                                        <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-full">
+                                            Save ₹{(price - finalPrice).toFixed(2)}
+                                        </span>
+                                    </>
                                 )}
                             </div>
                             {isNegotiable && (
-                                <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-full">
-                                    Negotiable
-                                </span>
+                                <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                                    💬 Price Negotiable
+                                </p>
                             )}
                         </div>
 
-                        <div>
-                            <h2 className="text-lg md:text-xl font-bold mb-2">About this item</h2>
+                        <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-5 shadow-sm">
+                            <h2 className="text-xl font-bold mb-3">About this item</h2>
                             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                                 {description}
                             </p>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-2 mb-1 text-sm md:text-base">
+                        <div className="flex flex-wrap gap-2">
                             {brand && (
-                                <span className='bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-md px-4 py-2'>
-                                    Brand: <span className="font-semibold text-gray-800 dark:text-gray-200">{brand}</span>
-                                </span>
+                                <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl px-4 py-2.5 text-sm">
+                                    <span className="text-gray-600 dark:text-gray-400">Brand:</span>{' '}
+                                    <span className="font-semibold text-gray-800 dark:text-gray-200">{brand}</span>
+                                </div>
                             )}
                             {category?.name && (
-                                <span className='bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-md px-4 py-2'>
-                                    Category: <span className="font-semibold text-gray-800 dark:text-gray-200">{category.name}</span>
-                                </span>
+                                <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl px-4 py-2.5 text-sm">
+                                    <span className="text-gray-600 dark:text-gray-400">Category:</span>{' '}
+                                    <span className="font-semibold text-gray-800 dark:text-gray-200">{category.name}</span>
+                                </div>
                             )}
                             {subCategory?.name && (
-                                <span className='bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-md px-4 py-2'>
-                                    Sub-Category: <span className="font-semibold text-gray-800 dark:text-gray-200">{subCategory.name}</span>
-                                </span>
+                                <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl px-4 py-2.5 text-sm">
+                                    <span className="text-gray-600 dark:text-gray-400">Sub-Category:</span>{' '}
+                                    <span className="font-semibold text-gray-800 dark:text-gray-200">{subCategory.name}</span>
+                                </div>
                             )}
                         </div>
 
                         {delivery && (
-                            <div>
-                                <h2 className="text-lg md:text-xl font-bold mb-2">Delivery Options</h2>
-                                <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-lg p-4 space-y-3">
-                                    {delivery.type === 'pickup' && delivery.pickupLocation && (
-                                        <div className="flex items-center gap-2">
-                                            <Package className="w-5 h-5 text-sky-600" />
+                            <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-5 shadow-sm">
+                                <h2 className="text-xl font-bold mb-3">Delivery Options</h2>
+                                <div className="space-y-3">
+                                    {(delivery.type === 'pickup' || delivery.type === 'both') && delivery.pickupLocation && (
+                                        <div className="flex items-start gap-3 bg-gray-50 dark:bg-neutral-950 px-3 py-3 rounded-lg border border-gray-200 dark:border-neutral-800">
+                                            <Package className="w-5 h-5 text-sky-600 flex-shrink-0 mt-0.5" />
                                             <div className="text-sm">
-                                                <span className="font-semibold">Pickup Available</span>
-                                                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                                                <span className="font-semibold text-gray-800 dark:text-gray-200 block mb-1">Pickup Available</span>
+                                                <p className="text-gray-600 dark:text-gray-400">
                                                     {delivery.pickupLocation.address}, {delivery.pickupLocation.city},
                                                     {delivery.pickupLocation.state} - {delivery.pickupLocation.pincode}
                                                 </p>
@@ -438,78 +443,41 @@ const UsedProductDetail = ({ id }) => {
                                         </div>
                                     )}
 
-                                    {delivery.type === 'shipping' && delivery.shippingLocations?.length > 0 && (
-                                        <div className="flex items-center gap-2">
-                                            <Truck className="w-5 h-5 text-sky-600" />
-                                            <div className="text-sm w-full">
-                                                <span className="font-semibold">Shipping Available</span>
-                                                <ul className="mt-2 space-y-1 w-full max-h-32 overflow-y-auto">
-                                                    {delivery.shippingLocations.map((loc, idx) => (
-                                                        <li key={idx} className="flex justify-between items-center py-1 border-t border-gray-100 dark:border-neutral-800">
-                                                            <span className="text-gray-600 dark:text-gray-400">
-                                                                {loc.areaName} ({loc.shippingArea})
-                                                            </span>
-                                                            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                                                                Charge: ₹{loc.shippingCharge}
-                                                            </span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
+                                    {(delivery.type === 'shipping' || delivery.type === 'both') && delivery.shippingLocations?.length > 0 && (
+                                        <div className="bg-gray-50 dark:bg-neutral-950 px-3 py-3 rounded-lg border border-gray-200 dark:border-neutral-800">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Truck className="w-5 h-5 text-sky-600" />
+                                                <span className="font-semibold text-gray-800 dark:text-gray-200 text-sm">Shipping Available</span>
+                                            </div>
+                                            <div className="space-y-2 max-h-32 overflow-y-auto">
+                                                {delivery.shippingLocations.map((loc, idx) => (
+                                                    <div key={idx} className="flex justify-between items-center text-xs py-1.5 border-t border-gray-200 dark:border-neutral-800">
+                                                        <span className="text-gray-600 dark:text-gray-400">
+                                                            {loc.areaName} ({loc.shippingArea})
+                                                        </span>
+                                                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                                                            ₹{loc.shippingCharge}
+                                                        </span>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
-                                    )}
-
-                                    {delivery.type === 'both' && (
-                                        <>
-                                            {delivery.pickupLocation && (
-                                                <div className="flex items-center gap-2">
-                                                    <Package className="w-5 h-5 text-sky-600" />
-                                                    <div className="text-sm">
-                                                        <span className="font-semibold">Pickup Available</span>
-                                                        <p className="text-gray-600 dark:text-gray-400 mt-1">
-                                                            {delivery.pickupLocation.address}, {delivery.pickupLocation.city},
-                                                            {delivery.pickupLocation.state} - {delivery.pickupLocation.pincode}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            )}
-                                            {delivery.shippingLocations?.length > 0 && (
-                                                <div className="flex items-center gap-2">
-                                                    <Truck className="w-5 h-5 text-sky-600" />
-                                                    <div className="text-sm w-full">
-                                                        <span className="font-semibold">Shipping Available</span>
-                                                        <ul className="mt-2 space-y-1 w-full max-h-32 overflow-y-auto">
-                                                            {delivery.shippingLocations.map((loc, idx) => (
-                                                                <li key={idx} className="flex justify-between items-center py-1 border-t border-gray-100 dark:border-neutral-800">
-                                                                    <span className="text-gray-600 dark:text-gray-400">
-                                                                        {loc.areaName} ({loc.shippingArea})
-                                                                    </span>
-                                                                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                                                                        Charge: ₹{loc.shippingCharge}
-                                                                    </span>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </>
                                     )}
                                 </div>
                             </div>
                         )}
 
                         {attributes && attributes.length > 0 && (
-                            <div>
-                                <h2 className="text-lg md:text-xl font-bold mb-2">Specifications</h2>
-                                <div className="flex flex-wrap gap-2">
+                            <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-5 shadow-sm">
+                                <h2 className="text-xl font-bold mb-3">Specifications</h2>
+                                <div className="grid grid-cols-2 gap-2">
                                     {attributes.map((attr, idx) => (
                                         <div
                                             key={idx}
-                                            className="flex items-center gap-1 bg-white dark:bg-neutral-900 px-3 py-1.5 rounded-md border border-black dark:border-white"
+                                            className="bg-gray-50 dark:bg-neutral-950 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-neutral-800"
                                         >
-                                            <span className="text-xs text-gray-600 dark:text-gray-400">{attr.key}:</span>
-                                            <span className="text-xs font-semibold">{attr.value}</span>
+                                            <span className="text-xs text-gray-600 dark:text-gray-400 block mb-0.5">{attr.key}</span>
+                                            <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{attr.value}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -518,12 +486,12 @@ const UsedProductDetail = ({ id }) => {
 
                         {tags && tags.length > 0 && (
                             <div>
-                                <h2 className="text-lg md:text-xl font-bold mb-2">Tags</h2>
+                                <h2 className="text-lg font-bold mb-3">Tags</h2>
                                 <div className="flex flex-wrap gap-2">
                                     {tags.map((tag, idx) => (
                                         <span
                                             key={idx}
-                                            className="px-2 py-1 bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300 rounded-full text-xs border border-black dark:border-white"
+                                            className="px-3 py-1.5 bg-sky-50 text-sky-700 dark:bg-sky-900/20 dark:text-sky-400 rounded-full text-xs font-medium border border-sky-200 dark:border-sky-800/50"
                                         >
                                             #{tag}
                                         </span>
@@ -532,66 +500,68 @@ const UsedProductDetail = ({ id }) => {
                             </div>
                         )}
 
-                        {user.role === "buyer" ? (
-                            <div className="border-y border-gray-200 dark:border-neutral-800 py-4 space-y-4">
-                                <div className="flex flex-col justify-center items-center sm:items-baseline gap-5">
-                                    <div className='flex flex-col justify-between items-center gap-3 w-[300px]'>
-                                        <button
-                                            disabled={isSold}
-                                            onClick={handleChatSeller}
-                                            className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
-                                                ${isSold
-                                                    ? "bg-gray-400 text-gray-600 dark:bg-neutral-900 dark:text-gray-400 cursor-not-allowed"
-                                                    : "bg-sky-500 text-white hover:bg-sky-600"}`}
-                                        >
-                                            <MessageCircle className="w-4 h-4" />
-                                            {isSold ? "Product Sold" : "Start Chat"}
-                                        </button>
-                                    </div>
+                        {user.role === "buyer" && (
+                            <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm space-y-5">
+                                <button
+                                    disabled={isSold}
+                                    onClick={handleChatSeller}
+                                    className={`flex items-center justify-center cursor-pointer w-full gap-2 py-3.5 px-6 rounded-xl font-semibold text-base transition-all shadow-sm hover:shadow-md
+                                        ${isSold
+                                            ? "bg-gray-300 text-gray-600 dark:bg-neutral-800 dark:text-gray-400 cursor-not-allowed border border-gray-200 dark:border-neutral-800"
+                                            : "bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 border border-gray-200 dark:border-neutral-800"}`}
+                                >
+                                    <MessageCircle className="w-5 h-5" />
+                                    {isSold ? "Product Sold" : "Chat with Seller"}
+                                </button>
 
-                                    <div className='flex justify-center items-center gap-3 w-[300px]'>
-                                        <button
-                                            onClick={() => handleWishList()}
-                                            className={`w-10 h-10 flex items-center justify-center cursor-pointer rounded-full border border-black dark:border-white transition-colors
-                                                ${isWishlisted
-                                                    ? "bg-red-100 text-red-500 dark:bg-red-900/20 dark:text-red-400"
-                                                    : "bg-gray-100 text-gray-600 dark:bg-neutral-900 dark:text-gray-300 hover:bg-white dark:hover:bg-neutral-900"
-                                                }`}
-                                        >
-                                            <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
-                                        </button>
+                                <div className="flex justify-center items-center gap-3 pt-2">
+                                    <button
+                                        onClick={() => handleWishList()}
+                                        className={`w-12 h-12 flex items-center justify-center cursor-pointer rounded-full transition-all hover:scale-110
+                                            ${isWishlisted
+                                                ? "bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800/50"
+                                                : "bg-gray-100 text-gray-600 dark:bg-neutral-950 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-800 border border-gray-200 dark:border-neutral-800"
+                                            }`}
+                                    >
+                                        <Heart className={`h-5 w-5 ${isWishlisted ? "fill-current" : ""}`} />
+                                    </button>
 
-                                        <button className="w-10 h-10 flex items-center justify-center cursor-pointer rounded-full bg-gray-100 text-gray-600 dark:bg-neutral-900 border border-black dark:border-white dark:text-gray-300 hover:bg-white dark:hover:bg-neutral-900">
-                                            <Share2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
+                                    <button
+                                        className="w-12 h-12 flex items-center justify-center cursor-pointer rounded-full bg-gray-100 text-gray-600 dark:bg-neutral-950 border border-gray-200 dark:border-neutral-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-800 transition-all hover:scale-110"
+                                    >
+                                        <Share2 className="w-5 h-5" />
+                                    </button>
                                 </div>
                             </div>
-                        ) : (
-                            <div className="border-y border-gray-200 dark:border-neutral-800 py-4 space-y-3">
-                                <h2 className="text-lg font-bold">Seller Actions</h2>
-                                <div className="flex flex-wrap justify-center items-center gap-3">
+                        )}
+
+                        {user.role === "seller" && (
+                            <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm space-y-4">
+                                <h2 className="text-xl font-bold">Seller Actions</h2>
+                                <div className="grid grid-cols-2 gap-3">
                                     <button
                                         onClick={() => handleUpdate(product)}
-                                        className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-sky-600 text-white font-semibold text-sm transition-all hover:bg-sky-700 border border-black dark:border-white"
+                                        className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl cursor-pointer bg-sky-600 text-white font-semibold text-sm transition-all hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 shadow-sm hover:shadow-md border border-gray-200 dark:border-neutral-800"
                                     >
                                         <Edit className="w-4 h-4" />
                                         Edit Product
                                     </button>
                                     <button
                                         onClick={() => handleDelete(product._id)}
-                                        className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-red-600 text-white font-semibold text-sm transition-all hover:bg-red-700 border border-black dark:border-white"
+                                        className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl cursor-pointer bg-red-600 text-white font-semibold text-sm transition-all hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 shadow-sm hover:shadow-md border border-gray-200 dark:border-neutral-800"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                         Delete Product
                                     </button>
-                                    {!paid && (<button
-                                        onClick={payAmount}
-                                        className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-yellow-600 text-white font-semibold text-sm transition-all hover:bg-yellow-700 border border-black dark:border-white"
-                                    >
-                                        <IndianRupee className="w-4 h-4" />
-                                        Pay Amount
-                                    </button>)}
+                                    {!paid && (
+                                        <button
+                                            onClick={payAmount}
+                                            className="col-span-2 flex items-center justify-center gap-2 py-3 px-4 rounded-xl cursor-pointer bg-yellow-600 text-white font-semibold text-sm transition-all hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600 shadow-sm hover:shadow-md border border-gray-200 dark:border-neutral-800"
+                                        >
+                                            <IndianRupee className="w-4 h-4" />
+                                            Pay Amount
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         )}
