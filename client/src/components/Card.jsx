@@ -1,4 +1,4 @@
-import { ShoppingCart, Star, Edit2, Trash2, Eye, Heart, Truck, X, AlertTriangle, MoreVertical, Layers } from "lucide-react";
+import { ShoppingCart, Star, Edit2, Trash2, Eye, Heart, Truck, AlertTriangle, MoreVertical, Layers } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { removeProduct, changeAvailability, removeFromWishlist, addToWishlist } from "../api/product";
@@ -171,23 +171,23 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
   };
 
   const getSellerButtonClass = (color) => {
-    return `flex cursor-pointer items-center gap-2 px-3 py-2 rounded-lg font-medium transition-colors duration-200 w-full text-sm transform hover:scale-[1.02] 
+    return `flex cursor-pointer items-center gap-2 px-3 py-2.5 rounded-lg font-medium transition-all duration-200 w-full text-sm transform hover:scale-[1.02] active:scale-95
         ${color === 'edit'
-        ? 'bg-sky-100 text-sky-700 hover:bg-sky-200 dark:bg-sky-900/50 dark:text-sky-300 dark:hover:bg-sky-700 border border-black dark:border-white'
+        ? 'bg-sky-50 text-sky-700 hover:bg-sky-100 dark:bg-sky-900/20 dark:text-sky-400 dark:hover:bg-sky-900/40 border border-sky-200 dark:border-sky-800/50'
         : ''
       }
         ${color === 'delete'
-        ? 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 dark:hover:bg-red-700 border border-black dark:border-white'
+        ? 'bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800/50'
         : ''
       }
         ${color === 'variants'
-        ? 'bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/50 dark:text-purple-300 dark:hover:bg-purple-700 border border-black dark:border-white'
+        ? 'bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-900/20 dark:text-purple-400 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-800/50'
         : ''
       }
         ${color === 'avail'
         ? (isAvailable
-          ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:hover:bg-yellow-700 border border-black dark:border-white'
-          : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/50 dark:text-green-300 dark:hover:bg-green-700 border border-black dark:border-white')
+          ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400 dark:hover:bg-yellow-900/40 border border-yellow-200 dark:border-yellow-800/50'
+          : 'bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40 border border-green-200 dark:border-green-800/50')
         : ''
       }
     `;
@@ -195,7 +195,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
   return (
     <div
-      className={`bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden flex flex-col w-full max-w-[320px] relative border border-black dark:border-white transition-all duration-300 cursor-pointer group transform hover:-translate-y-2`}
+      className={`bg-white dark:bg-neutral-900 rounded-2xl shadow-md hover:shadow-xl overflow-hidden flex flex-col w-full max-w-[320px] relative border border-gray-200 dark:border-neutral-800 transition-all duration-300 cursor-pointer group transform hover:-translate-y-1`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -203,7 +203,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
       }}
       onClick={() => handleCardClick(product)}
     >
-      <div className="relative w-full h-64 overflow-hidden border-b border-b-black dark:border-b-white">
+      <div className="relative w-full h-64 overflow-hidden bg-gray-100 dark:bg-neutral-950">
         <div className="relative w-full h-full">
           <img
             src={product.img?.[0]?.url}
@@ -219,37 +219,36 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
           )}
 
           {(!isAvailable || stock <= 0) && (
-            <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm flex items-center justify-center z-40">
-              <div className="text-white bg-red-900/80 transform -rotate-12 flex flex-col items-center justify-center p-6 border-4 border-white border-dashed rounded-xl shadow-2xl">
+            <div className="absolute inset-0 bg-gray-900/75 backdrop-blur-sm flex items-center justify-center z-40">
+              <div className="text-white bg-red-600/90 transform -rotate-12 flex flex-col items-center justify-center px-8 py-6 border-4 border-white border-dashed rounded-xl shadow-2xl">
                 <AlertTriangle className="h-10 w-10 mb-2" />
-                <span className="text-2xl w-62 text-center font-extrabold uppercase tracking-widest">
+                <span className="text-2xl text-center font-extrabold uppercase tracking-widest">
                   {!isAvailable ? "Not Available" : "Out of Stock"}
                 </span>
               </div>
             </div>
           )}
 
-          <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+          <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
             {hasDiscount > 0 && (
-              <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
-                -{discountType === "₹" && "₹"}{discountValue}
-                {discountType === "%" && "%"} OFF
+              <span className="bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
+                {discountType === "₹" && "₹"}{discountValue}{discountType === "%" && "%"} OFF
               </span>
             )}
             {isAvailable && stock > 0 && stock <= 5 && (
-              <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-bounce">
+              <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
                 Only {stock} left
               </span>
             )}
           </div>
 
           {userRole === "buyer" && isAvailable && stock > 0 && (
-            <div className="absolute top-4 right-4 z-20">
+            <div className="absolute top-3 right-3 z-20">
               <button
                 onClick={(e) => handleWishlistToggle(e)}
-                className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-105 ${isWishlisted
+                className={`p-2.5 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${isWishlisted
                   ? "bg-red-500 text-white"
-                  : "bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500"
+                  : "bg-white/95 dark:bg-neutral-800/95 text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500 dark:hover:text-red-400"
                   }`}
               >
                 <Heart className={`h-4 w-4 ${isWishlisted ? "fill-current" : ""}`} />
@@ -258,13 +257,13 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
           )}
 
           {userRole === "seller" && (
-            <div className="absolute top-4 right-4 z-[60]" onClick={e => e.stopPropagation()}>
+            <div className="absolute top-3 right-3 z-[60]" onClick={e => e.stopPropagation()}>
               <button
                 onClick={toggleSellerMenu}
-                className={`p-2.5 rounded-full shadow-lg cursor-pointer backdrop-blur-sm transition-all duration-300 
+                className={`p-2.5 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 transform hover:scale-110
                 ${isSellerMenuOpen
-                    ? "bg-sky-600 text-white"
-                    : "bg-white/90 text-gray-700 hover:bg-sky-500/90 hover:text-white"
+                    ? "bg-sky-600 dark:bg-sky-700 text-white"
+                    : "bg-white/95 dark:bg-neutral-800/95 text-gray-700 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-sky-900/30 hover:text-sky-600 dark:hover:text-sky-400"
                   }`}
               >
                 <MoreVertical className="h-4 w-4" />
@@ -272,7 +271,7 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
 
               {isSellerMenuOpen && (
                 <div
-                  className="absolute right-0 mt-1 w-52 bg-white dark:bg-neutral-800 rounded-lg shadow-2xl p-3 space-y-2 border border-black dark:border-white z-[65]"
+                  className="absolute right-0 mt-2 w-52 bg-white dark:bg-neutral-900 rounded-xl shadow-2xl p-2 space-y-1.5 border border-gray-200 dark:border-neutral-800 z-[65]"
                   onMouseLeave={() => setIsSellerMenuOpen(false)}
                 >
                   <button onClick={(e) => handleEdit(e, product)} className={getSellerButtonClass('edit')}>
@@ -293,12 +292,12 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
           )}
 
           <div
-            className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end justify-center pb-6 transition-opacity duration-300 z-50 ${isHovered ? "opacity-100" : "opacity-0"
+            className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center pb-6 transition-opacity duration-300 z-50 ${isHovered ? "opacity-100" : "opacity-0"
               }`}
           >
             <button
               onClick={(e) => handleQuickView(e)}
-              className={`bg-white/95 cursor-pointer text-gray-800 px-4 py-2 rounded-full shadow-lg hover:bg-white transition-all z-50 duration-300 font-medium text-sm flex items-center gap-2 transform ${isHovered ? "translate-y-0" : "translate-y-5"
+              className={`bg-white dark:bg-neutral-900 cursor-pointer text-gray-800 dark:text-gray-200 px-5 py-2.5 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-all duration-300 font-medium text-sm flex items-center gap-2 transform border border-gray-200 dark:border-neutral-800 ${isHovered ? "translate-y-0" : "translate-y-5"
                 }`}
             >
               <Eye size={16} />
@@ -307,62 +306,70 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
           </div>
         </div>
       </div>
+
       <div className="flex flex-col flex-grow p-5">
         <div className="mb-3">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-full">
+            <span className="text-xs font-semibold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 px-2.5 py-1 rounded-full border border-sky-200 dark:border-sky-800/50">
               {product.brand}
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">{product.category.name}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{product.category.name}</span>
           </div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
             {product.title}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mt-1 leading-relaxed">{product.description}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mt-1.5 leading-relaxed">{product.description}</p>
         </div>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-1">
-            <div className="flex">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-4 w-4 ${i < Math.floor(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300 dark:text-gray-600"}`}
-                />
-              ))}
-            </div>
-            <span className="ml-1 text-sm text-gray-600 dark:text-gray-400 font-medium">{rating > 0 ? rating.toFixed(1) : "New"}</span>
+
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star
+                key={i}
+                className={`h-4 w-4 ${i < Math.floor(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300 dark:text-gray-600"}`}
+              />
+            ))}
           </div>
+          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+            {rating > 0 ? rating.toFixed(1) : "New"}
+          </span>
         </div>
+
         <div className="mt-auto">
-          <div className="flex items-baseline gap-2 mb-4">
-            <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">₹{finalPrice.toFixed(2)}</span>
+          <div className="flex items-baseline gap-2 mb-3">
+            <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+              ₹{finalPrice.toFixed(2)}
+            </span>
             {hasDiscount > 0 && (
-              <span className="line-through text-gray-500 dark:text-gray-400 text-base">₹{product.price.toFixed(2)}</span>
-            )}
-            {hasDiscount > 0 && (
-              <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">Save ₹{(product.price - finalPrice).toFixed(2)}</span>
+              <>
+                <span className="line-through text-gray-500 dark:text-gray-400 text-sm">
+                  ₹{product.price.toFixed(2)}
+                </span>
+                <span className="text-emerald-600 dark:text-emerald-400 text-xs font-medium bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full">
+                  Save ₹{(product.price - finalPrice).toFixed(2)}
+                </span>
+              </>
             )}
           </div>
-          {product.deliveryCharge > 0 ? (
-            <div className="flex items-center gap-2 mb-3 text-xs text-gray-600 dark:text-gray-400">
-              <Truck size={14} className="text-sky-500" />
-              <span>Delivery: ₹{product.deliveryCharge}</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 mb-3 text-xs text-gray-600 dark:text-gray-400">
-              <Truck size={14} className="text-sky-500" />
-              <span>Delivery: Free</span>
+
+          <div className="flex items-center gap-2 mb-3 text-xs text-gray-600 dark:text-gray-400">
+            <Truck size={14} className="text-sky-500 dark:text-sky-400" />
+            <span>{product.deliveryCharge > 0 ? `Delivery: ₹${product.deliveryCharge}` : "Free Delivery"}</span>
+          </div>
+
+          {userRole === "seller" && (
+            <div className="mb-3">
+              <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-neutral-800 px-2.5 py-1 rounded-full">
+                Stock: {stock}
+              </span>
             </div>
           )}
-          {userRole === "seller" && (
-            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">Stock: {stock}</span>
-          )
-          }
+
           {userRole === "buyer" && (
             <button
               onClick={handleAddToCart}
               disabled={handleCartBtn(product._id) || !isAvailable || stock <= 0}
-              className="w-full border border-black dark:border-white flex items-center cursor-pointer justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
+              className="w-full flex items-center cursor-pointer justify-center gap-2 bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-sm hover:shadow-md disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-95 border border-gray-200 dark:border-neutral-800"
             >
               <ShoppingCart className="h-5 w-5" />
               {handleCartBtn(product._id) ? "Added to Cart" : (!isAvailable || stock <= 0 ? "Out of Stock" : "Add to Cart")}

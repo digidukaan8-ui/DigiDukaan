@@ -152,17 +152,17 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
   };
 
   const getSellerButtonClass = (color) => {
-    return `flex cursor-pointer items-center gap-2 px-3 py-2 rounded-lg font-medium transition-colors duration-200 w-full text-sm transform hover:scale-[1.02] 
+    return `flex cursor-pointer items-center gap-2 px-3 py-2.5 rounded-lg font-medium transition-all duration-200 w-full text-sm transform hover:scale-[1.02] active:scale-95
       ${color === 'edit'
-        ? 'bg-sky-100 text-sky-700 hover:bg-sky-200 dark:bg-sky-900/50 dark:text-sky-300 dark:hover:bg-sky-700 border border-black dark:border-white'
+        ? 'bg-sky-50 text-sky-700 hover:bg-sky-100 dark:bg-sky-900/20 dark:text-sky-400 dark:hover:bg-sky-900/40 border border-sky-200 dark:border-sky-800/50'
         : ''
       }
       ${color === 'delete'
-        ? 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 dark:hover:bg-red-700 border border-black dark:border-white'
+        ? 'bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800/50'
         : ''
       }
       ${color === 'pay'
-        ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:hover:bg-yellow-700 border border-black dark:border-white'
+        ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400 dark:hover:bg-yellow-900/40 border border-yellow-200 dark:border-yellow-800/50'
         : ''
       }
         `;
@@ -170,15 +170,15 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
   let overlayStatus = null;
   if (isSold) {
-    overlayStatus = { text: "SOLD", color: "bg-green-900/70" };
+    overlayStatus = { text: "SOLD", color: "bg-green-600/90" };
   } else if (!product?.paid) {
     const amount = getPriceForUsedProduct(product.category?.name, product.subCategory?.name);
-    overlayStatus = { text: `PAYMENT DUE ₹ ${amount}`, color: "bg-yellow-600/70" };
+    overlayStatus = { text: `PAYMENT DUE ₹ ${amount}`, color: "bg-yellow-600/90" };
   }
 
   return (
     <div
-      className={`bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden flex flex-col w-full max-w-[320px] relative border border-black dark:border-white transition-all duration-300 cursor-pointer group transform hover:-translate-y-2`}
+      className={`bg-white dark:bg-neutral-900 rounded-2xl shadow-md hover:shadow-xl overflow-hidden flex flex-col w-full max-w-[320px] relative border border-gray-200 dark:border-neutral-800 transition-all duration-300 cursor-pointer group transform hover:-translate-y-1`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -186,7 +186,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
       }}
       onClick={handleCardClick}
     >
-      <div className="relative w-full h-64 overflow-hidden border-b border-b-black dark:border-b-white">
+      <div className="relative w-full h-64 overflow-hidden bg-gray-100 dark:bg-neutral-950">
         <div className="relative w-full h-full">
           <img
             src={product.img?.[0]?.url}
@@ -203,42 +203,38 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
           )}
 
           {overlayStatus && (
-            <div className={`absolute inset-0 bg-gray-900/70 backdrop-blur-sm flex items-center justify-center z-40`}>
-              <div className={`text-white ${overlayStatus.color} transform -rotate-12 flex flex-col items-center justify-center p-6 border-4 border-white border-dashed rounded-xl shadow-2xl`}>
+            <div className={`absolute inset-0 bg-gray-900/75 backdrop-blur-sm flex items-center justify-center z-40`}>
+              <div className={`text-white ${overlayStatus.color} transform -rotate-12 flex flex-col items-center justify-center px-8 py-6 border-4 border-white border-dashed rounded-xl shadow-2xl`}>
                 <AlertTriangle className="h-10 w-10 mb-2" />
-                <span className="text-xl w-62 text-center font-extrabold uppercase tracking-widest">
+                <span className="text-xl text-center font-extrabold uppercase tracking-widest">
                   {overlayStatus.text}
                 </span>
               </div>
             </div>
           )}
 
-          <div className="absolute top-4 left-4 z-10">
+          <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
             {hasDiscount > 0 && (
-              <span className="bg-gradient-to-r from-sky-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
-                -{discountType === "₹" && "₹"}{discountValue}
-                {discountType === "%" && "%"} OFF
+              <span className="bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
+                {discountType === "₹" && "₹"}{discountValue}{discountType === "%" && "%"} OFF
+              </span>
+            )}
+            {product.deliveryCharge === 0 && (
+              <span className="bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1">
+                <Truck size={12} />
+                Free Delivery
               </span>
             )}
           </div>
 
-          {product.deliveryCharge === 0 && (
-            <div className="absolute bottom-4 left-4 z-10">
-              <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
-                <Truck size={12} />
-                Free Delivery
-              </span>
-            </div>
-          )}
-
           {userRole === "buyer" && !isSold && (
-            <div className="absolute top-4 right-4 z-20">
+            <div className="absolute top-3 right-3 z-20">
               <button
                 onClick={(e) => handleWishList(e)}
-                className={`p-2.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 transform hover:scale-110 
+                className={`p-2.5 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 transform hover:scale-110 
                                     ${isWishlisted
                     ? 'bg-red-500 text-white'
-                    : 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'
+                    : 'bg-white/95 dark:bg-neutral-800/95 text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500 dark:hover:text-red-400'
                   }`}
               >
                 <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`} />
@@ -247,13 +243,13 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
           )}
 
           {userRole === "seller" && (
-            <div className="absolute top-4 right-4 z-[60]" onClick={e => e.stopPropagation()}>
+            <div className="absolute top-3 right-3 z-[60]" onClick={e => e.stopPropagation()}>
               <button
                 onClick={toggleSellerMenu}
-                className={`p-2.5 rounded-full shadow-lg cursor-pointer backdrop-blur-sm transition-all duration-300 
+                className={`p-2.5 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 transform hover:scale-110
                                     ${isSellerMenuOpen
-                    ? "bg-sky-600 text-white"
-                    : "bg-white/90 text-gray-700 hover:bg-sky-500/90 hover:text-white"
+                    ? "bg-sky-600 dark:bg-sky-700 text-white"
+                    : "bg-white/95 dark:bg-neutral-800/95 text-gray-700 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-sky-900/30 hover:text-sky-600 dark:hover:text-sky-400"
                   }`}
               >
                 <MoreVertical className="h-4 w-4" />
@@ -261,7 +257,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
               {isSellerMenuOpen && (
                 <div
-                  className="absolute right-0 mt-2 w-48 bg-white dark:bg-neutral-800 rounded-lg shadow-2xl p-3 space-y-2 border border-black dark:border-white z-[65]"
+                  className="absolute right-0 mt-2 w-48 bg-white dark:bg-neutral-900 rounded-xl shadow-2xl p-2 space-y-1.5 border border-gray-200 dark:border-neutral-800 z-[65]"
                   onMouseLeave={() => setIsSellerMenuOpen(false)}
                 >
                   <button onClick={handleEditClick} className={getSellerButtonClass('edit')}>
@@ -281,12 +277,12 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
           )}
 
           <div
-            className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end justify-center pb-6 transition-opacity duration-300 z-50 ${isHovered ? 'opacity-100' : 'opacity-0'
+            className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center pb-6 transition-opacity duration-300 z-50 ${isHovered ? 'opacity-100' : 'opacity-0'
               }`}
           >
             <button
               onClick={handleQuickView}
-              className={`bg-white/95 text-gray-800 px-4 py-2 rounded-full shadow-lg hover:bg-white transition-all duration-300 font-medium text-sm flex items-center gap-2 transform ${isHovered ? 'translate-y-0' : 'translate-y-5'
+              className={`bg-white dark:bg-neutral-900 text-gray-800 dark:text-gray-200 px-5 py-2.5 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-all duration-300 font-medium text-sm flex items-center gap-2 transform border border-gray-200 dark:border-neutral-800 ${isHovered ? 'translate-y-0' : 'translate-y-5'
                 }`}
             >
               <Eye size={16} />
@@ -298,61 +294,61 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
       <div className="flex flex-col flex-grow p-5">
         <div className="mb-3">
-          <div className="flex flex-wrap gap-2 mb-2">
+          <div className="flex flex-wrap gap-1.5 mb-2">
             {product.condition && (
-              <span className="flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-full shadow-sm hover:scale-105 transition-transform">
+              <span className="flex items-center gap-1 text-xs font-semibold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 px-2.5 py-1 rounded-full border border-sky-200 dark:border-sky-800/50">
                 <CheckCircle className="w-3 h-3" />
                 {product.condition}
               </span>
             )}
             {product.isNegotiable && (
-              <span className="flex items-center gap-1 text-xs font-semibold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full shadow-sm hover:scale-105 transition-transform">
+              <span className="flex items-center gap-1 text-xs font-semibold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2.5 py-1 rounded-full border border-green-200 dark:border-green-800/50">
                 <DollarSign className="w-3 h-3" />
                 Negotiable
               </span>
             )}
             {product.billAvailable && (
-              <span className="flex items-center gap-1 text-xs font-semibold text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded-full shadow-sm hover:scale-105 transition-transform">
+              <span className="flex items-center gap-1 text-xs font-semibold text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 px-2.5 py-1 rounded-full border border-yellow-200 dark:border-yellow-800/50">
                 <FileText className="w-3 h-3" />
                 Bill Available
               </span>
             )}
             {product?.delivery?.shippingLocations?.length > 0 && (
-              <span className="flex items-center gap-1 text-xs font-semibold text-purple-700 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded-full shadow-sm hover:scale-105 transition-transform">
+              <span className="flex items-center gap-1 text-xs font-semibold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 px-2.5 py-1 rounded-full border border-purple-200 dark:border-purple-800/50">
                 <Truck className="w-3 h-3" />
                 Shipping Available
               </span>
             )}
           </div>
 
-          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
             {product.title}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mt-1 leading-relaxed">
+          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mt-1.5 leading-relaxed">
             {product.description}
           </p>
         </div>
 
         <div className="mt-auto">
-          <div className="flex items-baseline gap-2 mb-4">
+          <div className="flex items-baseline gap-2 mb-3">
             <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               ₹{finalPrice.toFixed(2)}
             </span>
             {hasDiscount > 0 && (
-              <span className="line-through text-gray-500 dark:text-gray-400 text-base">
-                ₹{product.price.toFixed(2)}
-              </span>
-            )}
-            {hasDiscount > 0 && (
-              <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">
-                Save ₹{(product.price - finalPrice).toFixed(2)}
-              </span>
+              <>
+                <span className="line-through text-gray-500 dark:text-gray-400 text-sm">
+                  ₹{product.price.toFixed(2)}
+                </span>
+                <span className="text-emerald-600 dark:text-emerald-400 text-xs font-medium bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full">
+                  Save ₹{(product.price - finalPrice).toFixed(2)}
+                </span>
+              </>
             )}
           </div>
 
           {product.deliveryCharge > 0 && (
-            <div className="flex items-center gap-1 mb-3 text-xs text-gray-600 dark:text-gray-400">
-              <Truck size={12} />
+            <div className="flex items-center gap-2 mb-3 text-xs text-gray-600 dark:text-gray-400">
+              <Truck size={14} className="text-sky-500 dark:text-sky-400" />
               <span>Delivery: ₹{product.deliveryCharge}</span>
             </div>
           )}
@@ -361,7 +357,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
             <button
               onClick={(e) => handleChatSeller(e, product.storeId)}
               disabled={isSold}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed border border-gray-200 dark:border-neutral-800"
             >
               <MessageCircle className="h-5 w-5" />
               {isSold ? "SOLD" : "Chat with Seller"}
