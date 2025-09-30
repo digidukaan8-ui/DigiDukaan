@@ -21,6 +21,7 @@ export default function Dashboard() {
   const [buyerInfo, setBuyerInfo] = useState({
     name: "",
     username: "",
+    phone: "",
     avatarUrl: "",
   });
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
@@ -60,9 +61,10 @@ export default function Dashboard() {
         ...prev,
         name: user.name || "",
         username: user.username || "",
+        phone: user.phone || "",
         avatarUrl: user.avatar?.url || "",
       }));
-      resetProfile({ name: user.name, username: user.username });
+      resetProfile({ name: user.name, username: user.username, phone: user.phone });
     }
   }, [isAuthenticated, user, resetProfile]);
 
@@ -90,7 +92,7 @@ export default function Dashboard() {
       if (result.success) {
         toast.success("Updated profile successfully");
         useAuthStore.getState().updateProfile(result.data)
-        setBuyerInfo((prev) => ({ ...prev, name: result.data.name, username: result.data.username }));
+        setBuyerInfo((prev) => ({ ...prev, name: result.data.name, username: result.data.username, phone: result.data.phone }));
         setShowEditProfileModal(false);
       }
     } finally {
@@ -143,7 +145,7 @@ export default function Dashboard() {
   };
 
   const initials = buyerInfo.name ? buyerInfo.name.charAt(0).toUpperCase() : "U";
-  const avatarColorClass = getAvatarColorClass(buyerInfo.name || buyerInfo.username);
+  const avatarColorClass = getAvatarColorClass(buyerInfo.name || buyerInfo.username||buyerInfo.phone);
   const totalWishlistItems = wishlistData.newProductWishlist.length + wishlistData.usedProductWishlist.length;
 
   return (
@@ -167,6 +169,7 @@ export default function Dashboard() {
           <div className="flex-1 min-w-0">
             <h2 className="text-xl md:text-2xl font-bold truncate">{buyerInfo.name || "Unnamed User"}</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 truncate">@{buyerInfo.username || "username"}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">@{buyerInfo.phone || "phone"}</p>
 
             <div className="flex flex-col sm:items-center justify-center sm:justify-start gap-2 mt-3">
               <button
@@ -394,11 +397,15 @@ export default function Dashboard() {
             <div className="space-y-3">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium">Name</label>
-                <input id="name" {...registerProfile("name", { required: true })} autoComplete="name" className="p-2 border border-black dark:border-white rounded-lg bg-transparent w-full" placeholder="Name" />
+                <input id="name" {...registerProfile("name", { required: true })} autoComplete="name" className="p-2 border border-black dark:border-white rounded-lg bg-transparent w-full" placeholder="Enter Name" />
               </div>
               <div>
                 <label htmlFor="username" className="block text-sm font-medium">Username</label>
-                <input id="username" {...registerProfile("username", { required: true })} autoComplete="username" className="p-2 border border-black dark:border-white rounded-lg bg-transparent w-full" placeholder="Username" />
+                <input id="username" {...registerProfile("username", { required: true })} autoComplete="username" className="p-2 border border-black dark:border-white rounded-lg bg-transparent w-full" placeholder="Enter Username" />
+              </div>
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium">Phone Number</label>
+                <input id="phone" {...registerProfile("phone", { required: true })} autoComplete="tel" className="p-2 border border-black dark:border-white rounded-lg bg-transparent w-full" placeholder="Enter Phone Number" />
               </div>
             </div>
             <div className="mt-6 flex justify-center gap-2">

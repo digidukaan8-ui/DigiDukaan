@@ -52,6 +52,9 @@ export default function Loader() {
     changeAvatar: "Changing Avatar...",
     removeAvatar: "Removing Avatar...",
     updateProfile: "Updating Profile...",
+    creatingOrder: "Creating Order...",
+    redirecting: "Redirecting...",
+    confirmingPayment: "Confirming Payment...",
     default: "Loading...",
   };
 
@@ -92,6 +95,9 @@ export default function Loader() {
     changeAvatar: "text-purple-500",
     removeAvatar: "text-purple-500",
     updateProfile: "text-purple-500",
+    creatingOrder: "text-blue-500",
+    redirecting: "text-blue-500",
+    confirmingPayment: "text-blue-500",
     default: "text-gray-500",
   };
 

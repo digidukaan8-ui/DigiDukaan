@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 
 const handleRegister = async (req, res, next) => {
     try {
-        const { name, username, email, password, role, captchaToken } = req.body;
+        const { name, username, email, password,phone, role, captchaToken } = req.body;
 
         if (!captchaToken) {
             return res.status(400).json({ success: false, message: "Captcha token missing" });
@@ -20,7 +20,7 @@ const handleRegister = async (req, res, next) => {
             return res.status(400).json({ success: false, message: "Captcha verification failed" });
         }
 
-        if (!name || !username || !email || !password || !role) {
+        if (!name || !username || !email || !password ||!phone|| !role) {
             return res.status(400).json({ success: false, message: 'All fields are required.' });
         }
 
@@ -29,6 +29,7 @@ const handleRegister = async (req, res, next) => {
             typeof username !== 'string' ||
             typeof email !== 'string' ||
             typeof password !== 'string' ||
+            typeof phone !== 'string' ||
             typeof role !== 'string' 
         ) {
             return res.status(400).json({ success: false, message: 'Invalid input format.' });
@@ -55,6 +56,14 @@ const handleRegister = async (req, res, next) => {
             return res.status(400).json({
                 success: false,
                 message: 'Username must be 5-10 characters and contain only letters, numbers, and underscore.',
+            });
+        }
+
+        const phoneRegex = /^\+91[6-9]\d{9}$/;
+        if (!phoneRegex.test(phone)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Phone number must start with +91 and must have correct number',
             });
         }
 

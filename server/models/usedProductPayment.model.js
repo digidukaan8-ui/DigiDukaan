@@ -26,13 +26,6 @@ const usedProductPaymentSchema = new mongoose.Schema({
     },
     paymentMethod: {
         type: String,
-        enum: [
-            'CARD',
-            'NETBANKING',
-            'UPI',
-            'WALLET',
-            'OTHER'
-        ],
         default: 'OTHER'
     }
 }, { timestamps: true });

@@ -1,4 +1,4 @@
-import { Heart, Truck, MessageCircle, Edit2, Trash2, Eye, CheckCircle, DollarSign, FileText, MoreVertical, Currency, AlertTriangle } from "lucide-react";
+import { Heart, Truck, MessageCircle, Edit2, Trash2, Eye, CheckCircle, DollarSign, FileText, MoreVertical, IndianRupee, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { removeUsedProduct, addToWishlist, removeFromWishlist } from "../api/product";
@@ -8,6 +8,7 @@ import useUsedProductStore from "../store/usedProduct";
 import useAuthStore from "../store/auth";
 import useWishlistStore from "../store/wishlist";
 import useStores from "../store/stores";
+import { payNow } from "../api/payment";
 
 export default function UsedProductCard({ product, userRole = "buyer", onQuickView }) {
   const navigate = useNavigate();
@@ -31,7 +32,6 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
   const isWishlisted = productIds?.includes(product._id);
 
   const isSold = product.isSold;
-  const isPaid = product.isPaid;
 
   const handleCardClick = () => navigate(`/used-product?productId=${product._id}`);
 
@@ -124,6 +124,22 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
     }
   };
 
+  const payAmount = async () => {
+    const data = {
+      storeId: product?.storeId,
+      productId: product?._id
+    }
+    startLoading("creatingOrder");
+    try {
+      const result = await payNow(data);
+      if (result.success) {
+        startLoading('redirecting');
+      }
+    } finally {
+      stopLoading()
+    }
+  }
+
   const handleQuickView = (e) => {
     e.stopPropagation();
     onQuickView();
@@ -154,7 +170,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
   let overlayStatus = null;
   if (isSold) {
     overlayStatus = { text: "SOLD", color: "bg-green-900/70" };
-  } else if (!isPaid) {
+  } else if (!product?.paid) {
     overlayStatus = { text: "PAYMENT DUE", color: "bg-yellow-600/70" };
   }
 
@@ -253,8 +269,8 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
                     <Trash2 className="h-4 w-4" /> Delete Listing
                   </button>
                   {!product?.paid && (
-                    <button onClick={handleDeleteClick} className={getSellerButtonClass('pay')}>
-                      <Currency className="h-4 w-4" /> Pay Amount
+                    <button onClick={payAmount} className={getSellerButtonClass('pay')}>
+                      <IndianRupee className="h-4 w-4" /> Pay Amount
                     </button>
                   )}
                 </div>

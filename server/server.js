@@ -11,6 +11,7 @@ import userRouter from './routes/user.route.js';
 import buyerRouter from './routes/buyer.route.js';
 import sellerRouter from './routes/seller.route.js';
 import adminRouter from './routes/admin.route.js';
+import paymentRouter from './routes/payment.route.js';
 import chatRouter from './routes/chat.route.js';
 import http from "http";
 import { initSocket } from "./socket.js";
@@ -33,11 +34,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, 
-  max: 100, 
+  windowMs: 1 * 60 * 1000,
+  max: 100,
   message: { success: false, message: "Too many requests, try again later" },
-  standardHeaders: true, 
-  legacyHeaders: false,  
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 app.use(limiter);
@@ -53,6 +54,7 @@ app.use('/api/buyers', buyerRouter);
 app.use('/api/sellers', sellerRouter);
 app.use('/api/admins', adminRouter);
 app.use('/api/chats', chatRouter);
+app.use('/api/payments', paymentRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -63,7 +65,7 @@ const server = http.createServer(app);
 initSocket(server);
 
 server.listen(4000, () => {
-  console.log("Server running on port 3000");
+  console.log("Server running on port 4000");
 });
 
 app.listen(PORT, () => {

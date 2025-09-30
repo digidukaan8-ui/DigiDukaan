@@ -6,7 +6,7 @@ import { addUsedProduct, updateUsedProduct } from "../../api/product";
 import { useLocation, useNavigate } from "react-router-dom";
 import useStore from "../../store/store";
 import useLoaderStore from "../../store/loader";
-import useProductStore from "../../store/usedProduct";
+import useUsedProductStore from "../../store/usedProduct";
 import toast from "react-hot-toast";
 import { usedProductCategories, getUsedProductSubCategories } from "../../utils/category";
 
@@ -206,10 +206,10 @@ export default function UsedProductForm() {
 
       if (result.data.storeId === store._id) {
         if (initialData) {
-          useProductStore.getState().updateUsedProduct(result.data);
+          useUsedProductStore.getState().updateUsedProduct(result.data);
           toast.success("Used product updated successfully");
         } else {
-          useProductStore.getState().addUsedProduct(result.data);
+          useUsedProductStore.getState().addUsedProduct(result.data);
           toast.success("Used product added successfully");
         }
         navigate("/seller/store");

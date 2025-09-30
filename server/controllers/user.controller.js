@@ -13,7 +13,7 @@ dotenv.config();
 
 const registerUser = async (req, res) => {
     try {
-        const { name, username, email, password, role } = req.body;
+        const { name, username, email, password, phone, role } = req.body;
         const userExists = User.findOne({ email });
 
         if (userExists.lenght > 0) {
@@ -22,7 +22,7 @@ const registerUser = async (req, res) => {
 
         const hashedPassword = await bcryptjs.hash(password, 10);
 
-        await User.create({ name, username, email, password: hashedPassword, role });
+        await User.create({ name, username, email, password: hashedPassword, phone, role });
 
         return res.status(201).json({ success: true, message: 'User registered successfully.' });
     } catch (error) {
@@ -73,6 +73,7 @@ const loginUser = async (req, res) => {
             _id: user._id,
             name: user.name,
             username: user.username,
+            phone: user.phone,
             role: user.role,
             avatar: user.avatar
         }
@@ -390,14 +391,14 @@ const removeUserAvatar = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        const { name, username } = req.body;
+        const { name, username, phone } = req.body;
         const userId = req.user._id;
 
-        if (!name || !username) {
+        if (!name || !username || !phone) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
-        if (typeof name !== 'string' || typeof username !== 'string') {
+        if (typeof name !== 'string' || typeof username !== 'string' || typeof phone !== 'string') {
             return res.status(400).json({ success: false, message: 'Invalid input format' });
         }
 
@@ -409,9 +410,10 @@ const updateProfile = async (req, res) => {
 
         user.name = name.trim();
         user.username = username.trim();
+        user.phone = phone.trim();
         await user.save();
 
-        return res.status(200).json({ success: true, message: 'Profile updated successfully', data: { name, username } });
+        return res.status(200).json({ success: true, message: 'Profile updated successfully', data: { name, username, phone } });
     } catch (error) {
         console.error("Error in update profile controller: ", error);
         return res.status(500).json({ success: false, message: "Internal server error", error });

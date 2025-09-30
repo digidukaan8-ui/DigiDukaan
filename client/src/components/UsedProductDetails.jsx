@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Heart, Share2, Edit, Trash2, MessageCircle, ShoppingCart, ChevronLeft, ChevronRight, Play, Truck, Package, CheckCircle, XCircle, FileText, AlertTriangle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Heart, Share2, Edit, Trash2, MessageCircle, ShoppingCart, ChevronLeft, ChevronRight, Play, Truck, Package, CheckCircle, XCircle, FileText, AlertTriangle, IndianRupee } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useAuthStore from "../store/auth";
 import useUsedProductStore from "../store/usedProduct";
 import { toast } from "react-hot-toast";
@@ -8,6 +8,7 @@ import { removeUsedProduct, addToWishlist, removeFromWishlist, addToViewed, getP
 import useUsedCategoryProductStore from "../store/categoryUsedProduct";
 import useWishlistStore from "../store/wishlist";
 import useLoaderStore from '../store/loader'
+import { payNow, verifyPayment } from "../api/payment";
 
 const UsedProductDetail = ({ id }) => {
     const navigate = useNavigate();
@@ -19,6 +20,8 @@ const UsedProductDetail = ({ id }) => {
         useUsedProductStore.getState().getUsedProduct(id) ||
         useUsedCategoryProductStore.getState().getUsedProductById(id)
     );
+    const [searchParams, setSearchParams] = useSearchParams();
+    const orderId = searchParams.get("orderId");
 
     useEffect(() => {
         if (!product) {
@@ -74,6 +77,26 @@ const UsedProductDetail = ({ id }) => {
         );
     }
 
+    useEffect(() => {
+        if (!orderId) return;
+        if (product.paid) return;
+        const fetchPaymentDetail = async () => {
+            startLoading('confirmingPayment')
+            try {
+                const result = await verifyPayment(orderId, product?._id);
+                if (result.success) {
+                    useUsedProductStore.getState().updateUsedProduct(result.product);
+                    toast.success("Payment confirmed");
+                    searchParams.delete('orderId');
+                    setSearchParams(searchParams);
+                }
+            } finally {
+                stopLoading();
+            }
+        }
+        fetchPaymentDetail();
+    }, [orderId])
+
     const productIds = useWishlistStore((state) => state.wishlist.productIds);
     const isWishlisted = productIds.includes(product._id);
     const {
@@ -93,7 +116,7 @@ const UsedProductDetail = ({ id }) => {
         video,
         tags,
         isSold,
-        isPaid,
+        paid,
     } = product;
 
     const hasDiscount = discount?.percentage || discount?.amount;
@@ -182,6 +205,22 @@ const UsedProductDetail = ({ id }) => {
         }
     };
 
+    const payAmount = async () => {
+        const data = {
+            storeId: product?.storeId,
+            productId: product?._id
+        }
+        startLoading("creatingOrder");
+        try {
+            const result = await payNow(data);
+            if (result.success) {
+                startLoading('redirecting');
+            }
+        } finally {
+            stopLoading()
+        }
+    }
+
     const handleChatSeller = () => {
         if (!user?._id || !user?.name) {
             navigate(`/login`);
@@ -214,12 +253,12 @@ const UsedProductDetail = ({ id }) => {
         user.role = "buyer";
     }
 
-    const showSellerWarning = user.role === "seller" && (isSold || !isPaid);
+    const showSellerWarning = user.role === "seller" && (isSold || !paid);
 
     let warningMessage = "";
     if (isSold) {
         warningMessage = "This product is NOT VISIBLE to buyers because it is already SOLD.";
-    } else if (!isPaid) {
+    } else if (!paid) {
         warningMessage = "This product is NOT VISIBLE to buyers because PAYMENT IS PENDING.";
     }
 
@@ -545,6 +584,13 @@ const UsedProductDetail = ({ id }) => {
                                         <Trash2 className="w-4 h-4" />
                                         Delete Product
                                     </button>
+                                    {!paid && (<button
+                                        onClick={payAmount}
+                                        className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer w-40 bg-yellow-600 text-white font-semibold text-sm transition-all hover:bg-yellow-700 border border-black dark:border-white"
+                                    >
+                                        <IndianRupee className="w-4 h-4" />
+                                        Pay Amount
+                                    </button>)}
                                 </div>
                             </div>
                         )}
