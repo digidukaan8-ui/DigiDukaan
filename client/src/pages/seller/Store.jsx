@@ -122,7 +122,7 @@ export default function Store() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pb-20 pt-30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="flex flex-wrap justify-center gap-4 pb-3">
           {["new", "used"].map((tab) => (

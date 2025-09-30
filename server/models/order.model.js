@@ -13,7 +13,7 @@ const orderSchema = new mongoose.Schema({
     },
     products: [
         {
-            product: {
+            productId: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Product',
                 required: true
@@ -40,17 +40,21 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'shipped', 'delivered', 'cancelled'],
-        default: 'pending'
+        enum: ['PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
+        default: 'PENDING'
     },
     paymentStatus: {
         type: String,
-        enum: ['pending', 'paid', 'failed'],
-        default: 'pending'
+        enum: ['PENDING', 'SUCCESS', 'FAILED'],
+        default: 'PENDING'
     },
     paymentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Payment'
+    },
+    paymentMethod: {
+        type: String,
+        default: 'OTHER'
     }
 }, { timestamps: true });
 
