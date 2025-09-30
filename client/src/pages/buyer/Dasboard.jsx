@@ -5,7 +5,7 @@ import Card from "../../components/Card.jsx";
 import UsedProductCard from "../../components/UsedProductCard.jsx";
 import useAuthStore from "../../store/auth.js";
 import useCartStore from "../../store/cart.js";
-import { Heart, Package, ShoppingCart, Eye, Star, Clock, Edit3, ArrowRight, MessageSquare, User, ImageDown, XCircle, MapPin } from "lucide-react";
+import { Heart, Package, ShoppingCart, Eye, Star, Clock, Edit3, ArrowRight, MessageSquare, User, ImageDown, MapPin } from "lucide-react";
 import { getWishlistProducts, getViewedProduct } from "../../api/product.js";
 import { useNavigate } from "react-router-dom";
 import useLoaderStore from "../../store/loader.js";
@@ -51,7 +51,6 @@ export default function Dashboard() {
   });
 
   const { register: registerProfile, handleSubmit: handleSubmitProfile, reset: resetProfile } = useForm();
-
   const { register: registerAvatar, handleSubmit: handleSubmitAvatar, watch: watchAvatar, reset: resetAvatar } = useForm();
   const avatarFile = watchAvatar("avatar");
 
@@ -69,14 +68,8 @@ export default function Dashboard() {
   }, [isAuthenticated, user, resetProfile]);
 
   const avatarColors = [
-    "bg-indigo-500",
-    "bg-emerald-500",
-    "bg-rose-500",
-    "bg-yellow-500",
-    "bg-blue-500",
-    "bg-purple-500",
-    "bg-pink-500",
-    "bg-sky-500",
+    "bg-indigo-500", "bg-emerald-500", "bg-rose-500", "bg-yellow-500",
+    "bg-blue-500", "bg-purple-500", "bg-pink-500", "bg-sky-500",
   ];
 
   const getAvatarColorClass = (name) => {
@@ -145,130 +138,163 @@ export default function Dashboard() {
   };
 
   const initials = buyerInfo.name ? buyerInfo.name.charAt(0).toUpperCase() : "U";
-  const avatarColorClass = getAvatarColorClass(buyerInfo.name || buyerInfo.username||buyerInfo.phone);
+  const avatarColorClass = getAvatarColorClass(buyerInfo.name || buyerInfo.username || buyerInfo.phone);
   const totalWishlistItems = wishlistData.newProductWishlist.length + wishlistData.usedProductWishlist.length;
 
   return (
-    <div className="px-4 md:px-6 pt-30 pb-10 bg-gray-100 dark:bg-neutral-950 min-h-screen text-black dark:text-white">
-      <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow mb-10 flex flex-col md:flex-row md:items-center gap-6 border border-black dark:border-white">
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:w-1/3 text-center md:text-left relative">
-          {buyerInfo.avatarUrl ? (
-            <img
-              src={buyerInfo.avatarUrl}
-              alt={buyerInfo.name}
-              className="w-20 h-20 rounded-full object-cover flex-shrink-0"
-            />
-          ) : (
-            <div
-              className={`w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-semibold flex-shrink-0 ${avatarColorClass}`}
-            >
-              {initials}
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-950 pt-24 sm:pt-28 pb-10 px-3 sm:px-4 lg:px-6">
+      <div className="max-w-[1400px] mx-auto space-y-6">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6">
+          <div className="flex flex-col xl:flex-row xl:items-center gap-8">
+            <div className="flex items-start gap-5">
+              {buyerInfo.avatarUrl ? (
+                <img
+                  src={buyerInfo.avatarUrl}
+                  alt={buyerInfo.name}
+                  className="w-24 h-24 rounded-full object-cover flex-shrink-0"
+                />
+              ) : (
+                <div className={`w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-semibold flex-shrink-0 ${avatarColorClass}`}>
+                  {initials}
+                </div>
+              )}
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white truncate">
+                      {buyerInfo.name || "Unnamed User"}
+                    </h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">@{buyerInfo.username || "username"}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{buyerInfo.phone || "phone"}</p>
+                  </div>
+                  <button
+                    className="p-2.5 rounded-xl bg-gray-100 dark:bg-neutral-800 text-blue-600 dark:text-blue-400 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors flex-shrink-0"
+                    onClick={() => setShowEditProfileModal(true)}
+                  >
+                    <Edit3 size={20} />
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    onClick={() => navigate('/buyer/address')}
+                  >
+                    <MapPin size={16} />
+                    <span>Manage Address</span>
+                  </button>
+                  <button
+                    className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    onClick={() => setShowChangeAvatarModal(true)}
+                  >
+                    {buyerInfo.avatarUrl ? <ImageDown size={16} /> : <User size={16} />}
+                    <span>{buyerInfo.avatarUrl ? "Change Avatar" : "Add Avatar"}</span>
+                  </button>
+                </div>
+              </div>
             </div>
-          )}
 
-          <div className="flex-1 min-w-0">
-            <h2 className="text-xl md:text-2xl font-bold truncate">{buyerInfo.name || "Unnamed User"}</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">@{buyerInfo.username || "username"}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">@{buyerInfo.phone || "phone"}</p>
+            <div className="w-full xl:w-px h-px xl:h-24 bg-gray-200 dark:bg-neutral-800" />
 
-            <div className="flex flex-col sm:items-center justify-center sm:justify-start gap-2 mt-3">
-              <button
-                className="w-40 cursor-pointer bg-sky-500 hover:bg-sky-600 text-white py-2 px-4 rounded-md text-sm flex justify-center items-center gap-1 transition-colors border border-black dark:border-white"
-                onClick={() => navigate('/buyer/address')}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 xl:flex-1">
+              <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-12 h-12 bg-white dark:bg-indigo-900/40 rounded-xl flex items-center justify-center shadow-sm">
+                    <Package className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                </div>
+                <p className="text-xs font-medium text-indigo-700 dark:text-indigo-300 mb-1">Total Orders</p>
+                <h3 className="text-2xl font-bold text-indigo-900 dark:text-white">{orders.length}</h3>
+              </div>
+
+              <div className="bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-900/30 dark:to-rose-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-12 h-12 bg-white dark:bg-rose-900/40 rounded-xl flex items-center justify-center shadow-sm">
+                    <Heart className="w-6 h-6 text-rose-600 dark:text-rose-400" />
+                  </div>
+                </div>
+                <p className="text-xs font-medium text-rose-700 dark:text-rose-300 mb-1">Wishlist Items</p>
+                <h3 className="text-2xl font-bold text-rose-900 dark:text-white">{totalWishlistItems}</h3>
+              </div>
+
+              <div
+                onClick={() => navigate('/buyer/cart')}
+                className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all"
               >
-                <MapPin size={14} />
-                <span>Manage Address</span>
-              </button>
-              <button
-                className="w-40 cursor-pointer bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-md text-sm flex justify-center items-center gap-1 transition-colors border border-black dark:border-white"
-                onClick={() => setShowChangeAvatarModal(true)}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-12 h-12 bg-white dark:bg-emerald-900/40 rounded-xl flex items-center justify-center shadow-sm">
+                    <ShoppingCart className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                </div>
+                <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300 mb-1">Cart Items</p>
+                <h3 className="text-2xl font-bold text-emerald-900 dark:text-white">{getCartLength()}</h3>
+              </div>
+
+              <div
+                onClick={() => navigate('/chat')}
+                className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all"
               >
-                {buyerInfo.avatarUrl ? <ImageDown size={14} /> : <User size={14} />}
-                <span>{buyerInfo.avatarUrl ? "Change Avatar" : "Add Avatar"}</span>
-              </button>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-12 h-12 bg-white dark:bg-blue-900/40 rounded-xl flex items-center justify-center shadow-sm">
+                    <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                  </div>
+                </div>
+                <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">Active Chats</p>
+                <h3 className="text-2xl font-bold text-blue-900 dark:text-white">0</h3>
+              </div>
             </div>
           </div>
-          <button
-            className="absolute top-0 right-0 p-2 rounded-full bg-gray-200 dark:bg-neutral-800 text-sky-600 dark:text-sky-400 hover:bg-gray-300 dark:hover:bg-neutral-700 transition-colors"
-            onClick={() => setShowEditProfileModal(true)}
-          >
-            <Edit3 size={16} />
-          </button>
         </div>
 
-        <div className="w-full h-px md:h-30 md:w-px bg-black dark:bg-white md:mx-4" />
-
-        <div className="md:w-2/3">
-          <h2 className="text-xl md:text-2xl font-bold mb-4 md:hidden">Your Activity</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-indigo-50 cursor-pointer dark:bg-indigo-900/20 p-4 rounded-xl text-center border border-black dark:border-white">
-              <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-2 border border-black dark:border-white">
-                <Package className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6">
+          <div className="flex justify-between items-center mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+                <Star className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
               </div>
-              <p className="text-gray-500 dark:text-gray-400 text-xs">Orders</p>
-              <h3 className="text-lg font-bold mt-1">{orders.length}</h3>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Your Orders</h2>
             </div>
-            <div className="bg-rose-50 cursor-pointer dark:bg-rose-900/20 p-4 rounded-xl text-center border border-black dark:border-white">
-              <div className="w-10 h-10 bg-rose-100 dark:bg-rose-900/30 rounded-full flex items-center justify-center mx-auto mb-2 border border-black dark:border-white">
-                <Heart className="h-5 w-5 text-rose-600 dark:text-rose-400" />
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 text-xs">Wishlist</p>
-              <h3 className="text-lg font-bold mt-1">{totalWishlistItems}</h3>
-            </div>
-            <div
-              onClick={() => navigate('/buyer/cart')}
-              className="bg-emerald-50 cursor-pointer dark:bg-emerald-900/20 p-4 rounded-xl text-center border border-black dark:border-white">
-              <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-2 border border-black dark:border-white">
-                <ShoppingCart className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 text-xs">Cart</p>
-              <h3 className="text-lg font-bold mt-1">{getCartLength()}</h3>
-            </div>
-            <div
-              onClick={() => navigate('/chat')}
-              className="bg-blue-50 cursor-pointer dark:bg-blue-900/20 p-4 rounded-xl text-center border border-black dark:border-white">
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-2 border border-black dark:border-white">
-                <MessageSquare className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 text-xs">Chats</p>
-              <h3 className="text-lg font-bold mt-1">0</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-6">
-        <div className="bg-white dark:bg-neutral-900 p-4 md:p-6 rounded-2xl shadow border border-black dark:border-white">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2">
-              <Star className="h-5 w-5 text-green-500" />
-              Your Orders
-            </h2>
-            <a href="/orders" className="text-sm text-indigo-600 hover:underline flex items-center gap-1">
+            <a href="/orders" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
             </a>
           </div>
           {orders.length === 0 ? (
-            <div className="text-center py-8 bg-gray-50 dark:bg-neutral-800 rounded-lg">
-              <Package className="h-12 w-12 mx-auto text-gray-400" />
-              <p className="text-gray-500 dark:text-gray-400 mt-2">You have no orders yet</p>
+            <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
+              <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Package className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500 dark:text-gray-400 font-medium">No orders yet</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Start shopping to see your orders here</p>
             </div>
           ) : (
-            <div className="overflow-x-auto hide-scrollbar custom-scrollbar">
-              <div className="flex space-x-4 pb-4 w-full">
+            <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
+              <div className="flex gap-4 pb-2">
                 {orders.slice(0, 10).map((order) => (
-                  <div key={order._id} className="min-w-[300px] flex-shrink-0 bg-gray-50 dark:bg-neutral-800 rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-sm font-medium">#{order._id.slice(-6)}</span>
-                      <span className={`px-2 py-1 text-xs rounded-full capitalize ${order.status === 'delivered' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                        order.status === 'shipped' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
-                          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                        }`}>
+                  <div key={order._id} className="w-[320px] flex-shrink-0 bg-gray-50 dark:bg-neutral-800 rounded-xl p-5 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Order ID</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">#{order._id.slice(-8)}</p>
+                      </div>
+                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                        order.status === 'delivered' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' :
+                        order.status === 'shipped' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400' :
+                        'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400'
+                      }`}>
                         {order.status}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{new Date(order.createdAt).toLocaleDateString()}</p>
-                    <p className="text-lg font-bold">${order.totalAmount?.toFixed(2) || '0.00'}</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Date</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">{new Date(order.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-neutral-700">
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Amount</span>
+                        <span className="text-xl font-bold text-gray-900 dark:text-white">₹{order.totalAmount?.toFixed(2) || '0.00'}</span>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -276,26 +302,31 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 p-4 md:p-6 rounded-2xl shadow border border-black dark:border-white">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2">
-              <Heart className="h-5 w-5 text-rose-500" />
-              New Products Wishlist
-            </h2>
-            <a href="/wishlist/new" className="text-sm text-indigo-600 hover:underline flex items-center gap-1">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6">
+          <div className="flex justify-between items-center mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-rose-100 dark:bg-rose-900/30 rounded-lg flex items-center justify-center">
+                <Heart className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">New Products Wishlist</h2>
+            </div>
+            <a href="/wishlist/new" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
             </a>
           </div>
           {wishlistData.newProductWishlist.length === 0 ? (
-            <div className="text-center py-8 bg-gray-50 dark:bg-neutral-800 rounded-lg">
-              <Heart className="h-12 w-12 mx-auto text-gray-400" />
-              <p className="text-gray-500 dark:text-gray-400 mt-2">No new products in wishlist</p>
+            <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
+              <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500 dark:text-gray-400 font-medium">No items in wishlist</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Add products you love to your wishlist</p>
             </div>
           ) : (
-            <div className="overflow-x-auto hide-scrollbar custom-scrollbar">
-              <div className="flex space-x-4 pb-4">
+            <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
+              <div className="flex gap-4 pb-2">
                 {wishlistData.newProductWishlist.slice(0, 10).map((p) => (
-                  <div key={p._id} className="min-w-[300px] flex-shrink-0">
+                  <div key={p._id} className="w-[320px] flex-shrink-0">
                     <Card product={p} userRole="buyer" />
                   </div>
                 ))}
@@ -304,26 +335,31 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 p-4 md:p-6 rounded-2xl shadow border border-black dark:border-white">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2">
-              <Heart className="h-5 w-5 text-rose-500" />
-              Used Products Wishlist
-            </h2>
-            <a href="/wishlist/used" className="text-sm text-indigo-600 hover:underline flex items-center gap-1">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6">
+          <div className="flex justify-between items-center mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-rose-100 dark:bg-rose-900/30 rounded-lg flex items-center justify-center">
+                <Heart className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Used Products Wishlist</h2>
+            </div>
+            <a href="/wishlist/used" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
             </a>
           </div>
           {wishlistData.usedProductWishlist.length === 0 ? (
-            <div className="text-center py-8 bg-gray-50 dark:bg-neutral-800 rounded-lg">
-              <Heart className="h-12 w-12 mx-auto text-gray-400" />
-              <p className="text-gray-500 dark:text-gray-400 mt-2">No used products in wishlist</p>
+            <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
+              <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500 dark:text-gray-400 font-medium">No items in wishlist</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Add used products you love to your wishlist</p>
             </div>
           ) : (
-            <div className="overflow-x-auto hide-scrollbar custom-scrollbar">
-              <div className="flex space-x-4 pb-4">
+            <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
+              <div className="flex gap-4 pb-2">
                 {wishlistData.usedProductWishlist.slice(0, 10).map((p) => (
-                  <div key={p._id} className="min-w-[300px] flex-shrink-0">
+                  <div key={p._id} className="w-[320px] flex-shrink-0">
                     <UsedProductCard product={p} userRole="buyer" />
                   </div>
                 ))}
@@ -332,26 +368,31 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 p-4 md:p-6 rounded-2xl shadow border border-black dark:border-white">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2">
-              <Clock className="h-5 w-5 text-blue-500" />
-              Recently Viewed New Products
-            </h2>
-            <a href="/recently-viewed/new" className="text-sm text-indigo-600 hover:underline flex items-center gap-1">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6">
+          <div className="flex justify-between items-center mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recently Viewed New Products</h2>
+            </div>
+            <a href="/recently-viewed/new" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
             </a>
           </div>
           {viewedData.newProductViewed.length === 0 ? (
-            <div className="text-center py-8 bg-gray-50 dark:bg-neutral-800 rounded-lg">
-              <Eye className="h-12 w-12 mx-auto text-gray-400" />
-              <p className="text-gray-500 dark:text-gray-400 mt-2">No recently viewed new products</p>
+            <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
+              <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Eye className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500 dark:text-gray-400 font-medium">No recently viewed products</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Products you view will appear here</p>
             </div>
           ) : (
-            <div className="overflow-x-auto hide-scrollbar custom-scrollbar">
-              <div className="flex space-x-4 pb-4">
+            <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
+              <div className="flex gap-4 pb-2">
                 {viewedData.newProductViewed.slice(0, 10).map((p) => (
-                  <div key={p._id} className="min-w-[300px] flex-shrink-0">
+                  <div key={p._id} className="w-[320px] flex-shrink-0">
                     <Card product={p} userRole="buyer" />
                   </div>
                 ))}
@@ -360,26 +401,31 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 p-4 md:p-6 rounded-2xl shadow border border-black dark:border-white">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2">
-              <Clock className="h-5 w-5 text-blue-500" />
-              Recently Viewed Used Products
-            </h2>
-            <a href="/recently-viewed/used" className="text-sm text-indigo-600 hover:underline flex items-center gap-1">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6">
+          <div className="flex justify-between items-center mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recently Viewed Used Products</h2>
+            </div>
+            <a href="/recently-viewed/used" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
             </a>
           </div>
           {viewedData.usedProductViewed.length === 0 ? (
-            <div className="text-center py-8 bg-gray-50 dark:bg-neutral-800 rounded-lg">
-              <Eye className="h-12 w-12 mx-auto text-gray-400" />
-              <p className="text-gray-500 dark:text-gray-400 mt-2">No recently viewed used products</p>
+            <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
+              <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Eye className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500 dark:text-gray-400 font-medium">No recently viewed products</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Used products you view will appear here</p>
             </div>
           ) : (
-            <div className="overflow-x-auto hide-scrollbar custom-scrollbar">
-              <div className="flex space-x-4 pb-4">
+            <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
+              <div className="flex gap-4 pb-2">
                 {viewedData.usedProductViewed.slice(0, 10).map((p) => (
-                  <div key={p._id} className="min-w-[300px] flex-shrink-0">
+                  <div key={p._id} className="w-[320px] flex-shrink-0">
                     <UsedProductCard product={p} userRole="buyer" />
                   </div>
                 ))}
@@ -390,78 +436,110 @@ export default function Dashboard() {
       </div>
 
       {showEditProfileModal && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setShowEditProfileModal(false)} />
-          <form onSubmit={handleSubmitProfile(onProfileSubmit)} className="relative max-w-md w-full bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-lg z-10 border border-black dark:border-white">
-            <h3 className="text-xl font-bold mb-4">Edit Profile</h3>
-            <div className="space-y-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in duration-200">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Edit Profile</h3>
+            <form onSubmit={handleSubmitProfile(onProfileSubmit)} className="space-y-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium">Name</label>
-                <input id="name" {...registerProfile("name", { required: true })} autoComplete="name" className="p-2 border border-black dark:border-white rounded-lg bg-transparent w-full" placeholder="Enter Name" />
+                <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+                <input
+                  id="name"
+                  {...registerProfile("name", { required: true })}
+                  autoComplete="name"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  placeholder="Enter your full name"
+                />
               </div>
               <div>
-                <label htmlFor="username" className="block text-sm font-medium">Username</label>
-                <input id="username" {...registerProfile("username", { required: true })} autoComplete="username" className="p-2 border border-black dark:border-white rounded-lg bg-transparent w-full" placeholder="Enter Username" />
+                <label htmlFor="username" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Username</label>
+                <input
+                  id="username"
+                  {...registerProfile("username", { required: true })}
+                  autoComplete="username"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  placeholder="Enter your username"
+                />
               </div>
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium">Phone Number</label>
-                <input id="phone" {...registerProfile("phone", { required: true })} autoComplete="tel" className="p-2 border border-black dark:border-white rounded-lg bg-transparent w-full" placeholder="Enter Phone Number" />
+                <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Phone Number</label>
+                <input
+                  id="phone"
+                  {...registerProfile("phone", { required: true })}
+                  autoComplete="tel"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  placeholder="Enter your phone number"
+                />
               </div>
-            </div>
-            <div className="mt-6 flex justify-center gap-2">
-              <button type="button" className="w-32 py-2 cursor-pointer rounded-lg text-white border border-black dark:border-white bg-red-600 hover:bg-red-700 transition-colors" onClick={() => setShowEditProfileModal(false)}>Cancel</button>
-              <button type="submit" className="bg-sky-500 hover:bg-sky-600 text-white w-32 py-2 cursor-pointer rounded-lg transition-colors border border-black dark:border-white">Save Changes</button>
-            </div>
-          </form>
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  className="flex-1 py-3 rounded-xl text-white font-medium bg-gray-500 hover:bg-gray-600 transition-colors"
+                  onClick={() => setShowEditProfileModal(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors">
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
       {showChangeAvatarModal && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setShowChangeAvatarModal(false)} />
-          <form onSubmit={handleSubmitAvatar(onAvatarSubmit)} className="relative max-w-md w-full bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-lg z-10 border border-black dark:border-white">
-            <h3 className="text-xl font-bold mb-4">Change Avatar</h3>
-
-            <div className="flex flex-col items-center gap-4 mb-6">
-              {getPreviewAvatarUrl() ? (
-                <img
-                  src={getPreviewAvatarUrl()}
-                  alt="Avatar Preview"
-                  className="w-24 h-24 rounded-full object-cover"
-                />
-              ) : (
-                <div
-                  className={`w-24 h-24 rounded-full flex items-center justify-center text-white text-4xl font-semibold ${getAvatarColorClass(buyerInfo.name)}`}
-                >
-                  {initials}
-                </div>
-              )}
-            </div>
-
-            <div className="mt-4">
-              <span className="block text-sm font-medium mb-1">Choose a new avatar (max 2 MB)</span>
-              <div className="flex items-start flex-col justify-center gap-4">
-                <label htmlFor="avatar" className="cursor-pointer bg-sky-500 text-white px-4 py-2 rounded-lg hover:bg-sky-600 transition-colors border border-black dark:border-white">
-                  Choose File
-                  <input id="avatar" type="file" {...registerAvatar("avatar")} accept="image/*" className="hidden" />
-                </label>
-                {avatarFile && avatarFile.length > 0 && <p className="text-sm w-full">Selected: {avatarFile[0].name}</p>}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in duration-200">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Change Avatar</h3>
+            <form onSubmit={handleSubmitAvatar(onAvatarSubmit)}>
+              <div className="flex flex-col items-center gap-4 mb-8">
+                {getPreviewAvatarUrl() ? (
+                  <img src={getPreviewAvatarUrl()} alt="Avatar Preview" className="w-32 h-32 rounded-full object-cover shadow-lg" />
+                ) : (
+                  <div className={`w-32 h-32 rounded-full flex items-center justify-center text-white text-4xl font-semibold shadow-lg ${getAvatarColorClass(buyerInfo.name)}`}>
+                    {initials}
+                  </div>
+                )}
               </div>
-            </div>
-            <div className="mt-6 flex justify-center gap-2">
-              {buyerInfo.avatarUrl && (
+
+              <div className="mb-8">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                  Choose a new avatar (max 2 MB)
+                </label>
+                <div className="space-y-3">
+                  <label htmlFor="avatar" className="inline-block cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-medium transition-colors">
+                    Choose File
+                    <input id="avatar" type="file" {...registerAvatar("avatar")} accept="image/*" className="hidden" />
+                  </label>
+                  {avatarFile && avatarFile.length > 0 && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Selected: {avatarFile[0].name}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                {buyerInfo.avatarUrl && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveAvatar}
+                    className="flex-1 py-3 rounded-xl text-white font-medium bg-red-600 hover:bg-red-700 transition-colors"
+                  >
+                    Remove
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={handleRemoveAvatar}
-                  className="w-32 py-2 rounded-lg cursor-pointer border border-black dark:border-white text-white bg-red-600 hover:bg-red-700 transition-colors"
+                  className="flex-1 py-3 rounded-xl text-white font-medium bg-gray-500 hover:bg-gray-600 transition-colors"
+                  onClick={() => setShowChangeAvatarModal(false)}
                 >
-                  Remove Avatar
+                  Cancel
                 </button>
-              )}
-              <button type="button" className="w-32 py-2 rounded-lg cursor-pointer border border-black dark:border-white text-white bg-red-600 hover:bg-red-700 transition-colors" onClick={() => setShowChangeAvatarModal(false)}>Cancel</button>
-              <button type="submit" className="bg-sky-500 hover:bg-sky-600 text-white w-32 py-2 rounded-lg cursor-pointer transition-colors border border-black dark:border-white">Save Changes</button>
-            </div>
-          </form>
+                <button type="submit" className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors">
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

@@ -128,93 +128,121 @@ export default function QuickView({ product, type, isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-30 p-4">
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden relative border border-black dark:border-white">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-[80] p-4" onClick={onClose}>
+      <div
+        className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl w-full max-w-3xl overflow-hidden relative border border-gray-200 dark:border-neutral-800"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-gray-200 dark:bg-neutral-800 hover:bg-gray-300 dark:hover:bg-neutral-700 transition"
+          className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 transition z-10"
         >
           <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
         </button>
 
         <div className="grid md:grid-cols-2 gap-6 p-6">
-          <div className="flex justify-center items-center h-60">
+          <div className="flex justify-center items-center bg-gray-50 dark:bg-neutral-800 rounded-lg p-4">
             <img
               src={product.img?.[0]?.url}
               alt={product.title}
-              className="w-full h-50 object-cover rounded-lg border border-black dark:border-white"
+              className="w-full h-64 object-contain rounded-lg"
             />
           </div>
 
-          <div className="flex flex-col space-y-4">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="flex flex-col space-y-3">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white pr-8">
               {product.title}
             </h2>
+
             <div className="flex items-center gap-2">
               <div className="flex">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
                     className={`h-4 w-4 ${i < Math.floor(rating)
-                      ? "text-yellow-400 fill-yellow-400"
-                      : "text-gray-300 dark:text-gray-600"
+                        ? "text-yellow-400 fill-yellow-400"
+                        : "text-gray-300 dark:text-gray-600"
                       }`}
                   />
                 ))}
               </div>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {rating > 0 ? rating.toFixed(1) : "New"}
+                {rating > 0 ? `${rating.toFixed(1)} / 5` : "No ratings yet"}
               </span>
             </div>
 
-            <p className="text-gray-600 dark:text-gray-300 line-clamp-3">
+            <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
               {product.description}
             </p>
 
-            <div className="flex items-baseline gap-3">
-              <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="flex items-baseline gap-2 pt-2">
+              <span className="text-2xl font-bold text-green-600 dark:text-green-400">
                 ₹{finalPrice.toFixed(2)}
               </span>
-              {hasDiscount > 0 && (
-                <span className="line-through text-gray-500 dark:text-gray-400">
-                  ₹{product.price.toFixed(2)}
-                </span>
+              {hasDiscount && (
+                <>
+                  <span className="text-base line-through text-gray-400 dark:text-gray-500">
+                    ₹{product.price.toFixed(2)}
+                  </span>
+                  <span className="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded">
+                    {product.discount?.percentage
+                      ? `${product.discount.percentage}% OFF`
+                      : `₹${product.discount.amount} OFF`}
+                  </span>
+                </>
               )}
             </div>
 
-            <div className="flex justify-center items-center gap-3 mt-4">
+            {product.attributes && product.attributes.length > 0 && (
+              <div className="space-y-1 pt-2">
+                {product.attributes.slice(0, 3).map((attr, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-sm">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      {attr.key}:
+                    </span>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      {attr.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 pt-4">
               {type === "new" ? (
                 <button
                   onClick={() => handleCart(product._id)}
                   disabled={handleCartBtn(product._id)}
-                  className="w-full border border-black dark:border-white flex items-center cursor-pointer justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
+                  className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg font-semibold transition text-sm"
                 >
-                  <ShoppingCart className="h-5 w-5" />
-                  Add to Cart
+                  <ShoppingCart className="h-4 w-4" />
+                  {handleCartBtn(product._id) ? "Added to Cart" : "Add to Cart"}
                 </button>
               ) : (
                 <button
                   onClick={handleChatSeller}
-                  className={`flex items-center justify-center cursor-pointer border border-black dark:border-white w-60 gap-2 py-2 px-4 rounded-full font-semibold text-sm transition-all
-                      ${isWishlisted
-                      ? "bg-gray-400 text-gray-600 dark:bg-neutral-900 dark:text-gray-400 cursor-not-allowed"
-                      : "bg-sky-500 text-white hover:bg-sky-600"}`}
+                  className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-semibold transition text-sm"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  Start Chat
+                  Chat with Seller
                 </button>
               )}
               <button
                 onClick={() => handleWishList()}
-                className={`w-10 h-10 flex items-center justify-center cursor-pointer rounded-full border border-black dark:border-white transition-colors
-                ${isWishlisted
-                    ? "bg-red-100 text-red-500 dark:bg-red-900/20 dark:text-red-400"
-                    : "bg-gray-100 text-gray-600 dark:bg-neutral-900 dark:text-gray-300 hover:bg-white dark:hover:bg-neutral-900"
+                className={`p-2.5 rounded-lg border transition ${isWishlisted
+                    ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400"
+                    : "bg-gray-50 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700"
                   }`}
               >
-                <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
+                <Heart className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`} />
               </button>
             </div>
+
+            {type === "new" && product.stock && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 pt-1">
+                {product.stock > 10 ? "In Stock" : `Only ${product.stock} left`}
+              </p>
+            )}
           </div>
         </div>
       </div>

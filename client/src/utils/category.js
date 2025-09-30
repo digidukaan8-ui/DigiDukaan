@@ -149,5 +149,5 @@ export const getPriceForUsedProduct = (categoryName, subCategoryName) => {
 
 export const getUsedProductSubCategories = (categoryName) => {
   const category = usedProductCategories.find(cat => cat.name === categoryName);
-  return category ? category.subCategories.name : [];
+  return category ? category.subCategories.map(s => s.name) : [];
 };

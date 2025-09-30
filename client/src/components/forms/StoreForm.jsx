@@ -123,206 +123,200 @@ export default function StoreForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pb-20 px-4 pt-40">
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.4 }}
-        className="max-w-xl mx-auto bg-white dark:bg-neutral-900 px-6 py-8 rounded-lg border border-black dark:border-white shadow-lg"
-      >
-        <h2 className="text-2xl font-bold mb-8 text-center text-gray-900 dark:text-gray-100">
-          {initialData ? "Edit Store" : "Add New Store"}
-        </h2>
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-950 pb-20 pt-40 px-4">
+      <div className="max-w-2xl mx-auto">
+        <motion.div
+          initial={{ scale: 0.98, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="bg-white dark:bg-neutral-900 rounded-lg border border-gray-200 dark:border-neutral-800 shadow-sm p-6"
+        >
+          <h2 className="text-2xl text-center font-bold mb-6 text-gray-900 dark:text-gray-100">
+            {initialData ? "Edit Store" : "Create New Store"}
+          </h2>
 
-        <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <label
-              htmlFor="name"
-              className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
-            >
-              Store Name
-            </label>
-            <input
-              id="name"
-              {...register("name", { required: true })}
-              placeholder="Enter store name"
-              autoComplete="organization"
-              className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
-            />
-          </motion.div>
+          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-5">
+            <div>
+              <label htmlFor="name" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Store Name
+              </label>
+              <input
+                id="name"
+                {...register("name", { required: true })}
+                placeholder="Enter store name"
+                autoComplete="organization"
+                className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+              />
+            </div>
 
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <label
-              htmlFor="description"
-              className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
-            >
-              Description
-            </label>
-            <textarea
-              id="description"
-              {...register("description", { required: true })}
-              placeholder="Enter description"
-              rows="3"
-              className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
-            ></textarea>
-          </motion.div>
+            <div>
+              <label htmlFor="description" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Description
+              </label>
+              <textarea
+                id="description"
+                {...register("description", { required: true })}
+                placeholder="Enter store description"
+                rows="3"
+                className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+              ></textarea>
+            </div>
 
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <label
-              htmlFor="category"
-              className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
-            >
-              Store Category (comma separated)
-            </label>
-            <input
-              id="category"
-              {...register("category", { required: true })}
-              placeholder="e.g. Grocery, Electronics"
-              className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
-            />
-          </motion.div>
+            <div>
+              <label htmlFor="category" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Store Categories
+              </label>
+              <input
+                id="category"
+                {...register("category", { required: true })}
+                placeholder="e.g. Grocery, Electronics, Clothing"
+                className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Comma separated categories
+              </p>
+            </div>
 
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <label
-              htmlFor="img"
-              className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
-            >
-              Store Image
-            </label>
+            <div>
+              <label htmlFor="img" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Store Image
+              </label>
 
-            <input
-              id="img"
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className={`w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white ${hide ? "hidden" : ""}`}
-              required={!initialData}
-            />
+              <input
+                id="img"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className={`w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-600 dark:file:text-blue-400 file:cursor-pointer ${hide ? "hidden" : ""}`}
+                required={!initialData}
+              />
 
-            {!imagePreview ? (
-              <p className="text-sm text-gray-500">No image selected</p>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="relative inline-block"
-              >
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-40 h-40 object-cover rounded-lg border"
-                />
-                <button
-                  type="button"
-                  onClick={removeImage}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full"
-                >
-                  <FiX size={16} />
-                </button>
-              </motion.div>
-            )}
-          </motion.div>
-
-          <div>
-            <h3 className="text-lg text-center font-semibold mb-3 text-gray-900 dark:text-gray-200">
-              Addresses
-            </h3>
-            <AnimatePresence>
-              {fields.map((field, index) => (
+              {!imagePreview ? (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">No image selected</p>
+              ) : (
                 <motion.div
-                  key={field.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="p-4 mb-4 border border-black dark:border-white rounded-lg relative bg-gray-100 dark:bg-neutral-950/40"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="relative inline-block mt-2"
                 >
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="font-medium text-sm text-gray-700 dark:text-gray-200">
-                      Address {index + 1}
-                    </span>
-                    {fields.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => remove(index)}
-                        className="text-red-500 hover:text-red-600"
-                      >
-                        <FiTrash2 size={18} />
-                      </button>
-                    )}
-                  </div>
-                  <div className="space-y-3">
-                    <input
-                      {...register(`addresses.${index}.addressLine1`, {
-                        required: true,
-                      })}
-                      placeholder="Address Line 1"
-                      className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
-                    />
-                    <input
-                      {...register(`addresses.${index}.addressLine2`)}
-                      placeholder="Address Line 2 (optional)"
-                      className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
-                    />
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <input
-                        {...register(`addresses.${index}.city`, {
-                          required: true,
-                        })}
-                        placeholder="City"
-                        className="border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
-                      />
-                      <input
-                        {...register(`addresses.${index}.state`, {
-                          required: true,
-                        })}
-                        placeholder="State"
-                        className="border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
-                      />
-                      <input
-                        {...register(`addresses.${index}.pincode`, {
-                          required: true,
-                        })}
-                        placeholder="Pincode"
-                        className="border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
-                      />
-                    </div>
-                  </div>
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200 dark:border-neutral-700"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full transition"
+                  >
+                    <FiX size={14} />
+                  </button>
                 </motion.div>
-              ))}
-            </AnimatePresence>
+              )}
+            </div>
 
-            <button
-              type="button"
-              onClick={() =>
-                append({
-                  addressLine1: "",
-                  addressLine2: "",
-                  city: "",
-                  state: "",
-                  pincode: "",
-                })
-              }
-              className="flex items-center gap-2 text-sky-500 font-medium text-sm hover:underline mt-2"
-            >
-              <FiPlus /> Add Another Address
-            </button>
-          </div>
+            <div className="pt-2">
+              <h3 className="text-base font-semibold mb-3 text-gray-900 dark:text-gray-200">
+                Store Addresses
+              </h3>
+              <AnimatePresence>
+                {fields.map((field, index) => (
+                  <motion.div
+                    key={field.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="p-3 mb-3 border border-gray-200 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800/50"
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium text-xs text-gray-600 dark:text-gray-400">
+                        Address {index + 1}
+                      </span>
+                      {fields.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => remove(index)}
+                          className="text-red-500 hover:text-red-600 transition"
+                        >
+                          <FiTrash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <input
+                        {...register(`addresses.${index}.addressLine1`, {
+                          required: true,
+                        })}
+                        placeholder="Address Line 1"
+                        className="w-full border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                      />
+                      <input
+                        {...register(`addresses.${index}.addressLine2`)}
+                        placeholder="Address Line 2 (optional)"
+                        className="w-full border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                      />
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <input
+                          {...register(`addresses.${index}.city`, {
+                            required: true,
+                          })}
+                          placeholder="City"
+                          className="border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                        />
+                        <input
+                          {...register(`addresses.${index}.state`, {
+                            required: true,
+                          })}
+                          placeholder="State"
+                          className="border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                        />
+                        <input
+                          {...register(`addresses.${index}.pincode`, {
+                            required: true,
+                          })}
+                          placeholder="Pincode"
+                          className="border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
 
-          <div className="flex justify-center items-center">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05 }}
-              type="submit"
-              disabled={!formState.isDirty || formState.isSubmitting}
-              className={`w-fit py-3 px-6 border rounded font-medium text-sm transition
-              ${!formState.isDirty ? "bg-gray-400 cursor-not-allowed" : "bg-sky-600 text-white hover:bg-sky-700"}`}
-            >
-              {initialData ? "Update Details" : "Save Details"}
-            </motion.button>
-          </div>
-        </form>
-      </motion.div>
+              <button
+                type="button"
+                onClick={() =>
+                  append({
+                    addressLine1: "",
+                    addressLine2: "",
+                    city: "",
+                    state: "",
+                    pincode: "",
+                  })
+                }
+                className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium text-sm hover:underline"
+              >
+                <FiPlus size={16} /> Add Another Address
+              </button>
+            </div>
+
+            <div className="flex justify-center pt-3">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                type="submit"
+                disabled={!formState.isDirty || formState.isSubmitting}
+                className={`px-8 py-2.5 rounded-lg font-medium text-sm transition ${!formState.isDirty
+                    ? "bg-gray-300 dark:bg-neutral-700 text-gray-500 dark:text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                  }`}
+              >
+                {initialData ? "Update Store" : "Create Store"}
+              </motion.button>
+            </div>
+          </form>
+        </motion.div>
+      </div>
     </div>
   );
 }

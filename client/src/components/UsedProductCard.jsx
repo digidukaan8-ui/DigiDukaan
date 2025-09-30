@@ -228,7 +228,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
           </div>
 
           {userRole === "buyer" && !isSold && (
-            <div className="absolute top-3 right-3 z-20">
+            <div className="absolute top-3 right-3 z-[60]">
               <button
                 onClick={(e) => handleWishList(e)}
                 className={`p-2.5 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 transform hover:scale-110 

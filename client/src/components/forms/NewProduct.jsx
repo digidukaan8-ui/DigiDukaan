@@ -239,149 +239,220 @@ export default function NewProductForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pb-20 px-4 pt-40">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-2xl mx-auto bg-white dark:bg-neutral-900 px-6 py-8 rounded-lg border border-black dark:border-white shadow-lg"
-      >
-        <h2 className="text-2xl font-bold mb-8 text-center text-gray-900 dark:text-gray-100">
-          {initialData ? "Edit Product" : "Add New Product"}
-        </h2>
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-950 pb-20 pt-40 px-4">
+      <div className="max-w-3xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="bg-white dark:bg-neutral-900 rounded-lg border border-gray-200 dark:border-neutral-800 shadow-sm p-6"
+        >
+          <h2 className="text-2xl text-center font-bold mb-6 text-gray-900 dark:text-gray-100">
+            {initialData ? "Edit Product" : "Add New Product"}
+          </h2>
 
-        <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="title" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-                Product Title
-              </label>
-              <input
-                id="title"
-                autoComplete="off"
-                {...register("title", {
-                  required: "Title is required",
-                  maxLength: {
-                    value: 70,
-                    message: "Title cannot exceed 70 characters",
-                  },
-                })}
-                placeholder="Enter product title"
-                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-              />
-              {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="brand" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-                Brand Name
-              </label>
-              <input
-                id="brand"
-                autoComplete="off"
-                {...register("brand")}
-                placeholder="Enter brand name"
-                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-              Description
-            </label>
-            <textarea
-              id="description"
-              autoComplete="off"
-              {...register("description", {
-                required: "Description is required",
-                validate: (value) =>
-                  value.split(/\s+/).length <= 300 ||
-                  "Description cannot exceed 300 words",
-              })}
-              placeholder="Enter product description (max 300 words)"
-              rows="3"
-              className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-            ></textarea>
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label htmlFor="category" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-                Category
-              </label>
-              <select
-                id="category"
-                {...register("category", { required: "Category is required" })}
-                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-              >
-                {categories.map((cat, index) => (
-                  <option key={`${cat.name}-${index}`} value={cat.name}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-              {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
-            </div>
-
-            <div>
-              <label
-                htmlFor="subCategory"
-                className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
-              >
-                Sub Category
-              </label>
-              {subCategories.length > 0 ? (
-                <select
-                  id="subCategory"
-                  {...register("subCategory", { required: "Sub Category is required" })}
-                  className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-                >
-                  {subCategories.map((sub, index) => (
-                    <option key={`${sub}-${index}`} value={sub}>
-                      {sub}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <p className="text-gray-500 dark:text-gray-400">No subcategories available for this category</p>
-              )}
-              {errors.subCategory && (
-                <p className="text-red-500 text-sm mt-1">{errors.subCategory.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label
-                htmlFor="discount"
-                className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
-              >
-                Discount
-              </label>
-              <div className="flex gap-2">
-                <select
-                  {...register("discount.type")}
-                  className="border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
-                >
-                  <option value="percentage">%</option>
-                  <option value="amount">₹</option>
-                </select>
-
+          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="title" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                  Product Title
+                </label>
                 <input
-                  id="discount"
-                  type="number"
-                  step="any"
-                  {...register("discount.value")}
-                  placeholder="Value"
-                  className="w-0 flex-1 border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
+                  id="title"
+                  autoComplete="off"
+                  {...register("title", {
+                    required: "Title is required",
+                    maxLength: {
+                      value: 70,
+                      message: "Title cannot exceed 70 characters",
+                    },
+                  })}
+                  placeholder="Enter product title"
+                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                />
+                {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="brand" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                  Brand Name
+                </label>
+                <input
+                  id="brand"
+                  autoComplete="off"
+                  {...register("brand")}
+                  placeholder="Enter brand name"
+                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
                 />
               </div>
             </div>
+
             <div>
-              <label htmlFor="tags" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
+              <label htmlFor="description" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Description
+              </label>
+              <textarea
+                id="description"
+                autoComplete="off"
+                {...register("description", {
+                  required: "Description is required",
+                  validate: (value) =>
+                    value.split(/\s+/).length <= 300 ||
+                    "Description cannot exceed 300 words",
+                })}
+                placeholder="Enter product description (max 300 words)"
+                rows="3"
+                className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+              ></textarea>
+              {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="category" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                  Category
+                </label>
+                <select
+                  id="category"
+                  {...register("category", { required: "Category is required" })}
+                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                >
+                  {categories.map((cat, index) => (
+                    <option key={`${cat.name}-${index}`} value={cat.name}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category.message}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="subCategory" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                  Sub Category
+                </label>
+                {subCategories.length > 0 ? (
+                  <select
+                    id="subCategory"
+                    {...register("subCategory", { required: "Sub Category is required" })}
+                    className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                  >
+                    {subCategories.map((sub, index) => (
+                      <option key={`${sub}-${index}`} value={sub}>
+                        {sub}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">No subcategories available</p>
+                )}
+                {errors.subCategory && (
+                  <p className="text-red-500 text-xs mt-1">{errors.subCategory.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label htmlFor="price" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                  Price (₹)
+                </label>
+                <input
+                  id="price"
+                  type="number"
+                  autoComplete="off"
+                  {...register("price", { required: "Price is required" })}
+                  placeholder="Enter price"
+                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                />
+                {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="stock" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                  Stock
+                </label>
+                <input
+                  id="stock"
+                  autoComplete="off"
+                  {...register("stock", { required: "Stock is required" })}
+                  placeholder="Enter stock"
+                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                />
+                {errors.stock && <p className="text-red-500 text-xs mt-1">{errors.stock.message}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="unit" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                  Unit
+                </label>
+                <select
+                  id="unit"
+                  {...register("unit")}
+                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                >
+                  <option value="">Select unit</option>
+                  <option value="g">Gram (g)</option>
+                  <option value="kg">Kilogram (kg)</option>
+                  <option value="ml">Milliliter (ml)</option>
+                  <option value="l">Liter (l)</option>
+                  <option value="pc">Piece (pc)</option>
+                  <option value="pkt">Packet (pkt)</option>
+                  <option value="box">Box</option>
+                  <option value="doz">Dozen (doz)</option>
+                  <option value="pair">Pair</option>
+                  <option value="set">Set</option>
+                  <option value="bottle">Bottle</option>
+                  <option value="can">Can</option>
+                  <option value="jar">Jar</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="discount" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                  Discount
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    {...register("discount.type")}
+                    className="border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none text-sm"
+                  >
+                    <option value="percentage">%</option>
+                    <option value="amount">₹</option>
+                  </select>
+
+                  <input
+                    id="discount"
+                    type="number"
+                    step="any"
+                    {...register("discount.value")}
+                    placeholder="Value"
+                    className="flex-1 border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="deliveryCharge" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                  Delivery Charge (₹)
+                </label>
+                <input
+                  id="deliveryCharge"
+                  type="number"
+                  autoComplete="off"
+                  {...register("deliveryCharge")}
+                  placeholder="Enter delivery charge"
+                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Charged on product
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="tags" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
                 Tags
               </label>
               <input
@@ -389,249 +460,159 @@ export default function NewProductForm() {
                 autoComplete="off"
                 {...register("tags")}
                 placeholder="Comma separated tags"
-                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+                className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="stock" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-                Stock
+              <label htmlFor="img" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Product Images (Min 1, Max 5, 2MB each)
               </label>
               <input
-                id="stock"
-                autoComplete="off"
-                {...register("stock", { required: "Stock is required" })}
-                placeholder="Enter stock"
-                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
+                id="img"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageChange}
+                className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-600 dark:file:text-blue-400 file:cursor-pointer"
               />
-              {errors.stock && <p className="text-red-500 text-sm mt-1">{errors.stock.message}</p>}
+              <div className="flex gap-2 flex-wrap mt-3">
+                <AnimatePresence>
+                  {imagePreviews.map((img, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.2 }}
+                      className="relative"
+                    >
+                      <img
+                        src={img.url}
+                        alt="Preview"
+                        className="w-20 h-20 object-cover rounded-lg border-2 border-gray-200 dark:border-neutral-700"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(img, img._id)}
+                        className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full transition"
+                      >
+                        <FiX size={12} />
+                      </button>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
             </div>
 
             <div>
-              <label htmlFor="price" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-                Price
+              <label htmlFor="video" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
+                Product Video (Optional, Max 1, 20MB)
               </label>
-              <input
-                id="price"
-                type="number"
-                autoComplete="off"
-                {...register("price", { required: "Price is required" })}
-                placeholder="Enter price"
-                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-              />
-              {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label
-                htmlFor="unit"
-                className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300"
-              >
-                Unit
-              </label>
-              <select
-                id="unit"
-                {...register("unit")}
-                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-              >
-                <option value="">Select unit</option>
-                <option value="g">Gram (g)</option>
-                <option value="kg">Kilogram (kg)</option>
-                <option value="ml">Milliliter (ml)</option>
-                <option value="l">Liter (l)</option>
-                <option value="pc">Piece (pc)</option>
-                <option value="pkt">Packet (pkt)</option>
-                <option value="box">Box</option>
-                <option value="doz">Dozen (doz)</option>
-                <option value="pair">Pair</option>
-                <option value="set">Set</option>
-                <option value="bottle">Bottle</option>
-                <option value="can">Can</option>
-                <option value="jar">Jar</option>
-              </select>
-              {errors.unit && (
-                <p className="text-red-500 text-sm mt-1">{errors.unit.message}</p>
+              {!videoPreview ? (
+                <input
+                  id="video"
+                  type="file"
+                  accept="video/*"
+                  onChange={handleVideoChange}
+                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-600 dark:file:text-blue-400 file:cursor-pointer"
+                />
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="relative mt-2 inline-block"
+                >
+                  <video
+                    src={videoPreview}
+                    controls
+                    className="w-48 h-32 rounded-lg border-2 border-gray-200 dark:border-neutral-700"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeVideo}
+                    className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full transition"
+                  >
+                    <FiX size={12} />
+                  </button>
+                </motion.div>
               )}
             </div>
 
-            <div>
-              <label htmlFor="deliveryCharge" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-                Delivery Charge
-              </label>
-              <input
-                id="deliveryCharge"
-                type="number"
-                autoComplete="off"
-                {...register("deliveryCharge")}
-                placeholder="Enter delivery charge"
-                className="w-full border p-3 rounded focus:ring-2 focus:ring-sky-500 bg-gray-100 dark:bg-neutral-950 dark:text-white"
-              />
-              {errors.deliveryCharge && <p className="text-red-500 text-sm mt-1">{errors.deliveryCharge.message}</p>}
-              <p className="pl-0.5 text-xs text-gray-600 dark:text-gray-400 mt-1">
-                Charged on product.
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="img" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-              Product Images (Min 1, Max 5, 2MB each)
-            </label>
-            <input
-              id="img"
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageChange}
-              className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
-            />
-            <div className="flex gap-3 flex-wrap mt-3">
+            <div className="pt-2">
+              <h3 className="text-base font-semibold mb-3 text-gray-900 dark:text-gray-200">
+                Attributes
+              </h3>
               <AnimatePresence>
-                {imagePreviews.map((img, index) => (
+                {attributeFields.map((field, index) => (
                   <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.3 }}
-                    className="relative"
+                    key={field.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="p-3 mb-3 border border-gray-200 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800/50"
                   >
-                    <img
-                      src={img.url}
-                      alt="Preview"
-                      className="w-24 h-24 object-cover rounded border"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(img, img._id)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full"
-                    >
-                      <FiX size={14} />
-                    </button>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium text-xs text-gray-600 dark:text-gray-400">
+                        Attribute {index + 1}
+                      </span>
+                      {attributeFields.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeAttribute(index)}
+                          className="text-red-500 hover:text-red-600 transition"
+                        >
+                          <FiTrash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <input
+                        id={`attr-key-${field.id}`}
+                        autoComplete="off"
+                        {...register(`attributes.${index}.key`)}
+                        placeholder="Key (e.g. Color)"
+                        className="w-full border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                      />
+                      <input
+                        id={`attr-value-${field.id}`}
+                        autoComplete="off"
+                        {...register(`attributes.${index}.value`)}
+                        placeholder="Value (e.g. Red)"
+                        className="w-full border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                      />
+                    </div>
                   </motion.div>
                 ))}
               </AnimatePresence>
-            </div>
-          </div>
 
-          <div>
-            <label htmlFor="video" className="block mb-2 font-medium text-sm text-gray-700 dark:text-gray-300">
-              Product Video (Optional, Max 1, 20MB)
-            </label>
-            {!videoPreview ? (
-              <input
-                id="video"
-                type="file"
-                accept="video/*"
-                onChange={handleVideoChange}
-                className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white"
-              />
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="relative mt-2"
+              <button
+                type="button"
+                onClick={() => appendAttribute({ key: "", value: "" })}
+                className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium text-sm hover:underline"
               >
-                <video
-                  src={videoPreview}
-                  controls
-                  className="w-60 h-40 rounded border"
-                />
-                <button
-                  type="button"
-                  onClick={removeVideo}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full"
-                >
-                  <FiX size={14} />
-                </button>
-              </motion.div>
-            )}
-          </div>
+                <FiPlus size={16} /> Add Attribute
+              </button>
+            </div>
 
-          <div>
-            <h3 className="text-lg text-center font-semibold mb-3 text-gray-900 dark:text-gray-200">
-              Attributes
-            </h3>
-            <AnimatePresence>
-              {attributeFields.map((field, index) => (
-                <motion.div
-                  key={field.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                  className="p-4 mb-4 border border-black dark:border-white rounded-lg relative bg-gray-100 dark:bg-neutral-950/40"
-                >
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="font-medium text-sm text-gray-700 dark:text-gray-200">
-                      Attribute {index + 1}
-                    </span>
-                    {attributeFields.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeAttribute(index)}
-                        className="text-red-500 hover:text-red-600"
-                      >
-                        <FiTrash2 size={18} />
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row justify-center items-center gap-5">
-                    <input
-                      id={`attr-key-${field.id}`}
-                      autoComplete="off"
-                      {...register(`attributes.${index}.key`)}
-                      placeholder="Attribute Key (e.g. Color)"
-                      className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white focus:ring-2 focus:ring-sky-500"
-                    />
-                    <input
-                      id={`attr-value-${field.id}`}
-                      autoComplete="off"
-                      {...register(`attributes.${index}.value`)}
-                      placeholder="Attribute Value (e.g. Red)"
-                      className="w-full border p-3 rounded bg-gray-100 dark:bg-neutral-950 dark:text-white focus:ring-2 focus:ring-sky-500"
-                    />
-                  </div>
-                  {errors.attributes?.[index]?.key && (
-                    <p className="text-red-500 text-sm mt-1">{errors.attributes[index].key.message}</p>
-                  )}
-                  {errors.attributes?.[index]?.value && (
-                    <p className="text-red-500 text-sm mt-1">{errors.attributes[index].value.message}</p>
-                  )}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-
-            <button
-              type="button"
-              onClick={() => appendAttribute({ key: "", value: "" })}
-              className="flex items-center gap-2 text-sky-500 font-medium text-sm hover:underline mt-2"
-            >
-              <FiPlus /> Add Attribute
-            </button>
-          </div>
-
-          <div className="flex justify-center items-center">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: canUpdate ? 1.05 : 1 }}
-              type="submit"
-              disabled={!canUpdate}
-              className={`w-fit py-2 px-4 border border-black dark:border-white rounded font-medium text-sm transition
-              ${canUpdate
-                  ? "bg-sky-600 text-white hover:bg-sky-700"
-                  : "bg-gray-400 text-gray-200 cursor-not-allowed"}`}
-            >
-              {initialData ? "Update" : "Save"}
-            </motion.button>
-          </div>
-        </form>
-      </motion.div>
-    </div >
+            <div className="flex justify-center pt-3">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                type="submit"
+                disabled={!canUpdate}
+                className={`px-8 py-2.5 rounded-lg font-medium text-sm transition ${canUpdate
+                    ? "bg-blue-600 hover:bg-blue-700 text-white"
+                    : "bg-gray-300 dark:bg-neutral-700 text-gray-500 dark:text-gray-500 cursor-not-allowed"
+                  }`}
+              >
+                {initialData ? "Update Product" : "Save Product"}
+              </motion.button>
+            </div>
+          </form>
+        </motion.div>
+      </div>
+    </div>
   );
 }
