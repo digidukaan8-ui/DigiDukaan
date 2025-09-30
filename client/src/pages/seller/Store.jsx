@@ -100,12 +100,23 @@ export default function Store() {
   if (!store) {
     return (
       <div className="h-screen flex justify-center items-center bg-gray-100 dark:bg-neutral-950">
-        <p
-          onClick={() => navigate("/seller/store-details")}
-          className="text-lg cursor-pointer text-black dark:text-white font-semibold hover:underline"
-        >
-          <FiPlus /> Add your store details to get started
-        </p>
+        <div className="text-center p-8 bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-200 dark:border-neutral-800 max-w-md">
+          <div className="w-16 h-16 bg-sky-100 dark:bg-sky-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FiPlus className="text-sky-600 dark:text-sky-400 text-3xl" />
+          </div>
+          <p className="text-xl text-gray-800 dark:text-gray-200 font-semibold mb-4">
+            No Store Found
+          </p>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Add your store details to get started
+          </p>
+          <button
+            onClick={() => navigate("/seller/store-details")}
+            className="px-6 py-3 bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 text-white font-semibold rounded-xl transition-all shadow-sm hover:shadow-md"
+          >
+            Add Store Details
+          </button>
+        </div>
       </div>
     );
   }
@@ -117,14 +128,11 @@ export default function Store() {
     ? "New products marked as 'Not Available' or having zero stock will not be displayed to buyers."
     : "Used products with 'Payment Due' or marked as 'Sold' will not be displayed to general buyers.";
 
-  const warningIconColor = activeTab === "new" ? "text-yellow-600" : "text-red-600";
-  const warningBgColor = activeTab === "new" ? "bg-yellow-50 dark:bg-yellow-900/20" : "bg-red-50 dark:bg-red-900/20";
-
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pb-20 pt-30">
-      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pb-20 pt-24 md:pt-28">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
 
-        <div className="flex flex-wrap justify-center gap-4 pb-3">
+        <div className="flex flex-wrap justify-center gap-3 pb-6">
           {["new", "used"].map((tab) => (
             <button
               key={tab}
@@ -132,9 +140,9 @@ export default function Store() {
                 searchParams.set("show", tab);
                 setSearchParams(searchParams, { replace: true });
               }}
-              className={`text-base sm:text-lg cursor-pointer px-6 py-2 rounded-lg border border-black dark:border-white font-semibold transition-all duration-300 ease-in-out ${activeTab === tab
-                ? "bg-blue-600 text-white shadow-md"
-                : "bg-white dark:bg-neutral-900 text-black dark:text-white hover:bg-gray-50 dark:hover:bg-neutral-800"
+              className={`text-sm sm:text-base cursor-pointer px-6 py-3 rounded-xl font-semibold transition-all duration-200 ease-in-out shadow-sm ${activeTab === tab
+                ? "bg-sky-600 dark:bg-sky-700 text-white shadow-md scale-105"
+                : "bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800 border border-gray-200 dark:border-neutral-800"
                 }`}
             >
               {tab === "new" ? "New Products" : "Used Products"}
@@ -142,33 +150,51 @@ export default function Store() {
           ))}
         </div>
 
-        <div className={`flex items-center gap-3 mt-4 p-4 rounded-lg shadow-sm border border-black dark:border-white ${warningBgColor}`}>
-          <FiAlertTriangle className={`w-6 h-6 ${warningIconColor}`} />
-          <p className={`text-sm font-medium text-gray-800 dark:text-gray-200`}>
+        <div className={`flex items-start gap-3 p-4 rounded-xl shadow-sm border ${activeTab === "new"
+          ? "bg-yellow-50 dark:bg-yellow-900/10 border-yellow-200 dark:border-yellow-800/30"
+          : "bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800/30"
+          }`}>
+          <FiAlertTriangle className={`w-5 h-5 mt-0.5 flex-shrink-0 ${activeTab === "new" ? "text-yellow-600 dark:text-yellow-500" : "text-red-600 dark:text-red-500"}`} />
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
             {warningMessage}
           </p>
         </div>
 
         <div className="mt-8">
           {!hasProducts ? (
-            <div className="p-10 text-center bg-white dark:bg-neutral-900 rounded-xl shadow-lg border border-black dark:border-white">
-              <p className="text-xl text-gray-600 dark:text-gray-400 font-medium">
-                No {activeTab} products found in your store yet.
+            <div className="p-10 md:p-16 text-center bg-white dark:bg-neutral-900 rounded-2xl shadow-md border border-gray-200 dark:border-neutral-800">
+              <div className="w-20 h-20 bg-gray-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                <FiTag className="text-gray-400 dark:text-gray-600 text-3xl" />
+              </div>
+              <p className="text-xl text-gray-700 dark:text-gray-300 font-semibold mb-2">
+                No {activeTab} products found
+              </p>
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
+                Start adding products to your store
               </p>
               <button
                 onClick={() => navigate(activeTab === "new" ? "/seller/new-product" : "/seller/used-product")}
-                className="mt-4 text-sky-600 dark:text-sky-400 hover:underline font-semibold"
+                className="px-6 py-3 bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 text-white font-semibold rounded-xl transition-all shadow-sm hover:shadow-md"
               >
-                Click here to add your first {activeTab} product!
+                Add Your First {activeTab === "new" ? "New" : "Used"} Product
               </button>
             </div>
           ) : (
             productsToShow.map(([categoryName, productsList]) => (
               <div key={categoryName} className="mb-12">
-                <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100 border-b-2 border-sky-500 pb-2 flex items-center gap-3">
-                  <FiTag className="text-sky-500" /> {categoryName} ({productsList.length})
-                </h2>
-                <div className="flex flex-wrap justify-center md:justify-start items-baseline gap-10">
+                <div className="bg-white dark:bg-neutral-900 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-neutral-800 mb-6">
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-sky-100 dark:bg-sky-900/30 rounded-lg flex items-center justify-center">
+                      <FiTag className="text-sky-600 dark:text-sky-400 text-lg" />
+                    </div>
+                    <span>{categoryName}</span>
+                    <span className="ml-auto text-sm font-normal bg-gray-100 dark:bg-neutral-800 px-3 py-1 rounded-full text-gray-600 dark:text-gray-400">
+                      {productsList.length} {productsList.length === 1 ? 'item' : 'items'}
+                    </span>
+                  </h2>
+                </div>
+
+                <div className="flex flex-wrap justify-center md:justify-start items-baseline gap-6 md:gap-8">
                   {productsList.map((product) =>
                     activeTab === "new" ? (
                       <Card
