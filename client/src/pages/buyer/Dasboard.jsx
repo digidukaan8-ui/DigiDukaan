@@ -7,7 +7,7 @@ import useAuthStore from "../../store/auth.js";
 import useCartStore from "../../store/cart.js";
 import { Heart, Package, ShoppingCart, Eye, Star, Clock, Edit3, ArrowRight, MessageSquare, User, ImageDown, MapPin } from "lucide-react";
 import { getWishlistProducts, getViewedProduct } from "../../api/product.js";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 import useLoaderStore from "../../store/loader.js";
 import { toast } from 'react-hot-toast';
 import { changeAvatar, removeAvatar, updateProfile } from "../../api/user.js";
@@ -144,7 +144,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-neutral-950 pt-24 sm:pt-28 pb-10 px-3 sm:px-4 lg:px-6">
       <div className="max-w-[1400px] mx-auto space-y-6">
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">
           <div className="flex flex-col xl:flex-row xl:items-center gap-8">
             <div className="flex items-start gap-5">
               {buyerInfo.avatarUrl ? (
@@ -169,7 +169,7 @@ export default function Dashboard() {
                     <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{buyerInfo.phone || "phone"}</p>
                   </div>
                   <button
-                    className="p-2.5 rounded-xl bg-gray-100 dark:bg-neutral-800 text-blue-600 dark:text-blue-400 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors flex-shrink-0"
+                    className="p-2.5 rounded-xl bg-gray-100 dark:bg-neutral-800 text-blue-600 dark:text-blue-400 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors flex-shrink-0 border border-black dark:border-white cursor-pointer"
                     onClick={() => setShowEditProfileModal(true)}
                   >
                     <Edit3 size={20} />
@@ -178,14 +178,14 @@ export default function Dashboard() {
 
                 <div className="flex flex-wrap gap-2">
                   <button
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors border border-black dark:border-white cursor-pointer"
                     onClick={() => navigate('/buyer/address')}
                   >
                     <MapPin size={16} />
                     <span>Manage Address</span>
                   </button>
                   <button
-                    className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors border border-black dark:border-white cursor-pointer"
                     onClick={() => setShowChangeAvatarModal(true)}
                   >
                     {buyerInfo.avatarUrl ? <ImageDown size={16} /> : <User size={16} />}
@@ -198,7 +198,7 @@ export default function Dashboard() {
             <div className="w-full xl:w-px h-px xl:h-24 bg-gray-200 dark:bg-neutral-800" />
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 xl:flex-1">
-              <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all">
+              <div className="bg-gradient-to-br border border-black dark:border-white from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all">
                 <div className="flex items-center justify-between mb-3">
                   <div className="w-12 h-12 bg-white dark:bg-indigo-900/40 rounded-xl flex items-center justify-center shadow-sm">
                     <Package className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
@@ -208,7 +208,7 @@ export default function Dashboard() {
                 <h3 className="text-2xl font-bold text-indigo-900 dark:text-white">{orders.length}</h3>
               </div>
 
-              <div className="bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-900/30 dark:to-rose-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all">
+              <div className="bg-gradient-to-br border border-black dark:border-white from-rose-50 to-rose-100 dark:from-rose-900/30 dark:to-rose-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all">
                 <div className="flex items-center justify-between mb-3">
                   <div className="w-12 h-12 bg-white dark:bg-rose-900/40 rounded-xl flex items-center justify-center shadow-sm">
                     <Heart className="w-6 h-6 text-rose-600 dark:text-rose-400" />
@@ -220,7 +220,7 @@ export default function Dashboard() {
 
               <div
                 onClick={() => navigate('/buyer/cart')}
-                className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all"
+                className="bg-gradient-to-br border border-black dark:border-white from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="w-12 h-12 bg-white dark:bg-emerald-900/40 rounded-xl flex items-center justify-center shadow-sm">
@@ -233,7 +233,7 @@ export default function Dashboard() {
 
               <div
                 onClick={() => navigate('/chat')}
-                className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all"
+                className="bg-gradient-to-br border border-black dark:border-white from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="w-12 h-12 bg-white dark:bg-blue-900/40 rounded-xl flex items-center justify-center shadow-sm">
@@ -247,7 +247,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">
           <div className="flex justify-between items-center mb-5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
@@ -255,9 +255,9 @@ export default function Dashboard() {
               </div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Your Orders</h2>
             </div>
-            <a href="/orders" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
+            <span onClick={() => navigate('/buyer/orders', { replace: true })} className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
-            </a>
+            </span>
           </div>
           {orders.length === 0 ? (
             <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
@@ -277,11 +277,10 @@ export default function Dashboard() {
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Order ID</p>
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">#{order._id.slice(-8)}</p>
                       </div>
-                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                        order.status === 'delivered' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' :
+                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${order.status === 'delivered' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' :
                         order.status === 'shipped' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400' :
-                        'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400'
-                      }`}>
+                          'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400'
+                        }`}>
                         {order.status}
                       </span>
                     </div>
@@ -302,7 +301,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">
           <div className="flex justify-between items-center mb-5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-rose-100 dark:bg-rose-900/30 rounded-lg flex items-center justify-center">
@@ -335,7 +334,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">
           <div className="flex justify-between items-center mb-5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-rose-100 dark:bg-rose-900/30 rounded-lg flex items-center justify-center">
@@ -343,9 +342,9 @@ export default function Dashboard() {
               </div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Used Products Wishlist</h2>
             </div>
-            <a href="/wishlist/used" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
+            <span onClick={() => navigate('/buyer/wishlist', { replace: true })} className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
-            </a>
+            </span>
           </div>
           {wishlistData.usedProductWishlist.length === 0 ? (
             <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
@@ -368,7 +367,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">
           <div className="flex justify-between items-center mb-5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
@@ -376,9 +375,9 @@ export default function Dashboard() {
               </div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recently Viewed New Products</h2>
             </div>
-            <a href="/recently-viewed/new" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
+            <span onClick={() => navigate('/buyer/recently-viewed/new-product', { replace: true })} className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
-            </a>
+            </span>
           </div>
           {viewedData.newProductViewed.length === 0 ? (
             <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
@@ -401,7 +400,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">
           <div className="flex justify-between items-center mb-5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
@@ -409,9 +408,9 @@ export default function Dashboard() {
               </div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recently Viewed Used Products</h2>
             </div>
-            <a href="/recently-viewed/used" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
+            <span onClick={() => navigate('/buyer/recently-viewed/used-product', { replace: true })} className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
-            </a>
+            </span>
           </div>
           {viewedData.usedProductViewed.length === 0 ? (
             <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
@@ -436,9 +435,9 @@ export default function Dashboard() {
       </div>
 
       {showEditProfileModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="relative w-full max-w-md bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in duration-200">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Edit Profile</h3>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in duration-200 border border-black dark:border-white">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Edit Profile</h3>
             <form onSubmit={handleSubmitProfile(onProfileSubmit)} className="space-y-5">
               <div>
                 <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
@@ -446,7 +445,7 @@ export default function Dashboard() {
                   id="name"
                   {...registerProfile("name", { required: true })}
                   autoComplete="name"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full px-4 py-3 border border-black dark:border-white rounded-xl bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   placeholder="Enter your full name"
                 />
               </div>
@@ -456,7 +455,7 @@ export default function Dashboard() {
                   id="username"
                   {...registerProfile("username", { required: true })}
                   autoComplete="username"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full px-4 py-3 border border-black dark:border-white rounded-xl bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   placeholder="Enter your username"
                 />
               </div>
@@ -466,19 +465,19 @@ export default function Dashboard() {
                   id="phone"
                   {...registerProfile("phone", { required: true })}
                   autoComplete="tel"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full px-4 py-3 border border-black dark:border-white rounded-xl bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   placeholder="Enter your phone number"
                 />
               </div>
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
-                  className="flex-1 py-3 rounded-xl text-white font-medium bg-gray-500 hover:bg-gray-600 transition-colors"
+                  className="flex-1 py-3 rounded-xl text-white font-medium bg-gray-500 hover:bg-gray-600 transition-colors border border-black dark:border-white cursor-pointer"
                   onClick={() => setShowEditProfileModal(false)}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors">
+                <button type="submit" className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors border border-black dark:border-white cursor-pointer">
                   Save Changes
                 </button>
               </div>
@@ -488,9 +487,9 @@ export default function Dashboard() {
       )}
 
       {showChangeAvatarModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="relative w-full max-w-md bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in duration-200">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Change Avatar</h3>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in duration-200 border border-black dark:border-white">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Change Avatar</h3>
             <form onSubmit={handleSubmitAvatar(onAvatarSubmit)}>
               <div className="flex flex-col items-center gap-4 mb-8">
                 {getPreviewAvatarUrl() ? (
@@ -503,11 +502,11 @@ export default function Dashboard() {
               </div>
 
               <div className="mb-8">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <label htmlFor="label" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                   Choose a new avatar (max 2 MB)
                 </label>
                 <div className="space-y-3">
-                  <label htmlFor="avatar" className="inline-block cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-medium transition-colors">
+                  <label htmlFor="avatar" className="inline-block cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-medium transition-colors border border-black dark:border-white">
                     Choose File
                     <input id="avatar" type="file" {...registerAvatar("avatar")} accept="image/*" className="hidden" />
                   </label>
@@ -522,19 +521,19 @@ export default function Dashboard() {
                   <button
                     type="button"
                     onClick={handleRemoveAvatar}
-                    className="flex-1 py-3 rounded-xl text-white font-medium bg-red-600 hover:bg-red-700 transition-colors"
+                    className="flex-1 py-3 rounded-xl text-white font-medium bg-red-600 hover:bg-red-700 transition-colors border border-black dark:border-white cursor-pointer"
                   >
                     Remove
                   </button>
                 )}
                 <button
                   type="button"
-                  className="flex-1 py-3 rounded-xl text-white font-medium bg-gray-500 hover:bg-gray-600 transition-colors"
+                  className="flex-1 py-3 rounded-xl text-white font-medium bg-gray-500 hover:bg-gray-600 transition-colors border border-black dark:border-white cursor-pointer"
                   onClick={() => setShowChangeAvatarModal(false)}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors">
+                <button type="submit" className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors border border-black dark:border-white cursor-pointer">
                   Save
                 </button>
               </div>

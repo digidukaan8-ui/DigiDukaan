@@ -15,9 +15,10 @@ import Cart from "./buyer/Cart";
 import Category from "./common/Category";
 import Chat from "./common/Chat";
 import Dashboard from "./buyer/Dasboard";
+import Checkout from "./buyer/Checkout";
 import Address from "./buyer/Address";
 import SellerDashboard from "./seller/SellerDashboard";
 
 export {
-    Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct, Cart, Category, Chat, Dashboard, Address, SellerDashboard
+    Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct, Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout
 };

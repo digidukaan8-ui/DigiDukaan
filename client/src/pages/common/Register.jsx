@@ -59,7 +59,7 @@ const Register = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-md p-6 rounded-lg shadow-sm border border-gray-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 space-y-4"
+        className="w-full max-w-md p-6 rounded-lg shadow-sm border border-black dark:border-white bg-white dark:bg-neutral-900 space-y-4"
       >
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-2">Create Account</h2>
         <p className="text-sm text-center text-gray-500 dark:text-gray-400 mb-4">Sign up to get started</p>
@@ -80,7 +80,7 @@ const Register = () => {
                 message: 'Only letters and spaces allowed',
               },
             })}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+            className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
           />
           {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
         </div>
@@ -101,7 +101,7 @@ const Register = () => {
                 message: 'Only letters, numbers, and _ allowed',
               },
             })}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+            className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
           />
           {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username.message}</p>}
         </div>
@@ -121,7 +121,7 @@ const Register = () => {
                 message: 'Invalid email format',
               },
             })}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+            className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
           />
           {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
         </div>
@@ -140,7 +140,7 @@ const Register = () => {
                 minLength: { value: 8, message: 'Minimum 8 characters' },
                 maxLength: { value: 20, message: 'Maximum 20 characters' },
               })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+              className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
             />
             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
           </div>
@@ -157,7 +157,7 @@ const Register = () => {
                 required: 'Please confirm password',
                 validate: value => value === password || 'Passwords do not match',
               })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+              className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
             />
             {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
           </div>
@@ -179,7 +179,7 @@ const Register = () => {
                 message: 'Invalid phone number format',
               },
             })}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+            className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
           />
           {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
         </div>
@@ -190,7 +190,7 @@ const Register = () => {
             id="role"
             name="role"
             {...register('role', { required: 'Role is required' })}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+            className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
           >
             <option value="">Select role</option>
             <option value="buyer">Buyer</option>
@@ -205,7 +205,7 @@ const Register = () => {
 
         <button
           type="submit"
-          className="w-full py-2.5 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition text-sm"
+          className="w-full py-2.5 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition text-sm border border-black dark:border-white cursor-pointer"
         >
           Create Account
         </button>
@@ -215,7 +215,7 @@ const Register = () => {
           <button
             type="button"
             onClick={() => navigate('/login')}
-            className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+            className="text-blue-600 dark:text-blue-400 hover:underline font-medium cursor-pointer"
           >
             Login
           </button>

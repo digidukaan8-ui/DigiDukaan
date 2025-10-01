@@ -60,7 +60,7 @@ const ProductDetail = ({ id }) => {
   if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-neutral-950">
-        <div className="text-center p-8 bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-200 dark:border-neutral-800 max-w-md">
+        <div className="text-center p-8 bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-black dark:border-white max-w-md">
           <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full mx-auto mb-4 flex items-center justify-center">
             <ShoppingCart className="w-8 h-8 text-red-500 dark:text-red-400" />
           </div>
@@ -267,7 +267,7 @@ const ProductDetail = ({ id }) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           <div className="flex flex-col">
-            <div className="relative w-full mx-auto rounded-2xl overflow-hidden shadow-md bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 mb-4 flex items-center justify-center">
+            <div className="relative w-full mx-auto rounded-2xl overflow-hidden shadow-md bg-white dark:bg-neutral-900 mb-4 flex items-center justify-center">
               {video ? (
                 <video
                   src={typeof video === 'string' ? video : video.url}
@@ -286,13 +286,13 @@ const ProductDetail = ({ id }) => {
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-neutral-900/90 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-all hover:scale-110 z-10 border border-gray-200 dark:border-neutral-800"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-neutral-900/90 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-all hover:scale-110 z-10 border border-black dark:border-white"
                   >
                     <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-neutral-900/90 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-all hover:scale-110 z-10 border border-gray-200 dark:border-neutral-800"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-neutral-900/90 text-gray-800 dark:text-gray-200 rounded-full shadow-md hover:bg-white dark:hover:bg-neutral-900 transition-all hover:scale-110 z-10 border border-black dark:border-white"
                   >
                     <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                   </button>
@@ -375,7 +375,7 @@ const ProductDetail = ({ id }) => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-5 space-y-4 shadow-sm">
+            <div className="bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-2xl p-5 space-y-4 shadow-sm">
               {hasDiscount > 0 && (
                 <span className="inline-block bg-gradient-to-r from-sky-500 to-sky-600 text-white text-sm font-bold px-4 py-2 rounded-full shadow-md">
                   {discountType === "₹" && "₹"}{discountValue}{discountType === "%" && "%"} OFF
@@ -397,7 +397,7 @@ const ProductDetail = ({ id }) => {
               </p>
             </div>
 
-            <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-5 shadow-sm">
+            <div className="bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-2xl p-5 shadow-sm">
               <h2 className="text-xl font-bold mb-3">About this item</h2>
               <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                 {description}
@@ -406,19 +406,19 @@ const ProductDetail = ({ id }) => {
 
             <div className="flex flex-wrap gap-2">
               {brand && (
-                <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl px-4 py-2.5 text-sm">
+                <div className="bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-xl px-4 py-2.5 text-sm">
                   <span className="text-gray-600 dark:text-gray-400">Brand:</span>{' '}
                   <span className="font-semibold text-gray-800 dark:text-gray-200">{brand}</span>
                 </div>
               )}
               {category?.name && (
-                <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl px-4 py-2.5 text-sm">
+                <div className="bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-xl px-4 py-2.5 text-sm">
                   <span className="text-gray-600 dark:text-gray-400">Category:</span>{' '}
                   <span className="font-semibold text-gray-800 dark:text-gray-200">{category.name}</span>
                 </div>
               )}
               {subCategory?.name && (
-                <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl px-4 py-2.5 text-sm">
+                <div className="bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-xl px-4 py-2.5 text-sm">
                   <span className="text-gray-600 dark:text-gray-400">Sub-Category:</span>{' '}
                   <span className="font-semibold text-gray-800 dark:text-gray-200">{subCategory.name}</span>
                 </div>
@@ -426,13 +426,13 @@ const ProductDetail = ({ id }) => {
             </div>
 
             {attributes && attributes.length > 0 && (
-              <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-5 shadow-sm">
+              <div className="bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-2xl p-5 shadow-sm">
                 <h2 className="text-xl font-bold mb-3">Specifications</h2>
                 <div className="grid grid-cols-2 gap-2">
                   {attributes.map((attr, idx) => (
                     <div
                       key={idx}
-                      className="bg-gray-50 dark:bg-neutral-950 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-neutral-800"
+                      className="bg-gray-50 dark:bg-neutral-950 px-3 py-2.5 rounded-lg border border-black dark:border-white"
                     >
                       <span className="text-xs text-gray-600 dark:text-gray-400 block mb-0.5">{attr.key}</span>
                       <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{attr.value}</span>
@@ -459,20 +459,20 @@ const ProductDetail = ({ id }) => {
             )}
 
             {user.role === "buyer" && (
-              <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm space-y-5">
+              <div className="bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-2xl p-6 shadow-sm space-y-5">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-base">Quantity:</span>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-10 h-10 cursor-pointer rounded-full bg-gray-100 dark:bg-neutral-950 text-gray-700 dark:text-gray-300 flex items-center justify-center font-medium hover:bg-gray-200 dark:hover:bg-neutral-800 transition-colors border border-gray-200 dark:border-neutral-800"
+                      className="w-10 h-10 cursor-pointer rounded-full bg-gray-100 dark:bg-neutral-950 text-gray-700 dark:text-gray-300 flex items-center justify-center font-medium hover:bg-gray-200 dark:hover:bg-neutral-800 transition-colors border border-black dark:border-white"
                     >
                       <Minus size={16} />
                     </button>
                     <span className="w-12 text-center text-lg font-semibold">{quantity}</span>
                     <button
                       onClick={() => setQuantity(Math.min(stock, quantity + 1))}
-                      className="w-10 h-10 cursor-pointer rounded-full bg-gray-100 dark:bg-neutral-950 text-gray-700 dark:text-gray-300 flex items-center justify-center font-medium hover:bg-gray-200 dark:hover:bg-neutral-800 transition-colors border border-gray-200 dark:border-neutral-800"
+                      className="w-10 h-10 cursor-pointer rounded-full bg-gray-100 dark:bg-neutral-950 text-gray-700 dark:text-gray-300 flex items-center justify-center font-medium hover:bg-gray-200 dark:hover:bg-neutral-800 transition-colors border border-black dark:border-white"
                     >
                       <Plus size={16} />
                     </button>
@@ -485,8 +485,8 @@ const ProductDetail = ({ id }) => {
                     disabled={handleCartBtn(product._id) || stock === 0 || !isAvailable}
                     className={`flex items-center justify-center cursor-pointer w-full gap-2 py-3.5 px-6 rounded-xl font-semibold text-base transition-all shadow-sm hover:shadow-md
                       ${stock === 0 || !isAvailable
-                        ? "bg-gray-300 text-gray-600 dark:bg-neutral-800 dark:text-gray-400 cursor-not-allowed border border-gray-200 dark:border-neutral-800"
-                        : "bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 border border-gray-200 dark:border-neutral-800"}`}
+                        ? "bg-gray-300 text-gray-600 dark:bg-neutral-800 dark:text-gray-400 cursor-not-allowed border border-black dark:border-white"
+                        : "bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 border border-black dark:border-white"}`}
                   >
                     <ShoppingCart className="w-5 h-5" />
                     {stock === 0 || !isAvailable ? 'Out of Stock' : handleCartBtn(product._id) ? 'Added to Cart' : 'Add to Cart'}
@@ -495,8 +495,8 @@ const ProductDetail = ({ id }) => {
                     disabled={stock === 0 || !isAvailable}
                     className={`flex items-center justify-center cursor-pointer w-full gap-2 py-3.5 px-6 rounded-xl font-semibold text-base transition-all shadow-sm hover:shadow-md
                       ${stock === 0 || !isAvailable
-                        ? "bg-gray-300 text-gray-600 dark:bg-neutral-800 dark:text-gray-400 cursor-not-allowed border border-gray-200 dark:border-neutral-800"
-                        : "bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 border border-gray-200 dark:border-neutral-800"}`}
+                        ? "bg-gray-300 text-gray-600 dark:bg-neutral-800 dark:text-gray-400 cursor-not-allowed border border-black dark:border-white"
+                        : "bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 border border-black dark:border-white"}`}
                   >
                     <ShoppingCart className="w-5 h-5" />
                     Buy Now
@@ -509,14 +509,14 @@ const ProductDetail = ({ id }) => {
                     className={`w-12 h-12 flex items-center justify-center cursor-pointer rounded-full transition-all hover:scale-110
                       ${isWishlisted
                         ? "bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800/50"
-                        : "bg-gray-100 text-gray-600 dark:bg-neutral-950 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-800 border border-gray-200 dark:border-neutral-800"
+                        : "bg-gray-100 text-gray-600 dark:bg-neutral-950 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-800 border border-black dark:border-white"
                       }`}
                   >
                     <Heart className={`h-5 w-5 ${isWishlisted ? "fill-current" : ""}`} />
                   </button>
 
                   <button
-                    className="w-12 h-12 flex items-center justify-center cursor-pointer rounded-full bg-gray-100 text-gray-600 dark:bg-neutral-950 border border-gray-200 dark:border-neutral-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-800 transition-all hover:scale-110"
+                    className="w-12 h-12 flex items-center justify-center cursor-pointer rounded-full bg-gray-100 text-gray-600 dark:bg-neutral-950 border border-black dark:border-white dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-800 transition-all hover:scale-110"
                   >
                     <Share2 className="w-5 h-5" />
                   </button>
@@ -525,19 +525,19 @@ const ProductDetail = ({ id }) => {
             )}
 
             {user.role === "seller" && (
-              <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-2xl p-6 shadow-sm space-y-4">
                 <h2 className="text-xl font-bold">Seller Actions</h2>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => handleUpdateDetails(product)}
-                    className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl cursor-pointer bg-sky-600 text-white font-semibold text-sm transition-all hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 shadow-sm hover:shadow-md border border-gray-200 dark:border-neutral-800"
+                    className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl cursor-pointer bg-sky-600 text-white font-semibold text-sm transition-all hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 shadow-sm hover:shadow-md border border-black dark:border-white"
                   >
                     <Edit className="w-4 h-4" />
                     Edit Product
                   </button>
                   <button
                     onClick={() => handleToggleAvailability(product._id, !product.isAvailable)}
-                    className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl cursor-pointer font-semibold text-sm transition-all shadow-sm hover:shadow-md border border-gray-200 dark:border-neutral-800 ${isAvailable
+                    className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl cursor-pointer font-semibold text-sm transition-all shadow-sm hover:shadow-md border border-black dark:border-white ${isAvailable
                       ? 'bg-yellow-600 text-white hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600'
                       : 'bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600'
                       }`}
@@ -546,13 +546,13 @@ const ProductDetail = ({ id }) => {
                   </button>
                   <button
                     onClick={handleManageVariant}
-                    className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl cursor-pointer bg-purple-600 text-white font-semibold text-sm transition-all hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 shadow-sm hover:shadow-md border border-gray-200 dark:border-neutral-800"
+                    className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl cursor-pointer bg-purple-600 text-white font-semibold text-sm transition-all hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 shadow-sm hover:shadow-md border border-black dark:border-white"
                   >
                     Manage Variant
                   </button>
                   <button
                     onClick={() => handleDelete(product._id)}
-                    className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl cursor-pointer bg-red-600 text-white font-semibold text-sm transition-all hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 shadow-sm hover:shadow-md border border-gray-200 dark:border-neutral-800"
+                    className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl cursor-pointer bg-red-600 text-white font-semibold text-sm transition-all hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 shadow-sm hover:shadow-md border border-black dark:border-white"
                   >
                     <Trash2 className="w-4 h-4" />
                     Delete Product

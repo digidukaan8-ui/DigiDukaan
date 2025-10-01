@@ -178,7 +178,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
 
   return (
     <div
-      className={`bg-white dark:bg-neutral-900 rounded-2xl shadow-md hover:shadow-xl overflow-hidden flex flex-col w-full max-w-[320px] relative border border-gray-200 dark:border-neutral-800 transition-all duration-300 cursor-pointer group transform hover:-translate-y-1`}
+      className={`bg-white dark:bg-neutral-900 rounded-2xl shadow-md hover:shadow-xl overflow-hidden flex flex-col w-full max-w-[320px] relative border border-black dark:border-white transition-all duration-300 cursor-pointer group transform hover:-translate-y-1`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -231,7 +231,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
             <div className="absolute top-3 right-3 z-[60]">
               <button
                 onClick={(e) => handleWishList(e)}
-                className={`p-2.5 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 transform hover:scale-110 
+                className={`p-2.5 rounded-full shadow-md cursor-pointer backdrop-blur-sm transition-all duration-300 transform hover:scale-110 
                                     ${isWishlisted
                     ? 'bg-red-500 text-white'
                     : 'bg-white/95 dark:bg-neutral-800/95 text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500 dark:hover:text-red-400'
@@ -246,7 +246,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
             <div className="absolute top-3 right-3 z-[60]" onClick={e => e.stopPropagation()}>
               <button
                 onClick={toggleSellerMenu}
-                className={`p-2.5 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 transform hover:scale-110
+                className={`p-2.5 rounded-full shadow-md backdrop-blur-sm transition-all duration-300 transform hover:scale-110 cursor-pointer
                                     ${isSellerMenuOpen
                     ? "bg-sky-600 dark:bg-sky-700 text-white"
                     : "bg-white/95 dark:bg-neutral-800/95 text-gray-700 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-sky-900/30 hover:text-sky-600 dark:hover:text-sky-400"
@@ -282,7 +282,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
           >
             <button
               onClick={handleQuickView}
-              className={`bg-white dark:bg-neutral-900 text-gray-800 dark:text-gray-200 px-5 py-2.5 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-all duration-300 font-medium text-sm flex items-center gap-2 transform border border-gray-200 dark:border-neutral-800 ${isHovered ? 'translate-y-0' : 'translate-y-5'
+              className={`bg-white dark:bg-neutral-900 text-gray-800 dark:text-gray-200 px-5 py-2.5 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-all duration-300 font-medium text-sm flex items-center gap-2 transform border border-black dark:border-white cursor-pointer ${isHovered ? 'translate-y-0' : 'translate-y-5'
                 }`}
             >
               <Eye size={16} />
@@ -357,7 +357,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
             <button
               onClick={(e) => handleChatSeller(e, product.storeId)}
               disabled={isSold}
-              className="w-full flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed border border-gray-200 dark:border-neutral-800"
+              className="w-full flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed border border-black dark:border-white"
             >
               <MessageCircle className="h-5 w-5" />
               {isSold ? "SOLD" : "Chat with Seller"}

@@ -151,7 +151,27 @@ function Cart() {
           </div>
         ) : (
           <div className="space-y-4 sm:space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 border border-black dark:border-white">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm sm:text-base font-semibold text-blue-900 dark:text-blue-100">
+                    Keep your cart updated
+                  </p>
+                  <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300">
+                    Prices and availability may change
+                  </p>
+                </div>
+                <button
+                  onClick={fetchCartItems}
+                  className="w-40 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-md transition-colors border border-black dark:border-white"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Refresh Cart
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
               {safeCart.map((item) => {
                 const prices = calculateItemPrices(item);
 
@@ -159,12 +179,12 @@ function Cart() {
                   <div
                     key={item._id}
                     onClick={() => handleOnCLick(item.productId._id)}
-                    className="bg-white dark:bg-neutral-900 rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer overflow-hidden"
+                    className="bg-white dark:bg-neutral-900 rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer overflow-hidden border border-black dark:border-white"
                   >
-                    <div className="p-3 sm:p-4 md:p-5">
+                    <div className="relative p-3 sm:p-4 md:p-5">
                       <div className="flex gap-3 sm:gap-4">
-                        <div className="relative flex-shrink-0">
-                          <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gray-100 dark:bg-neutral-800 rounded-lg overflow-hidden">
+                        <div className="flex-shrink-0">
+                          <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gray-100 dark:bg-neutral-800 rounded-lg overflow-hidden border border-black dark:border-white">
                             {item.productId.img?.[0]?.url && (
                               <img
                                 src={item.productId.img[0].url}
@@ -173,12 +193,6 @@ function Cart() {
                               />
                             )}
                           </div>
-                          <button
-                            onClick={(e) => handleRemove(e, item._id)}
-                            className="absolute -top-2 -right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          </button>
                         </div>
 
                         <div className="flex-1 space-y-2 sm:space-y-3">
@@ -186,9 +200,12 @@ function Cart() {
                             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">
                               {item.productId.title}
                             </h3>
-                            <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 text-xs rounded">
-                              {item.productId.unit || "N/A"}
-                            </span>
+                            <div className="flex justify-start items-center gap-2">
+                              <p className="text-gray-500 dark:text-gray-400 mb-0.5">Quantity Unit:</p>
+                              <span className="px-2 py-0.5 bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 text-xs rounded border border-black dark:border-white">
+                                {item.productId.unit || "N/A"}
+                              </span>
+                            </div>
                           </div>
 
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs sm:text-sm">
@@ -225,8 +242,8 @@ function Cart() {
                           </div>
 
                           <div className="flex flex-wrap items-center gap-2">
-                            <label 
-                              htmlFor={`qty-${item._id}`} 
+                            <label
+                              htmlFor={`qty-${item._id}`}
                               className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300"
                             >
                               Quantity:
@@ -240,19 +257,19 @@ function Cart() {
                                 onClick={(e) => e.stopPropagation()}
                                 onChange={(e) => setQuantities({ ...quantities, [item._id]: parseInt(e.target.value) || 0 })}
                                 disabled={!editing[item._id]}
-                                className="w-16 sm:w-20 px-2 py-1.5 text-sm text-center border border-gray-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-16 sm:w-20 px-2 py-1.5 text-sm text-center border border-black dark:border-white rounded-lg bg-white dark:bg-neutral-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                               />
                               {editing[item._id] ? (
                                 <>
                                   <button
                                     onClick={(e) => handleUpdate(e, item._id)}
-                                    className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                                    className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors border border-black dark:border-white"
                                   >
                                     <Check className="w-4 h-4" />
                                   </button>
                                   <button
                                     onClick={(e) => handleCancel(e, item._id)}
-                                    className="p-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                                    className="p-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors border border-black dark:border-white"
                                   >
                                     <X className="w-4 h-4" />
                                   </button>
@@ -263,7 +280,7 @@ function Cart() {
                                     e.stopPropagation();
                                     setEditing({ ...editing, [item._id]: true })
                                   }}
-                                  className="p-2 bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 text-gray-800 dark:text-white rounded-lg transition-colors"
+                                  className="p-2 bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 text-gray-800 dark:text-white rounded-lg transition-colors border border-black dark:border-white"
                                 >
                                   <Pencil className="w-4 h-4" />
                                 </button>
@@ -272,49 +289,34 @@ function Cart() {
                           </div>
                         </div>
                       </div>
+                      <button
+                        onClick={(e) => handleRemove(e, item._id)}
+                        className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition-colors border border-black dark:border-white"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      </button>
                     </div>
                   </div>
                 );
               })}
             </div>
-
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div className="flex items-start gap-2">
-                  <RefreshCw className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5 w-4 h-4 sm:w-5 sm:h-5" />
-                  <div>
-                    <p className="text-sm sm:text-base font-semibold text-blue-900 dark:text-blue-100">
-                      Keep your cart updated
-                    </p>
-                    <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300">
-                      Prices and availability may change
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={fetchCartItems}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-md transition-colors"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Refresh Cart
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-neutral-900 rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-5 md:p-6">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            
+            <div className="bg-white dark:bg-neutral-900 rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-5 md:p-6 border border-black dark:border-white">
+              <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                     Grand Total
                   </p>
-                  <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1">
+                  <p className="text-lg sm:text-xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1">
                     ₹{grandTotal.toFixed(2)}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     *Additional charges may apply at checkout
                   </p>
                 </div>
-                <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-lg font-semibold rounded-lg shadow-lg transition-colors">
+                <button
+                  onClick={() => navigate('/buyer/checkout', { replace: true })}
+                  className="w-40 flex items-center justify-center gap-2 px-5 py-3 bg-sky-600 hover:bg-sky-700 text-white text-base sm:text-lg font-semibold rounded-lg shadow-lg transition-colors border border-black dark:border-white">
                   Checkout
                   <ArrowRight className="w-5 h-5" />
                 </button>

@@ -110,7 +110,7 @@ const Home = () => {
 
                   <div className="flex items-start justify-start gap-4 sm:gap-6 pt-2 overflow-x-auto hide-scrollbar scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent px-4 sm:px-0">
                     {products.map((product) => (
-                      <div key={product._id} className="flex-shrink-0 w-[300px]">
+                      <div key={product._id} className="flex-shrink-0 w-[320px]">
                         {activeTab === "used" ? (
                           <UsedProductCard
                             product={product}

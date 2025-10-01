@@ -140,9 +140,9 @@ export default function Store() {
                 searchParams.set("show", tab);
                 setSearchParams(searchParams, { replace: true });
               }}
-              className={`text-sm sm:text-base cursor-pointer px-6 py-3 rounded-xl font-semibold transition-all duration-200 ease-in-out shadow-sm ${activeTab === tab
+              className={`text-sm sm:text-base cursor-pointer px-6 py-3 rounded-xl font-semibold transition-all duration-200 ease-in-out shadow-sm border border-black dark:border-white ${activeTab === tab
                 ? "bg-sky-600 dark:bg-sky-700 text-white shadow-md scale-105"
-                : "bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800 border border-gray-200 dark:border-neutral-800"
+                : "bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800"
                 }`}
             >
               {tab === "new" ? "New Products" : "Used Products"}
@@ -150,9 +150,9 @@ export default function Store() {
           ))}
         </div>
 
-        <div className={`flex items-start gap-3 p-4 rounded-xl shadow-sm border ${activeTab === "new"
-          ? "bg-yellow-50 dark:bg-yellow-900/10 border-yellow-200 dark:border-yellow-800/30"
-          : "bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800/30"
+        <div className={`flex items-start gap-3 p-4 rounded-xl shadow-sm border border-black dark:border-white ${activeTab === "new"
+          ? "bg-yellow-50 dark:bg-yellow-900/10"
+          : "bg-red-50 dark:bg-red-900/10"
           }`}>
           <FiAlertTriangle className={`w-5 h-5 mt-0.5 flex-shrink-0 ${activeTab === "new" ? "text-yellow-600 dark:text-yellow-500" : "text-red-600 dark:text-red-500"}`} />
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -174,7 +174,7 @@ export default function Store() {
               </p>
               <button
                 onClick={() => navigate(activeTab === "new" ? "/seller/new-product" : "/seller/used-product")}
-                className="px-6 py-3 bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 text-white font-semibold rounded-xl transition-all shadow-sm hover:shadow-md"
+                className="px-6 py-3 bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 text-white font-semibold rounded-xl transition-all shadow-sm hover:shadow-md cursor-pointer"
               >
                 Add Your First {activeTab === "new" ? "New" : "Used"} Product
               </button>
@@ -182,7 +182,7 @@ export default function Store() {
           ) : (
             productsToShow.map(([categoryName, productsList]) => (
               <div key={categoryName} className="mb-12">
-                <div className="bg-white dark:bg-neutral-900 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-neutral-800 mb-6">
+                <div className="bg-white dark:bg-neutral-900 rounded-xl p-4 shadow-sm mb-6 border border-black dark:border-white">
                   <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-3">
                     <div className="w-10 h-10 bg-sky-100 dark:bg-sky-900/30 rounded-lg flex items-center justify-center">
                       <FiTag className="text-sky-600 dark:text-sky-400 text-lg" />

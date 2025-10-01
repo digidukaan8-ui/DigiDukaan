@@ -38,10 +38,12 @@ export default function Location() {
     const formRef = useRef(null);
 
     const [selectedFields, setSelectedFields] = useState(INITIAL_EDITABLE_FIELDS);
+    
+    const initialLocationRef = useRef(location);
+    const initialSelectedFieldsRef = useRef(INITIAL_EDITABLE_FIELDS);
 
-    const locationToArray = (loc) => {
-        const keys = ["city", "state", "pincode", "district", "locality", "country"];
-        return keys.map(k => loc[k]).filter(Boolean);
+    const locationToArray = (loc, fields = selectedFields) => {
+        return fields.map(k => loc[k]).filter(Boolean);
     };
 
     const normalizeLocationData = (data) => {
@@ -64,10 +66,9 @@ export default function Location() {
         try {
             const fetchProductsAndUpdateStores = async (locData) => {
                 const normalizedData = normalizeLocationData(locData);
-
                 startLoading('fetching');
                 try {
-                    const data = await getProducts(locationToArray(normalizedData));
+                    const data = await getProducts(locationToArray(normalizedData, selectedFields));
                     if (data.success) {
                         toast.success("Products fetched successfully");
                         useStores.getState().clearStores();
@@ -126,17 +127,23 @@ export default function Location() {
             stopLoading();
             setIsFetching(false);
         }
-    }, [location, isFetching, setLocation, setEditedLocation, startLoading, stopLoading]);
+    }, [location, isFetching, setLocation, setEditedLocation, startLoading, stopLoading, selectedFields]);
 
     useEffect(() => {
         fetchLocation();
     }, [fetchLocation]);
 
+    const checkChanges = useCallback((currentEditedLocation, currentSelectedFields) => {
+        const locationValuesChanged = JSON.stringify(initialLocationRef.current) !== JSON.stringify(currentEditedLocation);
+        const fieldsChanged = JSON.stringify(initialSelectedFieldsRef.current.slice().sort()) !== JSON.stringify(currentSelectedFields.slice().sort());
+        return locationValuesChanged || fieldsChanged;
+    }, []);
+
     const cancelEditing = useCallback(() => {
         setEditedLocation(location);
         setShowForm(false);
         setIsEdited(false);
-        setSelectedFields(INITIAL_EDITABLE_FIELDS);
+        setSelectedFields(initialSelectedFieldsRef.current);
     }, [location, setEditedLocation]);
 
     useEffect(() => {
@@ -156,33 +163,41 @@ export default function Location() {
     }, [showForm, cancelEditing]);
 
     const handleChange = (field, value) => {
-        setEditedLocation({ ...editedLocation, [field]: value });
-        setIsEdited(true);
+        const newEditedLocation = { ...editedLocation, [field]: value };
+        setEditedLocation(newEditedLocation);
+        setIsEdited(checkChanges(newEditedLocation, selectedFields));
     };
 
     const applyChanges = async () => {
-        const hasChanged = JSON.stringify(location) !== JSON.stringify(editedLocation);
-        if (hasChanged) {
-            setLocation(editedLocation);
+        if (!checkChanges(editedLocation, selectedFields)) {
+            setIsEdited(false);
             setShowForm(false);
-            toast.success("Location updated successfully");
-            startLoading('fetching');
-            try {
-                const data = await getProducts(locationToArray(editedLocation));
-                if (data.success) {
-                    toast.success("Products fetched successfully");
-                    useStores.getState().clearStores();
-                    useStores.getState().addStores(data.stores);
-                    useCategoryProductStore.getState().clearCategories();
-                    useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
-                    useUsedCategoryProductStore.getState().clearUsedCategories();
-                    useUsedCategoryProductStore.getState().setAllUsedCategories(data.usedProductsByCategory);
-                }
-            } finally {
-                stopLoading();
-            }
+            return;
         }
+        
+        initialLocationRef.current = editedLocation;
+        initialSelectedFieldsRef.current = selectedFields;
+
+        setLocation(editedLocation);
+        setShowForm(false);
+        toast.success("Location updated successfully");
         setIsEdited(false);
+        
+        startLoading('fetching');
+        try {
+            const data = await getProducts(locationToArray(editedLocation, selectedFields));
+            if (data.success) {
+                toast.success("Products fetched successfully");
+                useStores.getState().clearStores();
+                useStores.getState().addStores(data.stores);
+                useCategoryProductStore.getState().clearCategories();
+                useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
+                useUsedCategoryProductStore.getState().clearUsedCategories();
+                useUsedCategoryProductStore.getState().setAllUsedCategories(data.usedProductsByCategory);
+            }
+        } finally {
+            stopLoading();
+        }
     };
 
     const handleRefresh = () => {
@@ -197,25 +212,18 @@ export default function Location() {
         setShowForm(prev => {
             if (prev) {
                 cancelEditing();
+            } else {
+                initialLocationRef.current = editedLocation;
+                initialSelectedFieldsRef.current = selectedFields;
+                setIsEdited(false);
             }
             return !prev;
         });
     };
 
     const renderLocationText = () => {
-        const parts = [];
-        if (editedLocation.state) parts.push(editedLocation.state);
-        if (editedLocation.city) parts.push(editedLocation.city);
-        if (editedLocation.pincode) parts.push(editedLocation.pincode);
-
-        const fallbackKeys = ["country", "district", "town", "village", "locality"];
-        for (const key of fallbackKeys) {
-            if (editedLocation[key] && !parts.includes(editedLocation[key])) {
-                parts.push(editedLocation[key]);
-            }
-        }
-
-        return parts.slice(0, 3).join(", ");
+        const parts = locationToArray(editedLocation, selectedFields);
+        return parts.join(", ");
     };
 
     const handleClickOutsideTooltip = useCallback(() => setShowTooltip(false), []);
@@ -226,16 +234,21 @@ export default function Location() {
 
     const handleFieldSelection = (key) => {
         setSelectedFields(prev => {
+            let newFields;
             if (prev.includes(key)) {
                 if (prev.length === 1) return prev;
-                return prev.filter(f => f !== key);
+                newFields = prev.filter(f => f !== key);
             } else {
                 if (prev.length >= 3) {
                     toast.error("You can select a maximum of 3 fields.");
                     return prev;
                 }
-                return [...prev, key];
+                newFields = [...prev, key];
             }
+            
+            setIsEdited(checkChanges(editedLocation, newFields));
+            
+            return newFields;
         });
     };
 
@@ -257,7 +270,7 @@ export default function Location() {
                         type="text"
                         value={editedLocation[fieldKey] || ""}
                         onChange={(e) => handleChange(fieldKey, e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                        className="w-full pl-10 pr-4 py-2.5 border border-black dark:border-white rounded-lg bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                         placeholder={`Enter ${fieldInfo.label.toLowerCase()}`}
                         autoComplete="off"
                     />
@@ -270,7 +283,7 @@ export default function Location() {
         <div className="w-full bg-gray-100 dark:bg-neutral-950 flex flex-col items-center pt-20">
             <div className="w-full max-w-7xl mx-auto px-4 py-4">
                 {Object.keys(location).length > 0 ? (
-                    <div className="w-full max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl px-5 py-3.5 shadow-md gap-4">
+                    <div className="w-full max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-xl px-5 py-3.5 shadow-md gap-4">
 
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                             <div className="p-2 bg-sky-50 dark:bg-sky-900/20 rounded-lg">
@@ -300,14 +313,14 @@ export default function Location() {
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={toggleForm}
-                                className="flex items-center gap-1.5 text-sm text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors bg-sky-50 dark:bg-sky-900/20 px-3 py-2 rounded-lg font-medium"
+                                className="flex items-center cursor-pointer gap-1.5 text-sm text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors bg-sky-50 dark:bg-sky-900/20 px-3 py-2 rounded-lg font-medium border border-black dark:border-white"
                             >
                                 <Edit size={16} /> Edit
                             </button>
                             <button
                                 onClick={handleRefresh}
                                 disabled={isFetching}
-                                className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-wait font-medium transition-colors"
+                                className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-neutral-950 hover:bg-white dark:hover:bg-neutral-900 disabled:opacity-50 disabled:cursor-wait font-medium transition-colors border border-black dark:border-white cursor-pointer"
                             >
                                 <RefreshCw size={16} className={isFetching ? "animate-spin" : ""} />
                                 Refresh
@@ -325,22 +338,22 @@ export default function Location() {
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                     <div
                         ref={formRef}
-                        className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-neutral-800 hide-scrollbar"
+                        className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-black dark:border-white hide-scrollbar"
                     >
-                        <div className="sticky top-0 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800 px-6 py-4 flex justify-between items-center z-20">
+                        <div className="sticky top-0 bg-white dark:bg-neutral-900 border-b border-black dark:border-white px-6 py-4 flex justify-between items-center z-20">
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                                 Customize Location Filter
                             </h3>
                             <button
                                 onClick={cancelEditing}
-                                className="p-2 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800"
+                                className="p-2 text-gray-500 cursor-pointer hover:text-gray-800 dark:text-gray-400 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800"
                             >
                                 <X size={20} />
                             </button>
                         </div>
 
                         <div className="p-6 space-y-6">
-                            <div className="p-4 rounded-xl bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800/50">
+                            <div className="p-4 rounded-xl bg-sky-50 dark:bg-sky-900/20 border border-black dark:border-white">
                                 <h4 className="text-sm font-bold text-sky-900 dark:text-sky-300 mb-3 flex items-center gap-2">
                                     <MapPin size={16} />
                                     Select Location Fields (1-3)
@@ -360,7 +373,7 @@ export default function Location() {
                                                 className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium border transition-all duration-200
                                                 ${isSelected
                                                         ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
-                                                        : 'bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-neutral-700 hover:border-sky-500 hover:text-sky-600 dark:hover:text-sky-400 disabled:opacity-40 disabled:cursor-not-allowed'
+                                                        : 'bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-300 border-black dark:border-white hover:border-sky-500 hover:text-sky-600 dark:hover:text-sky-400 disabled:opacity-40 disabled:cursor-not-allowed'
                                                     }`}
                                             >
                                                 {field.icon}
@@ -375,17 +388,17 @@ export default function Location() {
                                 {selectedFields.map(key => renderField(key))}
                             </div>
 
-                            <div className="p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg text-xs text-gray-600 dark:text-gray-400">
+                            <div className="p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg text-xs text-gray-600 dark:text-gray-400 border border-black dark:border-white">
                                 <span className="font-semibold text-gray-900 dark:text-gray-100">Active Filter: </span>
-                                {locationToArray(editedLocation).join(", ") || "No values entered yet"}
+                                {locationToArray(editedLocation, selectedFields).join(", ") || "No values entered yet"}
                             </div>
                         </div>
 
                         <div className="sticky bottom-0 bg-white dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-800 px-6 py-4 flex justify-center">
                             <button
                                 onClick={applyChanges}
-                                disabled={!isEdited || locationToArray(editedLocation).length === 0}
-                                className="w-fit px-6 py-3 bg-sky-600 text-white rounded-lg font-semibold hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                                disabled={!isEdited || locationToArray(editedLocation, selectedFields).length === 0}
+                                className="w-fit px-6 py-3 bg-sky-600 text-white rounded-lg cursor-pointer font-semibold hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm border border-black dark:border-white"
                             >
                                 Apply Changes
                             </button>

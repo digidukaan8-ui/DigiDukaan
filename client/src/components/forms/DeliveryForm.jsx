@@ -90,7 +90,7 @@ const DeliveryForm = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-neutral-950 pb-20 pt-40 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="max-w-md mx-auto bg-white dark:bg-neutral-900 rounded-lg shadow-sm border border-gray-200 dark:border-neutral-800 p-6 mb-8">
+        <div className="max-w-md mx-auto bg-white dark:bg-neutral-900 rounded-lg shadow-sm border border-black dark:border-white p-6 mb-8">
           <div className="flex justify-center items-center gap-2 mb-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               {editId ? "Edit Zone" : "Add Zone"}
@@ -107,7 +107,7 @@ const DeliveryForm = () => {
                 {...register("deliveryArea", { required: true })}
                 defaultValue="city"
                 autoComplete="off"
-                className="w-full rounded-lg px-3 py-2 bg-gray-50 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition capitalize text-sm"
+                className="w-full rounded-lg px-3 py-2 bg-gray-50 dark:bg-neutral-800 border border-black dark:border-white text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition capitalize text-sm"
               >
                 {options.map((opt) => (
                   <option key={opt} value={opt}>{opt}</option>
@@ -125,7 +125,7 @@ const DeliveryForm = () => {
                 {...register("areaName", { required: true })}
                 placeholder="Enter area name"
                 autoComplete="address-level2"
-                className="w-full rounded-lg px-3 py-2 bg-gray-50 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+                className="w-full rounded-lg px-3 py-2 bg-gray-50 dark:bg-neutral-800 border border-black dark:border-white text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
               />
             </div>
 
@@ -138,7 +138,7 @@ const DeliveryForm = () => {
                 type="number"
                 {...register("deliveryCharge", { required: true })}
                 placeholder="Enter delivery charge"
-                className="w-full rounded-lg px-3 py-2 bg-gray-50 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+                className="w-full rounded-lg px-3 py-2 bg-gray-50 dark:bg-neutral-800 border border-black dark:border-white text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
               />
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Applied to all deliveries in this zone
@@ -148,7 +148,7 @@ const DeliveryForm = () => {
             <div className="flex gap-2 pt-2">
               <button
                 type="submit"
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm border border-black dark:border-white cursor-pointer"
               >
                 {editId ? "Update" : "Add Zone"}
               </button>
@@ -168,7 +168,7 @@ const DeliveryForm = () => {
           </form>
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-sm border border-gray-200 dark:border-neutral-800 p-6">
+        <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-sm border border-black dark:border-white p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
@@ -197,7 +197,7 @@ const DeliveryForm = () => {
               {deliveryZone.map((zone) => (
                 <div
                   key={zone._id}
-                  className="bg-gray-50 dark:bg-neutral-800 rounded-lg p-4 border border-gray-200 dark:border-neutral-700 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+                  className="bg-gray-50 dark:bg-neutral-800 rounded-lg p-4 border border-black dark:border-white hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded capitalize border border-blue-200 dark:border-blue-800">
@@ -207,14 +207,14 @@ const DeliveryForm = () => {
                       <button
                         type="button"
                         onClick={() => handleEdit(zone)}
-                        className="p-1.5 rounded bg-white dark:bg-neutral-900 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                        className="p-1.5 rounded cursor-pointer bg-white dark:bg-neutral-900 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                       >
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
                         type="button"
                         onClick={() => handleRemove(zone._id)}
-                        className="p-1.5 rounded bg-white dark:bg-neutral-900 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        className="p-1.5 rounded cursor-pointer bg-white dark:bg-neutral-900 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>

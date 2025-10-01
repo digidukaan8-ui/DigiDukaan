@@ -222,7 +222,7 @@ function SellerDashboard() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
                     <button
                         onClick={() => setShowEditProfileModal(true)}
-                        className="group cursor-pointer bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-transparent hover:border-sky-500 dark:hover:border-sky-400"
+                        className="group cursor-pointer bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-black dark:border-white hover:border-sky-500 dark:hover:border-sky-400"
                     >
                         <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <FiUser className="w-6 h-6 text-sky-600 dark:text-sky-400" />
@@ -232,7 +232,7 @@ function SellerDashboard() {
 
                     <button
                         onClick={() => setShowChangeAvatarModal(true)}
-                        className="group cursor-pointer bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-transparent hover:border-emerald-500 dark:hover:border-emerald-400"
+                        className="group cursor-pointer bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-black dark:border-white hover:border-emerald-500 dark:hover:border-emerald-400"
                     >
                         <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <FiImage className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
@@ -242,7 +242,7 @@ function SellerDashboard() {
 
                     <button
                         onClick={() => navigate("/seller/store-details", { state: { initialData: store } })}
-                        className="group cursor-pointer bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-transparent hover:border-indigo-500 dark:hover:border-indigo-400"
+                        className="group cursor-pointer bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-black dark:border-white hover:border-indigo-500 dark:hover:border-indigo-400"
                     >
                         <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <FiFileText className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
@@ -252,7 +252,7 @@ function SellerDashboard() {
 
                     <button
                         onClick={() => navigate("/seller/new-product")}
-                        className="group cursor-pointer bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-transparent hover:border-green-500 dark:hover:border-green-400"
+                        className="group cursor-pointer bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-black dark:border-white hover:border-green-500 dark:hover:border-green-400"
                     >
                         <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <FiPackage className="w-6 h-6 text-green-600 dark:text-green-400" />
@@ -262,7 +262,7 @@ function SellerDashboard() {
 
                     <button
                         onClick={() => navigate("/seller/used-product")}
-                        className="group cursor-pointer bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-transparent hover:border-purple-500 dark:hover:border-purple-400"
+                        className="group cursor-pointer bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-black dark:border-white hover:border-purple-500 dark:hover:border-purple-400"
                     >
                         <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <FiBox className="w-6 h-6 text-purple-600 dark:text-purple-400" />
@@ -272,7 +272,7 @@ function SellerDashboard() {
 
                     <button
                         onClick={() => navigate("/seller/delivery-zone")}
-                        className="group cursor-pointer bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-transparent hover:border-red-500 dark:hover:border-red-400"
+                        className="group cursor-pointer bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-black dark:border-white hover:border-red-500 dark:hover:border-red-400"
                     >
                         <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <FiMapPin className="w-6 h-6 text-red-600 dark:text-red-400" />
@@ -281,7 +281,7 @@ function SellerDashboard() {
                     </button>
                 </div>
 
-                <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl p-8 mb-8">
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl p-8 mb-8 border border-black dark:border-white">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
                             <FiTrendingUp className="w-5 h-5 text-sky-600 dark:text-sky-400" />
@@ -290,56 +290,56 @@ function SellerDashboard() {
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-                        <div className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-yellow-500 to-orange-500 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                        <div className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-yellow-500 to-orange-500 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-black dark:border-white">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
                             <FiZap className="h-8 w-8 mb-2 relative z-10" />
                             <p className="text-xs opacity-90 mb-1 relative z-10">Total Orders</p>
                             <h3 className="text-3xl font-bold relative z-10">{counts.orderCount || 0}</h3>
                         </div>
 
-                        <div className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-green-500 to-emerald-600 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                        <div className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-green-500 to-emerald-600 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-black dark:border-white">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
                             <FiCheckSquare className="h-8 w-8 mb-2 relative z-10" />
                             <p className="text-xs opacity-90 mb-1 relative z-10">Delivered</p>
                             <h3 className="text-3xl font-bold relative z-10">0</h3>
                         </div>
 
-                        <div onClick={() => navigate(`/seller/store?show=new`, { replace: true })} className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                        <div onClick={() => navigate(`/seller/store?show=new`, { replace: true })} className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-black dark:border-white">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
                             <FiPackage className="h-8 w-8 mb-2 relative z-10" />
                             <p className="text-xs opacity-90 mb-1 relative z-10">New Products</p>
                             <h3 className="text-3xl font-bold relative z-10">{counts.newProductCount || 0}</h3>
                         </div>
 
-                        <div onClick={() => navigate(`/seller/store?show=used`, { replace: true })} className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-rose-500 to-pink-600 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                        <div onClick={() => navigate(`/seller/store?show=used`, { replace: true })} className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-rose-500 to-pink-600 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-black dark:border-white">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
                             <FiArchive className="h-8 w-8 mb-2 relative z-10" />
                             <p className="text-xs opacity-90 mb-1 relative z-10">Used Products</p>
                             <h3 className="text-3xl font-bold relative z-10">{counts.usedProductCount || 0}</h3>
                         </div>
 
-                        <div className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-orange-500 to-red-600 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                        <div className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-orange-500 to-red-600 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-black dark:border-white">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
                             <FiStar className="h-8 w-8 mb-2 relative z-10" />
                             <p className="text-xs opacity-90 mb-1 relative z-10">Rating</p>
                             <h3 className="text-3xl font-bold relative z-10">0</h3>
                         </div>
 
-                        <div className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-blue-500 to-cyan-600 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                        <div className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-blue-500 to-cyan-600 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-black dark:border-white">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
                             <FiMessageSquare className="h-8 w-8 mb-2 relative z-10" />
                             <p className="text-xs opacity-90 mb-1 relative z-10">Reviews</p>
                             <h3 className="text-3xl font-bold relative z-10">{counts.reviewCount || 0}</h3>
                         </div>
 
-                        <div className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-red-600 to-rose-700 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                        <div className="group cursor-pointer relative overflow-hidden bg-gradient-to-br from-red-600 to-rose-700 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-black dark:border-white">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
                             <FiXCircle className="h-8 w-8 mb-2 relative z-10" />
                             <p className="text-xs opacity-90 mb-1 relative z-10">Complaints</p>
                             <h3 className="text-3xl font-bold relative z-10">0</h3>
                         </div>
 
-                        <div className="group relative overflow-hidden bg-gradient-to-br from-cyan-500 to-blue-600 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                        <div className="group relative overflow-hidden bg-gradient-to-br from-cyan-500 to-blue-600 p-5 rounded-xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-black dark:border-white">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
                             <FiEye className="h-8 w-8 mb-2 relative z-10" />
                             <p className="text-xs opacity-90 mb-1 relative z-10">Views</p>
@@ -348,7 +348,7 @@ function SellerDashboard() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl p-8">
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl p-8 border border-black dark:border-white">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
                             <FiHome className="w-5 h-5 text-sky-600 dark:text-sky-400" />
@@ -361,7 +361,7 @@ function SellerDashboard() {
                             {store.addresses.map((addr, index) => (
                                 <div
                                     key={index}
-                                    className="group relative bg-gradient-to-br from-gray-50 to-gray-100 dark:from-neutral-900 dark:to-neutral-900/50 p-6 rounded-xl border-2 border-gray-200 dark:border-neutral-800 hover:border-sky-500 dark:hover:border-sky-400 transition-all duration-300 hover:shadow-lg"
+                                    className="group relative bg-gradient-to-br from-gray-50 to-gray-100 dark:from-neutral-900 dark:to-neutral-900/50 p-6 rounded-xl border border-black dark:border-white hover:border-sky-500 dark:hover:border-sky-400 transition-all duration-300 hover:shadow-lg"
                                 >
                                     <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center text-sm font-bold">
                                         {index + 1}
@@ -396,7 +396,7 @@ function SellerDashboard() {
                             <p className="text-gray-500 dark:text-gray-400 mb-4">No physical addresses listed yet</p>
                             <button
                                 onClick={() => navigate("/seller/store-details", { state: { initialData: store } })}
-                                className="px-6 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg font-medium transition-colors"
+                                className="px-6 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg font-medium transition-colors cursor-pointer"
                             >
                                 Add Location
                             </button>

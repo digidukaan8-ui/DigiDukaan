@@ -129,7 +129,7 @@ export default function StoreForm() {
           initial={{ scale: 0.98, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="bg-white dark:bg-neutral-900 rounded-lg border border-gray-200 dark:border-neutral-800 shadow-sm p-6"
+          className="bg-white dark:bg-neutral-900 rounded-lg border border-black dark:border-white shadow-sm p-6"
         >
           <h2 className="text-2xl text-center font-bold mb-6 text-gray-900 dark:text-gray-100">
             {initialData ? "Edit Store" : "Create New Store"}
@@ -145,7 +145,7 @@ export default function StoreForm() {
                 {...register("name", { required: true })}
                 placeholder="Enter store name"
                 autoComplete="organization"
-                className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                className="w-full border border-black dark:border-white p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
               />
             </div>
 
@@ -158,7 +158,7 @@ export default function StoreForm() {
                 {...register("description", { required: true })}
                 placeholder="Enter store description"
                 rows="3"
-                className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                className="w-full border border-black dark:border-white p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
               ></textarea>
             </div>
 
@@ -170,7 +170,7 @@ export default function StoreForm() {
                 id="category"
                 {...register("category", { required: true })}
                 placeholder="e.g. Grocery, Electronics, Clothing"
-                className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                className="w-full border border-black dark:border-white p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
               />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 Comma separated categories
@@ -187,7 +187,7 @@ export default function StoreForm() {
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                className={`w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-600 dark:file:text-blue-400 file:cursor-pointer ${hide ? "hidden" : ""}`}
+                className={`w-full cursor-pointer border border-black dark:border-white p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-600 dark:file:text-blue-400 file:cursor-pointer ${hide ? "hidden" : ""}`}
                 required={!initialData}
               />
 
@@ -207,7 +207,7 @@ export default function StoreForm() {
                   <button
                     type="button"
                     onClick={removeImage}
-                    className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full transition"
+                    className="absolute cursor-pointer -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full transition"
                   >
                     <FiX size={14} />
                   </button>
@@ -227,7 +227,7 @@ export default function StoreForm() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="p-3 mb-3 border border-gray-200 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800/50"
+                    className="p-3 mb-3 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800/50"
                   >
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-medium text-xs text-gray-600 dark:text-gray-400">
@@ -249,12 +249,12 @@ export default function StoreForm() {
                           required: true,
                         })}
                         placeholder="Address Line 1"
-                        className="w-full border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                        className="w-full border border-black dark:border-white p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
                       />
                       <input
                         {...register(`addresses.${index}.addressLine2`)}
                         placeholder="Address Line 2 (optional)"
-                        className="w-full border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                        className="w-full border border-black dark:border-white p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
                       />
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <input
@@ -262,21 +262,21 @@ export default function StoreForm() {
                             required: true,
                           })}
                           placeholder="City"
-                          className="border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                          className="border border-black dark:border-white p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
                         />
                         <input
                           {...register(`addresses.${index}.state`, {
                             required: true,
                           })}
                           placeholder="State"
-                          className="border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                          className="border border-black dark:border-white p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
                         />
                         <input
                           {...register(`addresses.${index}.pincode`, {
                             required: true,
                           })}
                           placeholder="Pincode"
-                          className="border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                          className="border border-black dark:border-white p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
                         />
                       </div>
                     </div>
@@ -295,7 +295,7 @@ export default function StoreForm() {
                     pincode: "",
                   })
                 }
-                className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium text-sm hover:underline"
+                className="flex cursor-pointer items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium text-sm hover:underline"
               >
                 <FiPlus size={16} /> Add Another Address
               </button>
@@ -306,7 +306,7 @@ export default function StoreForm() {
                 whileTap={{ scale: 0.95 }}
                 type="submit"
                 disabled={!formState.isDirty || formState.isSubmitting}
-                className={`px-8 py-2.5 rounded-lg font-medium text-sm transition ${!formState.isDirty
+                className={`px-8 py-2.5 rounded-lg font-medium cursor-pointer text-sm transition border border-black dark:border-white ${!formState.isDirty
                     ? "bg-gray-300 dark:bg-neutral-700 text-gray-500 dark:text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700 text-white"
                   }`}

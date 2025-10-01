@@ -130,12 +130,12 @@ export default function QuickView({ product, type, isOpen, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-[80] p-4" onClick={onClose}>
       <div
-        className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl w-full max-w-3xl overflow-hidden relative border border-gray-200 dark:border-neutral-800"
+        className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl w-full max-w-3xl overflow-hidden relative border border-black dark:border-white"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 transition z-10"
+          className="absolute top-3 right-3 p-1.5 rounded-full cursor-pointer bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 transition z-10"
         >
           <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
         </button>
@@ -160,8 +160,8 @@ export default function QuickView({ product, type, isOpen, onClose }) {
                   <Star
                     key={i}
                     className={`h-4 w-4 ${i < Math.floor(rating)
-                        ? "text-yellow-400 fill-yellow-400"
-                        : "text-gray-300 dark:text-gray-600"
+                      ? "text-yellow-400 fill-yellow-400"
+                      : "text-gray-300 dark:text-gray-600"
                       }`}
                   />
                 ))}
@@ -208,12 +208,12 @@ export default function QuickView({ product, type, isOpen, onClose }) {
               </div>
             )}
 
-            <div className="flex items-center gap-2 pt-4">
+            {user.role === "buyer" && (<div className="flex items-center gap-2 pt-4">
               {type === "new" ? (
                 <button
                   onClick={() => handleCart(product._id)}
                   disabled={handleCartBtn(product._id)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg font-semibold transition text-sm"
+                  className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg font-semibold transition text-sm border border-black dark:border-white cursor-pointer"
                 >
                   <ShoppingCart className="h-4 w-4" />
                   {handleCartBtn(product._id) ? "Added to Cart" : "Add to Cart"}
@@ -221,7 +221,7 @@ export default function QuickView({ product, type, isOpen, onClose }) {
               ) : (
                 <button
                   onClick={handleChatSeller}
-                  className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-semibold transition text-sm"
+                  className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-semibold transition text-sm border border-black dark:border-white cursor-pointer"
                 >
                   <MessageCircle className="w-4 h-4" />
                   Chat with Seller
@@ -229,14 +229,14 @@ export default function QuickView({ product, type, isOpen, onClose }) {
               )}
               <button
                 onClick={() => handleWishList()}
-                className={`p-2.5 rounded-lg border transition ${isWishlisted
-                    ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400"
-                    : "bg-gray-50 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700"
+                className={`p-2.5 rounded-lg border border-black dark:border-white transition cursor-pointer ${isWishlisted
+                  ? "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400"
+                  : "bg-gray-50 dark:bg-neutral-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700"
                   }`}
               >
                 <Heart className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`} />
               </button>
-            </div>
+            </div>)}
 
             {type === "new" && product.stock && (
               <p className="text-xs text-gray-500 dark:text-gray-400 pt-1">

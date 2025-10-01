@@ -703,8 +703,8 @@ function Chat() {
 
 
   return (
-    <section className="h-screen w-full flex text-black dark:text-white bg-gray-100 dark:bg-neutral-950 pt-[78px] md:pt-[86px]">
-      <div className={`h-full w-full md:w-1/3 border-r border-gray-300 dark:border-neutral-800 ${selectedChat ? "hidden md:flex" : "flex"} flex-col bg-white dark:bg-neutral-900`}>
+    <section className="h-screen w-full flex text-black dark:text-white bg-gray-100 dark:bg-neutral-950 pt-[80px]">
+      <div className={`h-full w-full md:w-1/3 border-r border-black dark:border-white ${selectedChat ? "hidden md:flex" : "flex"} flex-col bg-white dark:bg-neutral-900`}>
         <div className="flex-1 overflow-y-auto">
           {isFetchingChats ? (
             <div className="p-4 flex justify-center items-center text-gray-500 dark:text-gray-400">Loading chats...</div>
@@ -717,7 +717,7 @@ function Chat() {
                     setSelectedChat(chat);
                     setTypingUser(null);
                   }}
-                  className={`flex items-center gap-3 p-4 cursor-pointer border-b border-gray-200 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors ${selectedChat?._id === chat?._id ? "bg-gray-100 dark:bg-neutral-950" : "bg-gray-50 dark:bg-neutral-800"}`}
+                  className={`flex items-center gap-3 p-4 cursor-pointer border-b border-black dark:border-white hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors ${selectedChat?._id === chat?._id ? "bg-gray-100 dark:bg-neutral-950" : "bg-gray-50 dark:bg-neutral-800"}`}
                 >
                   <div className="relative">
                     {!getChatImgSrc(chat) ?
@@ -747,7 +747,7 @@ function Chat() {
       <div className={`h-full w-full md:w-2/3 ${selectedChat ? "flex" : "hidden md:flex"} flex-col bg-gray-100 dark:bg-neutral-950`}>
         {selectedChat ? (
           <>
-            <div className="p-4 flex items-center gap-3 border-b border-gray-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm">
+            <div className="p-4 flex items-center gap-3 border-b border-black dark:border-white bg-white dark:bg-neutral-900 shadow-sm">
               <button className="text-sky-600 dark:text-sky-400 cursor-pointer hover:text-sky-700 dark:hover:text-sky-300 transition-colors" onClick={() => setSelectedChat(null)}>
                 <LucideArrowLeft size={20} />
               </button>
@@ -801,12 +801,12 @@ function Chat() {
                     id={`msg-${chat._id}`}
                     data-unseen={!isSender(chat) && !chat.seen ? 'true' : 'false'}
                     onDoubleClick={() => handleDoubleClick(chat)}
-                    className={`max-w-xs md:max-w-md p-3 rounded-2xl break-words relative cursor-pointer transition-all duration-200 shadow-sm
+                    className={`max-w-xs md:max-w-md p-3 rounded-2xl break-words relative cursor-pointer transition-all duration-200 shadow-sm border border-black dark:border-white
                       ${isSender(chat)
                         ? "bg-sky-600 dark:bg-sky-700 text-white rounded-br-sm"
-                        : "bg-white dark:bg-neutral-900 text-black dark:text-white border border-gray-200 dark:border-neutral-800 rounded-bl-sm"
+                        : "bg-white dark:bg-neutral-900 text-black dark:text-white rounded-bl-sm"
                       }
-                      ${messageToEdit === chat._id ? "ring-2 ring-sky-400 dark:ring-sky-500 scale-[1.02]" : ""}
+                      ${messageToEdit === chat._id ? "ring-2 ring-black dark:ring-white scale-[1.02]" : ""}
                       hover:shadow-md
                       `}
                   >
@@ -868,7 +868,7 @@ function Chat() {
               </div>
             )}
 
-            <div className="w-full p-4 border-t border-gray-300 dark:border-neutral-800 flex gap-3 bg-white dark:bg-neutral-900">
+            <div className="w-full p-4 border-t border-black dark:border-white flex gap-3 bg-white dark:bg-neutral-900 ">
               <textarea
                 id="message"
                 value={message}
@@ -882,10 +882,10 @@ function Chat() {
                 placeholder={messageToEdit ? "Edit message" : "Type a message"}
                 disabled={disableTextbox}
                 rows={2.5}
-                className="flex-1 resize-none hide-scrollbar border border-gray-300 dark:border-neutral-700 rounded-xl px-4 py-3 bg-gray-100 dark:bg-neutral-950 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-600 transition-all"
+                className="flex-1 resize-none hide-scrollbar border border-black dark:border-white rounded-xl px-4 py-3 bg-gray-100 dark:bg-neutral-950 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-600 transition-all"
               />
               <div className="flex flex-col justify-between items-center gap-2">
-                <label className="bg-gray-100 dark:bg-neutral-950 hover:bg-gray-200 dark:hover:bg-neutral-800 cursor-pointer flex items-center justify-center px-4 py-2 rounded-xl border border-gray-300 dark:border-neutral-700 transition-colors">
+                <label className="bg-gray-100 dark:bg-neutral-950 hover:bg-gray-200 dark:hover:bg-neutral-800 cursor-pointer flex items-center justify-center px-4 py-2 rounded-xl border border-black dark:border-white transition-colors">
                   <Paperclip size={18} className="text-gray-600 dark:text-gray-400" />
                   <input
                     ref={fileInputRef}
@@ -896,7 +896,7 @@ function Chat() {
                     disabled={disableTextbox || !!messageToEdit}
                   />
                 </label>
-                <button onClick={() => handleSend(false)} className="bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 flex justify-center items-center text-white px-4 py-2 rounded-xl transition-colors shadow-sm hover:shadow-md">
+                <button onClick={() => handleSend(false)} className="bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 flex justify-center items-center text-white px-4 py-2 rounded-xl transition-colors shadow-sm hover:shadow-md border border-black dark:border-white cursor-pointer">
                   <SendHorizontalIcon size={18} />
                 </button>
               </div>
@@ -915,9 +915,9 @@ function Chat() {
 
       {file && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-2xl max-w-lg w-full mx-4 border border-gray-200 dark:border-neutral-800">
+          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-2xl max-w-lg w-full mx-4 border border-black dark:border-white">
             <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">File Preview</h2>
-            <div className="mb-4 flex items-center justify-center bg-gray-100 dark:bg-neutral-950 rounded-xl p-4">
+            <div className="mb-4 flex items-center justify-center bg-gray-100 dark:bg-neutral-950 rounded-xl p-4 border border-black dark:border-white">
               {file.type.startsWith("image/") ? (
                 <img src={URL.createObjectURL(file)} alt="File Preview" className="max-h-64 object-contain rounded-lg" />
               ) : file.type.startsWith("video/") ? (
@@ -934,7 +934,7 @@ function Chat() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => { setFile(null); setMessage(""); }}
-                className="px-5 py-2.5 bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 rounded-xl text-black dark:text-white transition-colors border border-gray-300 dark:border-neutral-700"
+                className="px-5 py-2.5 bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 rounded-xl text-black dark:text-white transition-colors border border-black dark:border-white cursor-pointer"
               >
                 Cancel
               </button>
@@ -943,7 +943,7 @@ function Chat() {
                   handleSend();
                   setFile(null);
                 }}
-                className="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 text-white rounded-xl transition-colors shadow-sm hover:shadow-md"
+                className="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 text-white rounded-xl transition-colors shadow-sm hover:shadow-md border border-black dark:border-white cursor-pointer"
               >
                 Send
               </button>

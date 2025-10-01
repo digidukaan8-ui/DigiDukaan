@@ -229,7 +229,7 @@ export default function UsedProductForm() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="bg-white dark:bg-neutral-900 rounded-lg border border-gray-200 dark:border-neutral-800 shadow-sm p-6"
+          className="bg-white dark:bg-neutral-900 rounded-lg border border-black dark:border-white shadow-sm p-6"
         >
           <h2 className="text-2xl text-center font-bold mb-6 text-gray-900 dark:text-gray-100">
             {initialData ? "Edit Used Product" : "Add Used Product"}
@@ -252,7 +252,7 @@ export default function UsedProductForm() {
                     },
                   })}
                   placeholder="Enter product title"
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                  className="w-full border border-black dark:border-white p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
                 />
                 {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
               </div>
@@ -266,7 +266,7 @@ export default function UsedProductForm() {
                   autoComplete="off"
                   {...register("brand")}
                   placeholder="Enter brand name"
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                  className="w-full border border-black dark:border-white p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
                 />
               </div>
             </div>
@@ -286,7 +286,7 @@ export default function UsedProductForm() {
                 })}
                 placeholder="Enter product description (max 300 words)"
                 rows="3"
-                className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                className="w-full border border-black dark:border-white p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
               ></textarea>
               {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
             </div>
@@ -299,7 +299,7 @@ export default function UsedProductForm() {
                 <select
                   id="category"
                   {...register("category", { required: "Category is required" })}
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                  className="w-full border border-black dark:border-white p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
                 >
                   {usedProductCategories.map((cat, index) => (
                     <option key={`${cat.name}-${index}`} value={cat.name}>
@@ -318,7 +318,7 @@ export default function UsedProductForm() {
                   <select
                     id="subCategory"
                     {...register("subCategory", { required: "Sub Category is required" })}
-                    className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                    className="w-full border border-black dark:border-white p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
                   >
                     {subCategories.map((sub, index) => (
                       <option key={`${sub}-${index}`} value={sub}>
@@ -346,7 +346,7 @@ export default function UsedProductForm() {
                   autoComplete="off"
                   {...register("price", { required: "Price is required" })}
                   placeholder="Enter price"
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                  className="w-full border border-black dark:border-white p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
                 />
                 {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
               </div>
@@ -358,7 +358,7 @@ export default function UsedProductForm() {
                 <select
                   id="unit"
                   {...register("unit", { required: "unit is required" })}
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                  className="w-full border border-black dark:border-white p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
                 >
                   <option value="">Select unit</option>
                   <option value="pc">Piece (pc)</option>
@@ -379,7 +379,7 @@ export default function UsedProductForm() {
                 <select
                   id="condition"
                   {...register("condition")}
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                  className="w-full border border-black dark:border-white p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
                 >
                   <option value="new">New</option>
                   <option value="like new">Like New</option>
@@ -397,7 +397,7 @@ export default function UsedProductForm() {
                 <div className="flex gap-2">
                   <select
                     {...register("discount.type")}
-                    className="border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none text-sm"
+                    className="border border-black dark:border-white p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none text-sm"
                   >
                     <option value="percentage">%</option>
                     <option value="amount">₹</option>
@@ -409,7 +409,7 @@ export default function UsedProductForm() {
                     step="any"
                     {...register("discount.value")}
                     placeholder="Value"
-                    className="flex-1 border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none text-sm"
+                    className="flex-1 border border-black dark:border-white p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none text-sm"
                   />
                 </div>
               </div>
@@ -423,7 +423,7 @@ export default function UsedProductForm() {
                   autoComplete="off"
                   {...register("tags")}
                   placeholder="Comma separated tags"
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
+                  className="w-full border border-black dark:border-white p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-neutral-800 dark:text-white outline-none transition text-sm"
                 />
               </div>
             </div>
@@ -438,7 +438,7 @@ export default function UsedProductForm() {
                 accept="image/*"
                 multiple
                 onChange={handleImageChange}
-                className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-600 dark:file:text-blue-400 file:cursor-pointer"
+                className="w-full cursor-pointer border border-black dark:border-white p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-600 dark:file:text-blue-400 file:cursor-pointer"
               />
               <div className="flex gap-2 flex-wrap mt-3">
                 <AnimatePresence>
@@ -459,7 +459,7 @@ export default function UsedProductForm() {
                       <button
                         type="button"
                         onClick={() => removeImage(img, img._id)}
-                        className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full transition"
+                        className="absolute cursor-pointer -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full transition"
                       >
                         <FiX size={12} />
                       </button>
@@ -479,7 +479,7 @@ export default function UsedProductForm() {
                   type="file"
                   accept="video/*"
                   onChange={handleVideoChange}
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-600 dark:file:text-blue-400 file:cursor-pointer"
+                  className="w-full cursor-pointer border border-black dark:border-white p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-blue-50 dark:file:bg-blue-900/20 file:text-blue-600 dark:file:text-blue-400 file:cursor-pointer"
                 />
               ) : (
                 <motion.div
@@ -495,7 +495,7 @@ export default function UsedProductForm() {
                   <button
                     type="button"
                     onClick={removeVideo}
-                    className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full transition"
+                    className="absolute cursor-pointer -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full transition"
                   >
                     <FiX size={12} />
                   </button>
@@ -503,7 +503,7 @@ export default function UsedProductForm() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
               <div>
                 <label htmlFor="delivery-info" className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-gray-300">
                   Delivery Type
@@ -511,7 +511,7 @@ export default function UsedProductForm() {
                 <select
                   {...register("deliveryType")}
                   id="delivery-info"
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                  className="w-full border border-black dark:border-white p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                 >
                   <option value="pickup">Pickup</option>
                   <option value="shipping">Shipping</option>
@@ -519,7 +519,7 @@ export default function UsedProductForm() {
                 </select>
               </div>
 
-              <div className="flex justify-around items-center border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800">
+              <div className="flex justify-around items-center border border-black dark:border-white p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 h-[42px]">
                 <label className="flex items-center gap-2 text-gray-700 dark:text-gray-300 cursor-pointer text-sm">
                   <input
                     type="checkbox"
@@ -546,25 +546,25 @@ export default function UsedProductForm() {
                   type="text"
                   placeholder="Pickup Address"
                   {...register("pickupLocation.address")}
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm"
+                  className="w-full border border-black dark:border-white p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm"
                 />
                 <input
                   type="text"
                   placeholder="City"
                   {...register("pickupLocation.city")}
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm"
+                  className="w-full border border-black dark:border-white p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm"
                 />
                 <input
                   type="text"
                   placeholder="State"
                   {...register("pickupLocation.state")}
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm"
+                  className="w-full border border-black dark:border-white p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm"
                 />
                 <input
                   type="text"
                   placeholder="Pincode"
                   {...register("pickupLocation.pincode")}
-                  className="w-full border border-gray-300 dark:border-neutral-700 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm"
+                  className="w-full border border-black dark:border-white p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:text-white text-sm"
                 />
               </div>
             )}
@@ -580,7 +580,7 @@ export default function UsedProductForm() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="p-3 mb-3 border border-gray-200 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800/50"
+                    className="p-3 mb-3 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800/50"
                   >
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-medium text-xs text-gray-600 dark:text-gray-400">
@@ -598,7 +598,7 @@ export default function UsedProductForm() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                       <select
                         {...register(`shippingLocations.${index}.shippingArea`)}
-                        className="w-full border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                        className="w-full border border-black dark:border-white p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
                       >
                         {[
                           "Country", "State", "District", "City", "Town", "Village", "Suburb",
@@ -612,14 +612,14 @@ export default function UsedProductForm() {
                         type="text"
                         placeholder="Name"
                         {...register(`shippingLocations.${index}.areaName`)}
-                        className="w-full border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                        className="w-full border border-black dark:border-white p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
                       />
 
                       <input
                         type="number"
                         placeholder="Charge (₹)"
                         {...register(`shippingLocations.${index}.shippingCharge`)}
-                        className="w-full border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
+                        className="w-full border border-black dark:border-white p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white text-sm"
                       />
                     </div>
                   </motion.div>
@@ -647,7 +647,7 @@ export default function UsedProductForm() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="p-3 mb-3 border border-gray-200 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800/50"
+                    className="p-3 mb-3 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800/50"
                   >
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-medium text-xs text-gray-600 dark:text-gray-400">
@@ -670,14 +670,14 @@ export default function UsedProductForm() {
                         autoComplete="off"
                         {...register(`attributes.${index}.key`)}
                         placeholder="Key (e.g. Color)"
-                        className="w-full border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                        className="w-full border border-black dark:border-white p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                       />
                       <input
                         id={`attr-value-${field.id}`}
                         autoComplete="off"
                         {...register(`attributes.${index}.value`)}
                         placeholder="Value (e.g. Red)"
-                        className="w-full border border-gray-300 dark:border-neutral-700 p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                        className="w-full border border-black dark:border-white p-2 rounded-lg bg-white dark:bg-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                       />
                     </div>
                   </motion.div>
@@ -687,7 +687,7 @@ export default function UsedProductForm() {
               <button
                 type="button"
                 onClick={() => appendAttribute({ key: "", value: "" })}
-                className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium text-sm hover:underline"
+                className="flex items-center gap-1.5 cursor-pointer text-blue-600 dark:text-blue-400 font-medium text-sm hover:underline"
               >
                 <FiPlus size={16} /> Add Attribute
               </button>
@@ -698,7 +698,7 @@ export default function UsedProductForm() {
                 whileTap={{ scale: 0.95 }}
                 type="submit"
                 disabled={!canUpdate}
-                className={`px-8 py-2.5 rounded-lg font-medium text-sm transition ${
+                className={`px-8 py-2.5 rounded-lg font-medium text-sm transition cursor-pointer border border-black dark:border-white ${
                   canUpdate
                     ? "bg-blue-600 hover:bg-blue-700 text-white"
                     : "bg-gray-300 dark:bg-neutral-700 text-gray-500 dark:text-gray-500 cursor-not-allowed"

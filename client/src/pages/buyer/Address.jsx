@@ -118,7 +118,7 @@ export default function Address() {
             <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg border border-black dark:border-white">
                             <MapPin className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -133,7 +133,7 @@ export default function Address() {
                     {!showForm && (
                         <button
                             onClick={handleAddNew}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors shadow-lg hover:shadow-xl"
+                            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors shadow-lg hover:shadow-xl border border-black dark:border-white cursor-pointer"
                         >
                             <Plus size={20} />
                             <span className="hidden sm:inline">Add Address</span>
@@ -144,20 +144,18 @@ export default function Address() {
                 {showForm && (
                     <form
                         onSubmit={handleSubmit(onSubmit)}
-                        className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg p-6 sm:p-8 mb-8"
+                        className="relative bg-white dark:bg-neutral-900 rounded-2xl shadow-lg p-6 sm:p-8 mb-8"
                     >
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                                {editId ? "Edit Address" : "Add New Address"}
-                            </h2>
-                            <button
-                                type="button"
-                                onClick={handleCancel}
-                                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-6">
+                            {editId ? "Edit Address" : "Add New Address"}
+                        </h2>
+                        <button
+                            type="button"
+                            onClick={handleCancel}
+                            className="absolute top-2 right-2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                        >
+                            <X size={20} />
+                        </button>
 
                         <div className="space-y-6">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -172,7 +170,7 @@ export default function Address() {
                                         placeholder="Enter full name"
                                         {...register("name", { required: "Name is required" })}
                                         autoComplete="name"
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-black dark:border-white bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                                     />
                                     {errors.name && <span className="text-red-500 text-xs mt-1.5 block">{errors.name.message}</span>}
                                 </div>
@@ -194,7 +192,7 @@ export default function Address() {
                                             }
                                         })}
                                         autoComplete="tel"
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-black dark:border-white bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                                     />
                                     {errors.mobile && <span className="text-red-500 text-xs mt-1.5 block">{errors.mobile.message}</span>}
                                 </div>
@@ -211,7 +209,7 @@ export default function Address() {
                                         placeholder="House No., Building Name"
                                         {...register("addressLine1", { required: "Address is required" })}
                                         autoComplete="address-line1"
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-black dark:border-white bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                                     />
                                     {errors.addressLine1 && <span className="text-red-500 text-xs mt-1.5 block">{errors.addressLine1.message}</span>}
                                 </div>
@@ -226,7 +224,7 @@ export default function Address() {
                                         placeholder="Street, Area, Locality"
                                         {...register("addressLine2")}
                                         autoComplete="address-line2"
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-black dark:border-white bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                                     />
                                 </div>
                             </div>
@@ -242,7 +240,7 @@ export default function Address() {
                                         placeholder="Enter city"
                                         {...register("city", { required: "City is required" })}
                                         autoComplete="address-level2"
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-black dark:border-white bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                                     />
                                     {errors.city && <span className="text-red-500 text-xs mt-1.5 block">{errors.city.message}</span>}
                                 </div>
@@ -257,7 +255,7 @@ export default function Address() {
                                         placeholder="Enter state"
                                         {...register("state", { required: "State is required" })}
                                         autoComplete="address-level1"
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-black dark:border-white bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                                     />
                                     {errors.state && <span className="text-red-500 text-xs mt-1.5 block">{errors.state.message}</span>}
                                 </div>
@@ -272,7 +270,7 @@ export default function Address() {
                                         placeholder="6-digit pincode"
                                         {...register("pincode", { required: "Pincode is required" })}
                                         autoComplete="postal-code"
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-black dark:border-white bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                                     />
                                     {errors.pincode && <span className="text-red-500 text-xs mt-1.5 block">{errors.pincode.message}</span>}
                                 </div>
@@ -289,7 +287,7 @@ export default function Address() {
                                         placeholder="Nearby landmark"
                                         {...register("landmark")}
                                         autoComplete="address-line3"
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-black dark:border-white bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                                     />
                                 </div>
 
@@ -302,33 +300,31 @@ export default function Address() {
                                         type="text"
                                         placeholder="Home, Work, Office"
                                         {...register("addressType", { required: "Address type is required" })}
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-black dark:border-white bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                                     />
                                     {errors.addressType && <span className="text-red-500 text-xs mt-1.5 block">{errors.addressType.message}</span>}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-neutral-800">
+                        <div className="flex justify-center gap-3 mt-8 pt-6">
                             <button
                                 type="button"
                                 onClick={handleCancel}
-                                className="flex-1 sm:flex-none px-6 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl transition-colors"
+                                className="flex-1 sm:flex-none px-6 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl transition-colors border border-black dark:border-white cursor-pointer"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="flex-1 sm:flex-none px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                                className="flex-1 sm:flex-none px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors shadow-lg hover:shadow-xl flex items-center justify-center gap-2 border border-black dark:border-white cursor-pointer"
                             >
                                 {editId ? (
                                     <>
-                                        <Pencil size={18} />
                                         Update Address
                                     </>
                                 ) : (
                                     <>
-                                        <Plus size={18} />
                                         Save Address
                                     </>
                                 )}
@@ -352,7 +348,7 @@ export default function Address() {
                             {!showForm && (
                                 <button
                                     onClick={handleAddNew}
-                                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors shadow-lg"
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors shadow-lg border border-black dark:border-white cursor-pointer"
                                 >
                                     <Plus size={18} />
                                     Add Your First Address
@@ -370,7 +366,7 @@ export default function Address() {
                                 {addresses.map((addr) => (
                                     <div
                                         key={addr._id}
-                                        className="bg-white dark:bg-neutral-900 rounded-2xl shadow-md hover:shadow-xl transition-all p-6 group"
+                                        className="bg-white dark:bg-neutral-900 rounded-2xl shadow-md hover:shadow-xl transition-all p-6 group border border-black dark:border-white"
                                     >
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="flex items-center gap-3">
@@ -412,14 +408,14 @@ export default function Address() {
                                                 <button
                                                     type="button"
                                                     onClick={() => handleEdit(addr)}
-                                                    className="p-2.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                                    className="p-2.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer border border-black dark:border-white"
                                                 >
                                                     <Pencil className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => handleDelete(addr._id)}
-                                                    className="p-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                                    className="p-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer border border-black dark:border-white"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>

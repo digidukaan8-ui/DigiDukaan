@@ -133,9 +133,9 @@ export default function Login() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="w-full max-w-md p-6 rounded-lg shadow-sm border border-gray-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 space-y-4 relative">
+        className="w-full max-w-md p-6 rounded-lg shadow-sm border border-black dark:border-white bg-white dark:bg-neutral-900 space-y-4 relative">
         {(showForgotEmail || showOtp || otpVerified) && (
-          <button onClick={goBack} className="absolute top-4 left-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition">
+          <button onClick={goBack} className="absolute top-4 left-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition cursor-pointer">
             <FaArrowLeft size={18} />
           </button>
         )}
@@ -170,7 +170,7 @@ export default function Login() {
                       type="email" 
                       placeholder="Enter your email" 
                       autoComplete='email' 
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm" 
+                      className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm" 
                       {...register('email', { required: 'Email is required' })} 
                     />
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
@@ -181,13 +181,13 @@ export default function Login() {
                       id="password" 
                       type={showLoginPassword ? "text" : "password"} 
                       placeholder="Enter your password" 
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm pr-10" 
+                      className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm pr-10" 
                       {...register('password', { required: 'Password is required' })} 
                     />
                     <button 
                       type="button" 
                       onClick={() => setShowLoginPassword(!showLoginPassword)} 
-                      className="absolute right-3 top-9 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
+                      className="absolute right-3 top-9 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition cursor-pointer"
                     >
                       {showLoginPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                     </button>
@@ -197,14 +197,14 @@ export default function Login() {
                     <button 
                       type='button' 
                       onClick={() => setShowForgotEmail(true)} 
-                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
                     >
                       Forgot Password?
                     </button>
                   </div>
                   <button 
                     type="submit" 
-                    className="w-full py-2.5 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition text-sm"
+                    className="w-full py-2.5 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition text-sm border border-black dark:border-white cursor-pointer"
                   >
                     Login
                   </button>
@@ -213,7 +213,7 @@ export default function Login() {
                     <button
                       type="button"
                       onClick={() => navigate('/register')}
-                      className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                      className="text-blue-600 dark:text-blue-400 hover:underline font-medium cursor-pointer"
                     >
                       Sign up
                     </button>
@@ -235,7 +235,7 @@ export default function Login() {
                       type="email" 
                       placeholder="Enter your email" 
                       autoComplete='email' 
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm" 
+                      className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm" 
                       {...register('email', { required: 'Email is required' })} 
                     />
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
@@ -245,7 +245,7 @@ export default function Login() {
                   </div>
                   <button 
                     type="submit" 
-                    className="w-full py-2.5 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition text-sm"
+                    className="w-full py-2.5 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition text-sm border border-black dark:border-white cursor-pointer"
                   >
                     Send OTP
                   </button>
@@ -265,7 +265,7 @@ export default function Login() {
                       type="text" 
                       placeholder="Enter 6-digit OTP" 
                       maxLength={6}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm text-center tracking-widest" 
+                      className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm text-center tracking-widest" 
                       {...register('otp', { required: 'OTP is required' })} 
                     />
                     {errors.otp && <p className="text-red-500 text-xs mt-1 text-center">{errors.otp.message}</p>}
@@ -275,14 +275,14 @@ export default function Login() {
                       disabled={resendCountdown > 0} 
                       type="button" 
                       onClick={resendOtpBtn} 
-                      className="flex-1 py-2.5 px-4 bg-gray-200 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm"
+                      className="flex-1 py-2.5 px-4 bg-gray-200 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm border border-black dark:border-white cursor-pointer"
                     >
                       {resendCountdown > 0 ? `Resend (${resendCountdown}s)` : 'Resend OTP'}
                     </button>
                     <button 
                       type="submit" 
                       disabled={!isOtpValidLength} 
-                      className="flex-1 py-2.5 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm"
+                      className="flex-1 py-2.5 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm border border-black dark:border-white cursor-pointer"
                     >
                       Verify
                     </button>
@@ -304,7 +304,7 @@ export default function Login() {
                       type={showNewPassword ? "text" : "password"} 
                       placeholder="Enter new password" 
                       {...register('newPassword', { required: 'New password is required' })} 
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm pr-10" 
+                      className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm pr-10" 
                     />
                     <button 
                       type="button" 
@@ -325,12 +325,12 @@ export default function Login() {
                         required: 'Confirm password is required', 
                         validate: (value) => value === watch('newPassword') || 'Passwords do not match' 
                       })} 
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm pr-10" 
+                      className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm pr-10" 
                     />
                     <button 
                       type="button" 
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
-                      className="absolute right-3 top-9 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
+                      className="absolute right-3 top-9 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition cursor-pointer"
                     >
                       {showConfirmPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                     </button>
@@ -339,7 +339,7 @@ export default function Login() {
                   <input type="hidden" value={watch('email')} {...register('email')} />
                   <button 
                     type="submit" 
-                    className="w-full py-2.5 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition text-sm"
+                    className="w-full py-2.5 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition text-sm border border-black dark:border-white cursor-pointer"
                   >
                     Reset Password
                   </button>
