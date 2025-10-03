@@ -7,17 +7,18 @@ import useAuthStore from "../../store/auth.js";
 import useCartStore from "../../store/cart.js";
 import { Heart, Package, ShoppingCart, Eye, Star, Clock, Edit3, ArrowRight, MessageSquare, User, ImageDown, MapPin } from "lucide-react";
 import { getWishlistProducts, getViewedProduct } from "../../api/product.js";
-import { replace, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useLoaderStore from "../../store/loader.js";
 import { toast } from 'react-hot-toast';
 import { changeAvatar, removeAvatar, updateProfile } from "../../api/user.js";
+import { getChatsCount } from "../../api/chat.js";
 
 export default function Dashboard() {
   const { user, isAuthenticated } = useAuthStore();
   const { getCartLength } = useCartStore();
   const navigate = useNavigate();
   const { startLoading, stopLoading } = useLoaderStore();
-
+  const [chatsCount, setChatsCount] = useState(0);
   const [buyerInfo, setBuyerInfo] = useState({
     name: "",
     username: "",
@@ -66,6 +67,16 @@ export default function Dashboard() {
       resetProfile({ name: user.name, username: user.username, phone: user.phone });
     }
   }, [isAuthenticated, user, resetProfile]);
+
+  useEffect(() => {
+    const fetchChatsCount = async () => {
+      const result = await getChatsCount();
+      if (result.success) {
+        setChatsCount(result.data);
+      }
+    }
+    fetchChatsCount();
+  }, [])
 
   const avatarColors = [
     "bg-indigo-500", "bg-emerald-500", "bg-rose-500", "bg-yellow-500",
@@ -198,7 +209,9 @@ export default function Dashboard() {
             <div className="w-full xl:w-px h-px xl:h-24 bg-gray-200 dark:bg-neutral-800" />
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 xl:flex-1">
-              <div className="bg-gradient-to-br border border-black dark:border-white from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all">
+              <div
+                onClick={() => navigate('/buyer/order', { replace: true })}
+                className="bg-gradient-to-br border border-black dark:border-white from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all">
                 <div className="flex items-center justify-between mb-3">
                   <div className="w-12 h-12 bg-white dark:bg-indigo-900/40 rounded-xl flex items-center justify-center shadow-sm">
                     <Package className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
@@ -208,7 +221,9 @@ export default function Dashboard() {
                 <h3 className="text-2xl font-bold text-indigo-900 dark:text-white">{orders.length}</h3>
               </div>
 
-              <div className="bg-gradient-to-br border border-black dark:border-white from-rose-50 to-rose-100 dark:from-rose-900/30 dark:to-rose-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all">
+              <div
+                onClick={() => navigate('/buyer/wishlist?show=new', { replace: true })}
+                className="bg-gradient-to-br border border-black dark:border-white from-rose-50 to-rose-100 dark:from-rose-900/30 dark:to-rose-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all">
                 <div className="flex items-center justify-between mb-3">
                   <div className="w-12 h-12 bg-white dark:bg-rose-900/40 rounded-xl flex items-center justify-center shadow-sm">
                     <Heart className="w-6 h-6 text-rose-600 dark:text-rose-400" />
@@ -219,7 +234,7 @@ export default function Dashboard() {
               </div>
 
               <div
-                onClick={() => navigate('/buyer/cart')}
+                onClick={() => navigate('/buyer/cart', { replace: true })}
                 className="bg-gradient-to-br border border-black dark:border-white from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all"
               >
                 <div className="flex items-center justify-between mb-3">
@@ -232,7 +247,7 @@ export default function Dashboard() {
               </div>
 
               <div
-                onClick={() => navigate('/chat')}
+                onClick={() => navigate('/buyer/chat', { replace: true })}
                 className="bg-gradient-to-br border border-black dark:border-white from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 p-5 rounded-xl cursor-pointer hover:shadow-md transition-all"
               >
                 <div className="flex items-center justify-between mb-3">
@@ -241,7 +256,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">Active Chats</p>
-                <h3 className="text-2xl font-bold text-blue-900 dark:text-white">0</h3>
+                <h3 className="text-2xl font-bold text-blue-900 dark:text-white">{chatsCount}</h3>
               </div>
             </div>
           </div>
@@ -309,7 +324,7 @@ export default function Dashboard() {
               </div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">New Products Wishlist</h2>
             </div>
-            <a href="/wishlist/new" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
+            <a href="/buyer/wishlist?show=new" className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
             </a>
           </div>
@@ -342,7 +357,7 @@ export default function Dashboard() {
               </div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Used Products Wishlist</h2>
             </div>
-            <span onClick={() => navigate('/buyer/wishlist', { replace: true })} className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
+            <span onClick={() => navigate('/buyer/wishlist?show=used', { replace: true })} className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
             </span>
           </div>
@@ -375,7 +390,7 @@ export default function Dashboard() {
               </div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recently Viewed New Products</h2>
             </div>
-            <span onClick={() => navigate('/buyer/recently-viewed/new-product', { replace: true })} className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
+            <span onClick={() => navigate('/buyer/recently-viewed?show=new', { replace: true })} className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
             </span>
           </div>
@@ -408,7 +423,7 @@ export default function Dashboard() {
               </div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recently Viewed Used Products</h2>
             </div>
-            <span onClick={() => navigate('/buyer/recently-viewed/used-product', { replace: true })} className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
+            <span onClick={() => navigate('/buyer/recently-viewed?show=used', { replace: true })} className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
               View All <ArrowRight size={16} />
             </span>
           </div>
@@ -435,7 +450,7 @@ export default function Dashboard() {
       </div>
 
       {showEditProfileModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[95] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="relative w-full max-w-md bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in duration-200 border border-black dark:border-white">
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Edit Profile</h3>
             <form onSubmit={handleSubmitProfile(onProfileSubmit)} className="space-y-5">
@@ -487,7 +502,7 @@ export default function Dashboard() {
       )}
 
       {showChangeAvatarModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[95] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="relative w-full max-w-md bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in duration-200 border border-black dark:border-white">
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Change Avatar</h3>
             <form onSubmit={handleSubmitAvatar(onAvatarSubmit)}>

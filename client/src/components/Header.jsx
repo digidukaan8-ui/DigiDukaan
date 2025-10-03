@@ -18,7 +18,7 @@ export default function Header() {
         { to: '/', label: 'Home' },
         { to: '/buyer/cart', label: 'Cart' },
         { to: '/buyer/chat', label: 'Chat' },
-        { to: '/buyer/order', label: 'Dashboard' },
+        { to: '/buyer/order', label: 'Orders' },
         { to: '/buyer/dashboard', label: 'Dashboard' },
         { to: '/logout', label: 'Logout' },
       ];
@@ -42,7 +42,7 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white dark:bg-neutral-900 w-full shadow-lg border-b border-gray-200 dark:border-neutral-800 fixed top-0 z-[100] h-20">
+    <header className="bg-white dark:bg-neutral-900 w-full shadow-lg border-b border-gray-200 dark:border-neutral-800 fixed top-0 z-[90] h-20">
       <div className="w-full max-w-7xl mx-auto px-5 md:px-10 h-full flex justify-between items-center">
         <NavLink to="/" className="flex justify-center items-center gap-3 group">
           <img

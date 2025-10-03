@@ -25,7 +25,28 @@ const ALL_LOCATION_FIELDS = [
     { key: "pincode", label: "Pincode", icon: <Search size={18} /> },
 ];
 
-const INITIAL_EDITABLE_FIELDS = ["state", "city", "pincode"];
+const LOCATION_GRANULARITY_ORDER = [
+    "locality", "street", "landmark", "area", "suburb", "town", "village", "city", "district", "taluka", "tehsil", "pincode", "state", "country"
+];
+
+const DEFAULT_FALLBACK_FIELDS = ["state", "city", "pincode"];
+
+const getInitialSelectedFields = (locationData) => {
+    let initialFields = [];
+
+    for (const key of LOCATION_GRANULARITY_ORDER) {
+        if (locationData[key] && !initialFields.includes(key)) {
+            initialFields.push(key);
+            if (initialFields.length >= 3) break;
+        }
+    }
+
+    if (initialFields.length === 0) {
+        return DEFAULT_FALLBACK_FIELDS;
+    }
+
+    return initialFields.slice(0, 3);
+};
 
 export default function Location() {
     const { location, editedLocation, setLocation, setEditedLocation } = useLocationStore();
@@ -37,53 +58,58 @@ export default function Location() {
     const [hoverTooltip, setHoverTooltip] = useState(false);
     const formRef = useRef(null);
 
-    const [selectedFields, setSelectedFields] = useState(INITIAL_EDITABLE_FIELDS);
-    
-    const initialLocationRef = useRef(location);
-    const initialSelectedFieldsRef = useRef(INITIAL_EDITABLE_FIELDS);
+    const [selectedFields, setSelectedFields] = useState([]);
+
+    const initialLocationRef = useRef({});
+    const initialSelectedFieldsRef = useRef([]);
 
     const locationToArray = (loc, fields = selectedFields) => {
         return fields.map(k => loc[k]).filter(Boolean);
     };
 
     const normalizeLocationData = (data) => {
-        return {
-            city: data.city || data.town || data.village || data.locality || data.district || '',
-            state: data.state || '',
-            pincode: data.pincode || '',
-            country: data.country || '',
-            district: data.district || '',
-            locality: data.locality || ''
-        };
+        const normalized = {};
+        ALL_LOCATION_FIELDS.forEach(({ key }) => {
+            normalized[key] = data[key] || '';
+        });
+        normalized.country = data.country || '';
+
+        normalized.city = data.city || data.town || data.village || data.suburb || data.locality || data.district || '';
+
+        return normalized;
     };
 
     const fetchLocation = useCallback(async () => {
         if (Object.keys(location).length > 0 || isFetching) return;
 
         setIsFetching(true);
-        startLoading('fetchLoc');
+
+        const fetchProductsAndUpdateStores = async (locData) => {
+            const normalizedData = normalizeLocationData(locData);
+
+            const newSelectedFields = getInitialSelectedFields(normalizedData);
+            setSelectedFields(newSelectedFields);
+            initialSelectedFieldsRef.current = newSelectedFields;
+
+            startLoading('fetching');
+            try {
+                const data = await getProducts(locationToArray(normalizedData, newSelectedFields));
+                if (data.success) {
+                    toast.success("Products fetched successfully");
+                    useStores.getState().clearStores();
+                    useStores.getState().addStores(data.stores);
+                    useCategoryProductStore.getState().clearCategories();
+                    useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
+                    useUsedCategoryProductStore.getState().clearUsedCategories();
+                    useUsedCategoryProductStore.getState().setAllUsedCategories(data.usedProductsByCategory);
+                }
+            } finally {
+                stopLoading();
+            }
+            return normalizedData;
+        };
 
         try {
-            const fetchProductsAndUpdateStores = async (locData) => {
-                const normalizedData = normalizeLocationData(locData);
-                startLoading('fetching');
-                try {
-                    const data = await getProducts(locationToArray(normalizedData, selectedFields));
-                    if (data.success) {
-                        toast.success("Products fetched successfully");
-                        useStores.getState().clearStores();
-                        useStores.getState().addStores(data.stores);
-                        useCategoryProductStore.getState().clearCategories();
-                        useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
-                        useUsedCategoryProductStore.getState().clearUsedCategories();
-                        useUsedCategoryProductStore.getState().setAllUsedCategories(data.usedProductsByCategory);
-                    }
-                } finally {
-                    stopLoading();
-                }
-                return normalizedData;
-            };
-
             if (navigator.geolocation) {
                 const geoPromise = new Promise((resolve, reject) => {
                     navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -94,31 +120,37 @@ export default function Location() {
                 });
 
                 await geoPromise.then(async (pos) => {
+                    startLoading('fetchLoc');
                     const { latitude, longitude } = pos.coords;
                     const result = await fetchLocationThroughGps(latitude, longitude);
                     if (result.success) {
                         const normalized = await fetchProductsAndUpdateStores(result.data);
                         setLocation(normalized);
                         setEditedLocation(normalized);
+                        initialLocationRef.current = normalized;
                         toast.success("Location fetched successfully via GPS");
-                    }
-                }).catch(async () => {
-                    const result = await fetchLocationThroughIp();
-                    if (result.success) {
-                        const normalized = await fetchProductsAndUpdateStores(result.data);
+                    } else {
+                        const resultIp = await fetchLocationThroughIp();
+                        const normalized = await fetchProductsAndUpdateStores(resultIp.data);
                         setLocation(normalized);
                         setEditedLocation(normalized);
-                        toast.success("Location fetched successfully via IP");
+                        initialLocationRef.current = normalized;
                     }
-                });
-            } else {
-                const result = await fetchLocationThroughIp();
-                if (result.success) {
+                }).catch(async (error) => {
+                    startLoading('fetchLocIp');
+                    const result = await fetchLocationThroughIp();
                     const normalized = await fetchProductsAndUpdateStores(result.data);
                     setLocation(normalized);
                     setEditedLocation(normalized);
-                    toast.success("Location fetched successfully via IP");
-                }
+                    initialLocationRef.current = normalized;
+                });
+            } else {
+                startLoading('fetchLocIp');
+                const result = await fetchLocationThroughIp();
+                const normalized = await fetchProductsAndUpdateStores(result.data);
+                setLocation(normalized);
+                setEditedLocation(normalized);
+                initialLocationRef.current = normalized;
             }
         } catch (error) {
             console.error("Location fetch error:", error);
@@ -127,24 +159,37 @@ export default function Location() {
             stopLoading();
             setIsFetching(false);
         }
-    }, [location, isFetching, setLocation, setEditedLocation, startLoading, stopLoading, selectedFields]);
+    }, [location, isFetching, setLocation, setEditedLocation, startLoading, stopLoading]);
 
     useEffect(() => {
         fetchLocation();
     }, [fetchLocation]);
 
+    useEffect(() => {
+        if (Object.keys(location).length > 0 && selectedFields.length === 0) {
+            const initialFields = getInitialSelectedFields(location);
+            setSelectedFields(initialFields);
+            initialSelectedFieldsRef.current = initialFields;
+            initialLocationRef.current = location;
+        }
+    }, [location, selectedFields.length]);
+
+
     const checkChanges = useCallback((currentEditedLocation, currentSelectedFields) => {
-        const locationValuesChanged = JSON.stringify(initialLocationRef.current) !== JSON.stringify(currentEditedLocation);
+        const currentLocValues = locationToArray(initialLocationRef.current, initialSelectedFieldsRef.current).join('|');
+        const editedLocValues = locationToArray(currentEditedLocation, currentSelectedFields).join('|');
+
+        const locationValuesChanged = currentLocValues !== editedLocValues;
         const fieldsChanged = JSON.stringify(initialSelectedFieldsRef.current.slice().sort()) !== JSON.stringify(currentSelectedFields.slice().sort());
         return locationValuesChanged || fieldsChanged;
-    }, []);
+    }, [locationToArray]);
 
     const cancelEditing = useCallback(() => {
-        setEditedLocation(location);
+        setEditedLocation(initialLocationRef.current);
         setShowForm(false);
         setIsEdited(false);
         setSelectedFields(initialSelectedFieldsRef.current);
-    }, [location, setEditedLocation]);
+    }, [setEditedLocation]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -174,7 +219,7 @@ export default function Location() {
             setShowForm(false);
             return;
         }
-        
+
         initialLocationRef.current = editedLocation;
         initialSelectedFieldsRef.current = selectedFields;
 
@@ -182,7 +227,7 @@ export default function Location() {
         setShowForm(false);
         toast.success("Location updated successfully");
         setIsEdited(false);
-        
+
         startLoading('fetching');
         try {
             const data = await getProducts(locationToArray(editedLocation, selectedFields));
@@ -203,6 +248,9 @@ export default function Location() {
     const handleRefresh = () => {
         setLocation({});
         setEditedLocation({});
+        initialLocationRef.current = {};
+        initialSelectedFieldsRef.current = [];
+        setSelectedFields([]);
         setIsFetching(false);
         setShowForm(false);
         fetchLocation();
@@ -213,7 +261,8 @@ export default function Location() {
             if (prev) {
                 cancelEditing();
             } else {
-                initialLocationRef.current = editedLocation;
+                setEditedLocation(location);
+                initialLocationRef.current = location;
                 initialSelectedFieldsRef.current = selectedFields;
                 setIsEdited(false);
             }
@@ -222,6 +271,11 @@ export default function Location() {
     };
 
     const renderLocationText = () => {
+        const parts = locationToArray(location, selectedFields);
+        return parts.join(", ");
+    };
+
+    const renderLocationTextInForm = () => {
         const parts = locationToArray(editedLocation, selectedFields);
         return parts.join(", ");
     };
@@ -236,7 +290,10 @@ export default function Location() {
         setSelectedFields(prev => {
             let newFields;
             if (prev.includes(key)) {
-                if (prev.length === 1) return prev;
+                if (prev.length === 1) {
+                    toast.error("You must select at least 1 field.");
+                    return prev;
+                }
                 newFields = prev.filter(f => f !== key);
             } else {
                 if (prev.length >= 3) {
@@ -245,9 +302,9 @@ export default function Location() {
                 }
                 newFields = [...prev, key];
             }
-            
+
             setIsEdited(checkChanges(editedLocation, newFields));
-            
+
             return newFields;
         });
     };
@@ -390,14 +447,14 @@ export default function Location() {
 
                             <div className="p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg text-xs text-gray-600 dark:text-gray-400 border border-black dark:border-white">
                                 <span className="font-semibold text-gray-900 dark:text-gray-100">Active Filter: </span>
-                                {locationToArray(editedLocation, selectedFields).join(", ") || "No values entered yet"}
+                                {renderLocationTextInForm() || "No values entered yet"}
                             </div>
                         </div>
 
                         <div className="sticky bottom-0 bg-white dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-800 px-6 py-4 flex justify-center">
                             <button
                                 onClick={applyChanges}
-                                disabled={!isEdited || locationToArray(editedLocation, selectedFields).length === 0}
+                                disabled={!isEdited || locationToArray(editedLocation, selectedFields).filter(Boolean).length === 0}
                                 className="w-fit px-6 py-3 bg-sky-600 text-white rounded-lg cursor-pointer font-semibold hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm border border-black dark:border-white"
                             >
                                 Apply Changes

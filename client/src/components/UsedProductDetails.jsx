@@ -10,6 +10,7 @@ import useWishlistStore from "../store/wishlist";
 import useLoaderStore from '../store/loader'
 import { payNow, verifyPayment } from "../api/payment";
 import { getPriceForUsedProduct } from "../utils/category";
+import useStores from "../store/stores";
 
 const UsedProductDetail = ({ id }) => {
     const navigate = useNavigate();
@@ -222,7 +223,8 @@ const UsedProductDetail = ({ id }) => {
         }
     }
 
-    const handleChatSeller = () => {
+    const handleChatSeller = (e, storeId) => {
+        e.stopPropagation();
         if (!user?._id || !user?.name) {
             navigate(`/login`);
             toast.error("Login First");
@@ -231,6 +233,15 @@ const UsedProductDetail = ({ id }) => {
             toast.error("Only for buyer");
             return;
         }
+
+        const store = useStores.getState().getStore(storeId);
+        navigate(`/buyer/chat?storeId=${storeId}`, {
+            state: {
+                img: store[0]?.img?.url,
+                name: store[0]?.name,
+                seller: store[0]?.userId
+            }
+        });
     };
 
     const getConditionColor = (condition) => {
@@ -504,7 +515,7 @@ const UsedProductDetail = ({ id }) => {
                             <div className="bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-2xl p-6 shadow-sm space-y-5">
                                 <button
                                     disabled={isSold}
-                                    onClick={handleChatSeller}
+                                    onClick={(e) => handleChatSeller(e, product.storeId)}
                                     className={`flex items-center justify-center cursor-pointer w-full gap-2 py-3.5 px-6 rounded-xl font-semibold text-base transition-all shadow-sm hover:shadow-md
                                         ${isSold
                                             ? "bg-gray-300 text-gray-600 dark:bg-neutral-800 dark:text-gray-400 cursor-not-allowed border border-black dark:border-white"

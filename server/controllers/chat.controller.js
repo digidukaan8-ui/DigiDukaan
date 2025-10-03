@@ -313,4 +313,17 @@ const markAllMessagesSeen = async (req, res) => {
   }
 };
 
-export { addMessage, getChats, getChatMessages, updateMessage, removeMessage, markMessageSeen, markAllMessagesSeen };
+const getChatsCount = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const count = await Chat.countDocuments({ userId });
+
+    return res.status(200).json({ success: true, message: 'Getched count successfully', data: count });
+  } catch (error) {
+    console.error("Error in markAllMessagesSeen:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+export { addMessage, getChats, getChatMessages, updateMessage, removeMessage, markMessageSeen, markAllMessagesSeen, getChatsCount };

@@ -92,7 +92,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
     }
 
     const store = useStores.getState().getStore(storeId);
-    navigate(`/chat?storeId=${storeId}`, {
+    navigate(`/buyer/chat?storeId=${storeId}`, {
       state: {
         img: store[0]?.img?.url,
         name: store[0]?.name,
@@ -357,7 +357,7 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
             <button
               onClick={(e) => handleChatSeller(e, product.storeId)}
               disabled={isSold}
-              className="w-full flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed border border-black dark:border-white"
+              className="w-full cursor-pointer flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed border border-black dark:border-white"
             >
               <MessageCircle className="h-5 w-5" />
               {isSold ? "SOLD" : "Chat with Seller"}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import useCartStore from "../../store/cart";
 import useAddressStore from "../../store/address";
 import useLoaderStore from "../../store/loader";
+import { getAddress } from "../../api/address";
 import { addOrder, getStoreCharges } from "../../api/order";
 import { getPlatformCharge, getTax } from "../../utils/category";
 import { toast } from "react-hot-toast";

@@ -1,5 +1,5 @@
 import express from 'express';
-import { addMessage, getChatMessages, getChats, updateMessage, removeMessage, markMessageSeen, markAllMessagesSeen } from '../controllers/chat.controller.js';
+import { addMessage, getChatMessages, getChats, updateMessage, removeMessage, markMessageSeen, markAllMessagesSeen, getChatsCount } from '../controllers/chat.controller.js';
 import { uploadChatMedia, validateChatFileSize } from '../middlewares/chatUpload.middleware.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 
@@ -7,6 +7,7 @@ const chatRouter = express.Router();
 
 chatRouter.get('/', authMiddleware('buyer', 'seller'), getChats);
 chatRouter.post('/add', authMiddleware('buyer', 'seller'), validateChatFileSize, uploadChatMedia, addMessage);
+chatRouter.get('/messages/', authMiddleware('buyer', 'seller'), getChatsCount);
 chatRouter.get('/messages/:chatId', authMiddleware('buyer', 'seller'), getChatMessages);
 chatRouter.put('/messages/:messageId', authMiddleware('buyer', 'seller'), updateMessage);
 chatRouter.delete('/messages/:messageId', authMiddleware('buyer', 'seller'), removeMessage);

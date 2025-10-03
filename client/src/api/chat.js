@@ -163,4 +163,29 @@ const markAllMessagesSeen = async (chatId) => {
     }
 }
 
-export { addMessage, getChats, getChatMessages, updateMessage, removeMessage, markAllMessagesSeen };
+const getChatsCount = async () => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/chats/messages`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'GET',
+            credentials: 'include',
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get chats count");
+            throw new Error(result.message || "Failed to get chats count");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in get chats count:", err);
+        throw err;
+    }
+}
+
+export { addMessage, getChats, getChatMessages, updateMessage, removeMessage, markAllMessagesSeen, getChatsCount };

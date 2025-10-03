@@ -187,7 +187,7 @@ const changeAvatar = async (img) => {
     try {
         const formData = new FormData();
         formData.append('img', img);
-        const response = await fetch('http://localhost:3000/api/buyers/avatar', {
+        const response = await fetch('http://localhost:3000/api/users/avatar', {
             method: 'PUT',
             credentials: 'include',
             body: formData
@@ -208,7 +208,7 @@ const changeAvatar = async (img) => {
 
 const removeAvatar = async () => {
     try {
-        const response = await fetch('http://localhost:3000/api/buyers/avatar', {
+        const response = await fetch('http://localhost:3000/api/users/avatar', {
             method: 'DELETE',
             credentials: 'include',
         });
@@ -228,7 +228,7 @@ const removeAvatar = async () => {
 
 const updateProfile = async (data) => {
     try {
-        const response = await fetch('http://localhost:3000/api/buyers/update', {
+        const response = await fetch('http://localhost:3000/api/users/update', {
             headers: {
                 'Content-Type': 'application/json'
             },

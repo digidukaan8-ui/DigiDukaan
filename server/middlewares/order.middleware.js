@@ -1,6 +1,6 @@
 const handleAddOrder = (req, res, next) => {
     try {
-        let { products, subtotal, overallTax, totalAmount, addressId, deliveryCharges } = req.body;
+        let { products, subtotal, platfromTax, totalAmount, addressId, deliveryCharges } = req.body;
 
         if (!addressId || !subtotal || !totalAmount || !products || !deliveryCharges) {
             return res.status(400).json({ success: false, message: 'Missing required fields: addressId, subtotal, totalAmount, products, deliveryCharges.' });
@@ -20,8 +20,8 @@ const handleAddOrder = (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Total Amount must be a non-negative number.' });
         }
 
-        if (overallTax !== undefined) {
-            const numTax = Number(overallTax);
+        if (platfromTax !== undefined) {
+            const numTax = Number(platfromTax);
             if (isNaN(numTax) || numTax < 0) {
                 return res.status(400).json({ success: false, message: 'Overall Tax must be a non-negative number.' });
             }
