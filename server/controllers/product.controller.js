@@ -664,7 +664,7 @@ const getCartProducts = async (req, res) => {
         const cartItems = await Cart.find({ userId: user._id })
             .populate({
                 path: "productId",
-                select: "title description unit price img discount stock deliveryCharge storeId",
+                select: "title description unit price img discount stock deliveryCharge storeId subCategory",
                 populate: {
                     path: "storeId",
                     select: "name"
@@ -786,7 +786,7 @@ const addCartProduct = async (req, res) => {
         cartItem = await Cart.findById(cartItem._id)
             .populate({
                 path: "productId",
-                select: "title description unit price img discount stock deliveryCharge storeId",
+                select: "title description unit price img discount stock deliveryCharge storeId subCategory",
                 populate: {
                     path: "storeId",
                     select: "name"

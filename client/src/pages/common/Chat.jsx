@@ -1,18 +1,34 @@
 import { useState, useRef, useEffect } from "react";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { LucideArrowLeft, SendHorizontalIcon, Paperclip, CheckIcon, LoaderIcon, RotateCcw, Download, Trash2, Edit3, X } from 'lucide-react';
 import { getChats, getChatMessages, addMessage, updateMessage, removeMessage, markAllMessagesSeen } from "../../api/chat";
 import useAuthStore from "../../store/auth";
 import { FileText, FileImage, FileVideo } from 'lucide-react';
 import socket from "../../utils/socket";
+import { toast } from "react-hot-toast";
 
 function Chat() {
   const { state } = useLocation();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const storeId = searchParams.get('storeId');
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  if (!user) {
+    toast.error('Login First');
+    navigate('/login', { replace: true });
+  }
+
+  if (user.role === 'buyer' && location.pathname.startsWith('/seller')) {
+    navigate('/buyer/chat', { replace: true });
+  }
+
+  if (user.role === 'seller' && location.pathname.startsWith('/buyer')) {
+    navigate('/seller/chat', { replace: true });
+  }
 
   const [selectedChat, setSelectedChat] = useState(() => {
     if (state?.seller) {

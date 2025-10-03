@@ -245,4 +245,29 @@ const getStoreInfo = async (req, res) => {
     }
 };
 
-export { createStore, updateStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone,getStoreInfo };
+const getStoreDeliveryCharge = async (req, res) => {
+    try {
+        let storeIds = req.body;
+
+        if (typeof storeIds === "string") {
+            try {
+                storeIds = JSON.parse(storeIds);
+            } catch (error) {
+                return res.status(400).json({ success: false, message: "Invalid storeIds format" });
+            }
+        }
+
+        if (!Array.isArray(storeIds) || storeIds.length === 0) {
+            return res.status(400).json({ success: false, message: "storeIds must be a non-empty array" });
+        }
+
+        const deliveryCharge = await DeliveryZone.find({ storeId: { $in: storeIds } });
+
+        return res.status(200).json({ success: true, message: "Store delivery charge fetched successfully", data: deliveryCharge });
+    } catch (error) {
+        console.error("Error in Get Store Delivery Charge controller: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+export { createStore, updateStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone, getStoreInfo, getStoreDeliveryCharge };

@@ -231,13 +231,13 @@ export default function Address() {
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 <div>
-                                    <label htmlFor="city" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                        City
+                                    <label htmlFor="city" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 text-wrap">
+                                        City / District / Town / Village / Suburbs / Tehsil / Taluka / Area (any 1)
                                     </label>
                                     <input
                                         id="city"
                                         type="text"
-                                        placeholder="Enter city"
+                                        placeholder="Enter Any One"
                                         {...register("city", { required: "City is required" })}
                                         autoComplete="address-level2"
                                         className="w-full px-4 py-3 rounded-xl border border-black dark:border-white bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
@@ -279,12 +279,12 @@ export default function Address() {
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="landmark" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                        Landmark <span className="text-gray-400 font-normal">(Optional)</span>
+                                        Landmark / Locality / Street (any 1) <span className="text-gray-400 font-normal">(Optional)</span>
                                     </label>
                                     <input
                                         id="landmark"
                                         type="text"
-                                        placeholder="Nearby landmark"
+                                        placeholder="Enter Any One"
                                         {...register("landmark")}
                                         autoComplete="address-line3"
                                         className="w-full px-4 py-3 rounded-xl border border-black dark:border-white bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"

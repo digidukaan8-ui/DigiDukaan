@@ -55,6 +55,8 @@ export default function Loader() {
     creatingOrder: "Creating Order...",
     redirecting: "Redirecting...",
     confirmingPayment: "Confirming Payment...",
+    fetchStoreCharges: "Fetching Store Charges...",
+    fetchOrder: "Fetching Orders...",
     default: "Loading...",
   };
 
@@ -98,6 +100,8 @@ export default function Loader() {
     creatingOrder: "text-blue-500",
     redirecting: "text-blue-500",
     confirmingPayment: "text-emerald-500",
+    fetchStoreCharges: "text-cyan-500",
+    fetchOrder: "text-cyan-500",
     default: "text-gray-500",
   };
 

@@ -21,7 +21,7 @@ const payNow = async (data) => {
             throw new Error(result.message || "Failed to create order");
         }
 
-        const { payment_session_id, order_id } = result.data;
+        const { payment_session_id } = result.data;
 
         if (!payment_session_id) {
             toast.error("Payment session id missing");

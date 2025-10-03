@@ -1,41 +1,112 @@
 export const categories = [
   {
     name: "Grocery",
-    subCategories: ["Fruit", "Vegetables", "Dairy", "Bakery", "Snacks"]
+    subCategories: [
+      { name: "Fruit", platform: 5, gst: 5 },
+      { name: "Vegetables", platform: 5, gst: 5 },
+      { name: "Dairy", platform: 5, gst: 5 },
+      { name: "Bakery", platform: 6, gst: 5 },
+      { name: "Snacks", platform: 7, gst: 12 }
+    ]
   },
   {
     name: "Electronics",
-    subCategories: ["Mobiles", "Laptops", "Headphones", "Cameras", "Accessories"]
+    subCategories: [
+      { name: "Mobiles", platform: 8, gst: 18 },
+      { name: "Laptops", platform: 8, gst: 18 },
+      { name: "Headphones", platform: 8, gst: 18 },
+      { name: "Cameras", platform: 8, gst: 18 },
+      { name: "Accessories", platform: 8, gst: 18 }
+    ]
   },
   {
     name: "Clothing",
-    subCategories: ["Men", "Women", "Kids", "Footwear", "Accessories"]
+    subCategories: [
+      { name: "Men", platform: 7, gst: 12 },
+      { name: "Women", platform: 7, gst: 12 },
+      { name: "Kids", platform: 7, gst: 12 },
+      { name: "Footwear", platform: 7, gst: 18 },
+      { name: "Accessories", platform: 7, gst: 18 }
+    ]
   },
   {
     name: "Home & Kitchen",
-    subCategories: ["Furniture", "Decor", "Kitchenware", "Bedding", "Appliances"]
+    subCategories: [
+      { name: "Furniture", platform: 6, gst: 12 },
+      { name: "Decor", platform: 6, gst: 12 },
+      { name: "Kitchenware", platform: 6, gst: 12 },
+      { name: "Bedding", platform: 6, gst: 12 },
+      { name: "Appliances", platform: 6, gst: 18 }
+    ]
   },
   {
     name: "Beauty & Personal Care",
-    subCategories: ["Skincare", "Haircare", "Makeup", "Fragrances", "Wellness"]
+    subCategories: [
+      { name: "Skincare", platform: 10, gst: 18 },
+      { name: "Haircare", platform: 10, gst: 18 },
+      { name: "Makeup", platform: 10, gst: 18 },
+      { name: "Fragrances", platform: 10, gst: 18 },
+      { name: "Wellness", platform: 10, gst: 18 }
+    ]
   },
   {
     name: "Sports & Outdoors",
-    subCategories: ["Fitness", "Outdoor Gear", "Sportswear", "Cycling", "Camping"]
+    subCategories: [
+      { name: "Fitness", platform: 6, gst: 12 },
+      { name: "Outdoor Gear", platform: 6, gst: 12 },
+      { name: "Sportswear", platform: 6, gst: 12 },
+      { name: "Cycling", platform: 6, gst: 12 },
+      { name: "Camping", platform: 6, gst: 12 }
+    ]
   },
   {
     name: "Books & Stationery",
-    subCategories: ["Fiction", "Non-Fiction", "Educational", "Comics", "Office Supplies"]
+    subCategories: [
+      { name: "Fiction", platform: 4, gst: 5 },
+      { name: "Non-Fiction", platform: 4, gst: 5 },
+      { name: "Educational", platform: 4, gst: 5 },
+      { name: "Comics", platform: 4, gst: 5 },
+      { name: "Office Supplies", platform: 4, gst: 12 }
+    ]
   },
   {
     name: "Toys & Baby Products",
-    subCategories: ["Toys", "Baby Care", "Feeding", "Diapers", "Clothing"]
+    subCategories: [
+      { name: "Toys", platform: 5, gst: 12 },
+      { name: "Baby Care", platform: 5, gst: 12 },
+      { name: "Feeding", platform: 5, gst: 12 },
+      { name: "Diapers", platform: 5, gst: 12 },
+      { name: "Clothing", platform: 5, gst: 12 }
+    ]
   }
 ];
 
+export function getPlatformCharge(subCategoryName, basePrice) {
+  for (const category of categories) {
+    const subCat = category.subCategories.find(sc => sc.name === subCategoryName);
+    if (subCat) {
+      return (basePrice * subCat.platform) / 100;
+    }
+  }
+  return 0;
+}
+
+export function getTax(subCategoryName, basePrice) {
+  for (const category of categories) {
+    const subCat = category.subCategories.find(sc => sc.name === subCategoryName);
+    if (subCat) {
+      if (category.name === "Clothing" && basePrice > 1000) {
+        return (basePrice * 18) / 100;
+      }
+      return (basePrice * subCat.gst) / 100;
+    }
+  }
+  return 0;
+}
+
 export const getSubCategories = (categoryName) => {
   const category = categories.find((cat) => cat.name === categoryName);
-  return category ? category.subCategories : [];
+  return category ? category.subCategories.map(s => s.name) : [];
 };
 
 export const usedProductCategories = [

@@ -18,7 +18,9 @@ import Dashboard from "./buyer/Dasboard";
 import Checkout from "./buyer/Checkout";
 import Address from "./buyer/Address";
 import SellerDashboard from "./seller/SellerDashboard";
+import Order from "./common/Order";
 
 export {
-    Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct, Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout
+    Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct,
+    Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout, Order
 };

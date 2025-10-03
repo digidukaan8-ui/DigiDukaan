@@ -96,7 +96,7 @@ const UsedProductDetail = ({ id }) => {
             }
         }
         fetchPaymentDetail();
-    }, [orderId])
+    }, [orderId]);
 
     const productIds = useWishlistStore((state) => state.wishlist.productIds);
     const isWishlisted = productIds.includes(product._id);

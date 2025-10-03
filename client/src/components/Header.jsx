@@ -17,15 +17,16 @@ export default function Header() {
       return [
         { to: '/', label: 'Home' },
         { to: '/buyer/cart', label: 'Cart' },
-        { to: '/chat', label: 'Chat' },
+        { to: '/buyer/chat', label: 'Chat' },
+        { to: '/buyer/order', label: 'Dashboard' },
         { to: '/buyer/dashboard', label: 'Dashboard' },
         { to: '/logout', label: 'Logout' },
       ];
     } else if (isAuthenticated && user.role === 'seller') {
       return [
         { to: '/seller/store', label: 'Store' },
-        { to: '/order', label: 'Orders' },
-        { to: '/chat', label: 'Chat' },
+        { to: '/seller/order', label: 'Orders' },
+        { to: '/seller/chat', label: 'Chat' },
         { to: '/seller/dashboard', label: 'Dashboard' },
         { to: '/logout', label: 'Logout' },
       ];
