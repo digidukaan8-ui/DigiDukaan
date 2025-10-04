@@ -7,7 +7,7 @@ import { toast } from "react-hot-toast";
 import useAuthStore from "../../store/auth";
 import useOrderStore from "../../store/order";
 import useLoaderStore from "../../store/loader";
-import { verifyOrder } from "../../api/order";
+import { verifyOrder, getOrders } from "../../api/order";
 
 export default function Order() {
   const { user } = useAuthStore();
@@ -18,7 +18,7 @@ export default function Order() {
 
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
-  const [ratingData, setRatingData] = useState({}); // { [productId]: { stars, comment } }
+  const [ratingData, setRatingData] = useState({});
 
   const orderStatusEnum = [
     "PENDING",
@@ -30,37 +30,48 @@ export default function Order() {
     "RETURNED",
   ];
 
-  // --- Fetch orders or confirm payment ---
   useEffect(() => {
     const fetchOrder = async () => {
-      if (!orderIdParam && orders.length > 0 && isFetched) return;
+      if (!orderIdParam) return;
 
       startLoading("fetchOrder");
       try {
         const result = await verifyOrder(orderIdParam);
         if (result.success) {
-          if (!orderIdParam) {
-            clearOrders();
-            setOrders(result.data);
-            toast.success("Orders fetched successfully");
-          } else {
-            toast.success("Payment confirmed");
-            searchParams.delete("orderId");
-            setSearchParams(searchParams);
-
-            addOrder(result.order);
-            setSelectedOrder(result.order);
-          }
+          addOrder(result.data);
+          toast.success("Payment confirmed");
+          searchParams.delete("orderId");
+          setSearchParams(searchParams);
         }
       } finally {
         stopLoading();
       }
     };
 
-    fetchOrder();
+    if (orderIdParam !== null) {
+      fetchOrder();
+    }
   }, [orderIdParam]);
 
-  // --- Handlers ---
+  useEffect(() => {
+    const fetchOrders = async () => {
+      startLoading('fetchOrder');
+      try {
+        const result = await getOrders();
+        if (result.success) {
+          clearOrders();
+          setOrders(result.data);
+          toast.success("Orders fetched successfully");
+        }
+      } finally {
+        stopLoading();
+      }
+    }
+    if (orders.length === 0 && !isFetched) {
+      fetchOrders();
+    }
+  }, []);
+
   const handleCancelOrder = (orderId) => {
     console.log("Cancel order:", orderId);
     setCancelModalOpen(false);
@@ -175,11 +186,10 @@ export default function Order() {
                         {[1, 2, 3, 4, 5].map((star) => (
                           <Star
                             key={star}
-                            className={`w-6 h-6 cursor-pointer ${
-                              ratingData[item.productId._id]?.stars >= star
-                                ? "text-yellow-400 fill-yellow-400"
-                                : "text-gray-500"
-                            }`}
+                            className={`w-6 h-6 cursor-pointer ${ratingData[item.productId._id]?.stars >= star
+                              ? "text-yellow-400 fill-yellow-400"
+                              : "text-gray-500"
+                              }`}
                             onClick={() =>
                               handleRatingChange(item.productId._id, star)
                             }

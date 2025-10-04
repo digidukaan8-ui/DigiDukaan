@@ -93,15 +93,39 @@ const verifyOrder = async (orderId) => {
         const result = await res.json();
 
         if (!result.success) {
-            toast.error("Payment not completed");
-            console.log("Verification failed:", result.data);
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to verify orders");
+            throw new Error(result.message || "Failed to verify orders");
         }
 
         return result;
     } catch (error) {
-        console.error("Error verifying payment:", error);
-        toast.error("Something went wrong while verifying payment");
+        console.error("Error in verify order:", error);
+        throw error;
     }
 };
 
-export { addOrder, getStoreCharges, verifyOrder };
+const getOrders = async () => {
+    try {
+        const res = await fetch(`http://localhost:3000/api/buyers/orders`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        const result = await res.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to verify orders");
+            throw new Error(result.message || "Failed to verify orders");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in get orders:", error);
+        throw error;
+    }
+};
+
+export { addOrder, getStoreCharges, verifyOrder, getOrders };

@@ -156,20 +156,21 @@ const addOrder = async (req, res) => {
 
 const verifyOrderPayment = async (req, res) => {
     try {
-        const { orderId } = req.params;
+        const { orderId } = req.params; 
 
         if (!orderId || typeof orderId !== 'string') {
             return res.status(400).json({ success: false, message: "Missing or invalid orderId" });
         }
 
         const cfResponse = await fetch(
-            `${CASHFREE_BASE_URL}/${orderId}/payments`,
+            `${CASHFREE_BASE_URL}/pg/orders/${orderId}`, 
             {
                 method: "GET",
                 headers: {
                     "x-client-id": process.env.CASHFREE_APP_ID,
                     "x-client-secret": process.env.CASHFREE_SECRET_KEY,
                     "x-api-version": "2022-09-01",
+                    "Content-Type": "application/json",
                 },
             }
         );
@@ -177,9 +178,10 @@ const verifyOrderPayment = async (req, res) => {
         const cfData = await cfResponse.json();
 
         if (!cfResponse.ok) {
+            console.error("Cashfree verification error: ", cfData);
             return res.status(400).json({
                 success: false,
-                message: cfData.message || "Failed to verify order status with Cashfree",
+                message: cfData.message || "Failed to fetch order status from Cashfree",
                 cfData
             });
         }
@@ -190,62 +192,70 @@ const verifyOrderPayment = async (req, res) => {
             return res.status(404).json({ success: false, message: "Order not found in database for verification" });
         }
 
-        if (cfData.order_status === "PAID") {
+        const cfOrderStatus = cfData.order_status;
+        let updateData = {};
+        let responseMessage = `Payment status: ${cfOrderStatus}`;
+        let successStatus = false;
 
-            const updatedOrder = await Order.findOneAndUpdate(
-                { paymentId: orderId },
-                {
-                    paymentStatus: "SUCCESS",
-                    status: "PLACED",
-                    paymentMethod: cfData.payment_mode || "OTHER",
-                    cfOrderId: cfData.cf_order_id,
-                },
-                { new: true }
-            );
+        if (cfOrderStatus === "PAID") {
+            updateData = {
+                paymentStatus: "SUCCESS",
+                status: "PLACED",
+                paymentMethod: cfData.payment_mode || "OTHER",
+                cfOrderId: cfData.cf_order_id,
+            };
+            responseMessage = "Payment Confirmed and Order Placed";
+            successStatus = true;
 
-            for (const item of order.products) {
-                await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
+            if (order.status !== "PLACED") {
+                for (const item of order.products) {
+                    await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
+                }
             }
 
-            return res.json({
-                success: true,
-                message: "Payment Confirmed and Order Placed",
-                data: updatedOrder,
-                cfData,
-            });
+        } else if (cfOrderStatus === "ACTIVE" || cfOrderStatus === "PENDING") {
+            updateData = {
+                paymentStatus: "PENDING",
+                status: "PENDING"
+            };
 
-        } else {
-
-            let newStatus = "CANCELLED";
-            let newPaymentStatus = cfData.order_status;
-
-            if (cfData.order_status === "ACTIVE") {
-                newStatus = "PENDING";
-                newPaymentStatus = "PENDING";
-            }
-
-            const updatedOrder = await Order.findOneAndUpdate(
-                { paymentId: orderId },
-                {
-                    paymentStatus: newPaymentStatus,
-                    status: newStatus
-                },
-                { new: true }
-            );
-
-            return res.json({
-                success: false,
-                message: `Payment status: ${cfData.order_status}`,
-                data: updatedOrder,
-                order:updatedOrder,
-                cfData
-            });
+        } else { 
+            updateData = {
+                paymentStatus: cfOrderStatus,
+                status: "CANCELLED"
+            };
         }
+        
+        const updatedOrder = await Order.findOneAndUpdate(
+            { paymentId: orderId },
+            updateData,
+            { new: true }
+        );
+
+        return res.json({
+            success: successStatus,
+            message: responseMessage,
+            data: updatedOrder,
+            cfData,
+        });
 
     } catch (error) {
-        console.error("Error verifying order payment:", error);
+        console.error("Error verifying order payment controller: ", error);
         return res.status(500).json({ success: false, message: "Server error during order verification" });
     }
 };
 
-export { addOrder, verifyOrderPayment };
+const getOrders = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        const orders = await Order.find({ userId });
+
+        return res.status(200).json({ success: true, message: 'Orders fetched successfully', data: orders });
+    } catch (error) {
+        console.error("Error get orders controller: ", error);
+        return res.status(500).json({ success: false, message: "Server error during order verification" });
+    }
+}
+
+export { addOrder, verifyOrderPayment, getOrders };

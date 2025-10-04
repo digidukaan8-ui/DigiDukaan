@@ -10,6 +10,7 @@ import { handleAddToCart, handleUpdateCart } from '../middlewares/product.middle
 import { addAddress, updateAddress, removeAddress, getAddresses } from '../controllers/address.controller.js';
 import { handleAddAddress, handleUpdateAddress } from '../middlewares/address.middleware.js';
 import { getStoreDeliveryCharge } from '../controllers/store.controller.js';
+import { getOrders } from '../controllers/order.controller.js';
 const buyerRouter = express.Router();
 
 buyerRouter.get('/cart', authMiddleware('buyer'), getCartProducts);
@@ -17,6 +18,7 @@ buyerRouter.get('/wishlist', authMiddleware('buyer'), getWishlistProducts);
 buyerRouter.get('/viewed', authMiddleware('buyer'), getViewedProducts);
 buyerRouter.get('/reviews', authMiddleware('buyer'), getReview);
 buyerRouter.get('/addresses', authMiddleware('buyer'), getAddresses);
+buyerRouter.get('/orders', authMiddleware('buyer', 'seller'), getOrders);
 
 buyerRouter.post('/cart/:productId', authMiddleware('buyer'), handleAddToCart, addCartProduct);
 buyerRouter.post('/wishlist/:productId', authMiddleware('buyer'), addWishlistProduct);
