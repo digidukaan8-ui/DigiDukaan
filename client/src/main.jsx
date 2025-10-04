@@ -38,6 +38,7 @@ const router = createBrowserRouter(
         <Route path='order' element={<Order />} />
         <Route path='wishlist' element={<Whislist />} />
         <Route path='recently-viewed' element={<View />} />
+        <Route path='review' element={<ReviewForm />} />
       </Route>
 
       <Route path='seller' element={<SellerRoute />} >

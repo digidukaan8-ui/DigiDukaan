@@ -21,13 +21,15 @@ const reviewSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
-    images: {
-        type: String,
-        trim: true
+    img: {
+        url: { type: String },
+        publicId: { type: String },
+        title: { type: String }
     },
     videos: {
-        type: String,
-        trim: true
+        url: { type: String },
+        publicId: { type: String },
+        title: { type: String }
     }
 }, { timestamps: true });
 
