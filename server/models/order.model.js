@@ -6,6 +6,11 @@ const orderSchema = new mongoose.Schema({
         ref: "User",
         required: true
     },
+    storeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Store",
+        required: true
+    },
     products: [
         {
             productId: {
@@ -43,39 +48,20 @@ const orderSchema = new mongoose.Schema({
         required: true,
         min: 0
     },
-    deliveryCharges: [
-        {
-            storeId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Store",
-                required: true
-            },
-            amount: { type: Number, required: true, min: 0 },
-            gst: {
-                rate: { type: Number, required: true, default: 0 },
-                amount: { type: Number, required: true, default: 0 }
-            }
-        }
-    ],
+    deliveryCharge:
+    {
+        amount: { type: Number, required: true, min: 0 },
+        gst: {
+            rate: { type: Number, required: true, default: 0 },
+            amount: { type: Number, required: true, default: 0 }
+        },
+        deliverWithInDays: { type: Number, required: true }
+    },
     platformTax: {
         type: Number,
         default: 0,
         min: 0
     },
-    storeTax: [
-        {
-            storeId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Store",
-                required: true
-            },
-            amount: { type: Number, required: true, min: 0 },
-            gst: {
-                rate: { type: Number, required: true, default: 0 },
-                amount: { type: Number, required: true, default: 0 }
-            }
-        }
-    ],
     totalAmount: {
         type: Number,
         required: true,

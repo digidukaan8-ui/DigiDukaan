@@ -10,11 +10,19 @@ const useOrderStore = create(
             setOrders: (orders) => {
                 set({ orders: orders, isFetched: true })
             },
+
             addOrder: (order) => {
                 set((state) => ({
                     orders: [...state.orders, order]
                 }))
             },
+
+            updateOrder: (id, order) => {
+                set((state) => ({
+                    orders: state.orders.map((o) => o._id === id ? order : o)
+                }))
+            },
+
             clearOrders: () => {
                 set({ orders: [], isFetched: false })
             }

@@ -5,6 +5,7 @@ import { uploadProductMedia, validateFileSizes } from '../middlewares/upload.mid
 import { createStore, updateStore, addDeliveryZone, updateDeliveryZone, removeDeliveryZone, getStoreInfo } from '../controllers/store.controller.js';
 import { handleAddProduct, handleUpdateProduct, handleAddUsedProduct, handleUpdateUsedProduct } from '../middlewares/product.middleware.js';
 import { addProduct, getProduct, updateProduct, removeProduct, changeAvailability, addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct } from '../controllers/product.controller.js';
+import { updateOrderStatus } from '../controllers/order.controller.js';
 
 const sellerRouter = express.Router();
 
@@ -27,5 +28,7 @@ sellerRouter.get('/stores/:storeId/used-products', authMiddleware('seller'), get
 sellerRouter.post('/stores/:storeId/used-products', authMiddleware('seller'), validateFileSizes, uploadProductMedia, handleAddUsedProduct, addUsedProduct);
 sellerRouter.patch('/used-products/:usedProductId', authMiddleware('seller'), validateFileSizes, uploadProductMedia, handleUpdateUsedProduct, updateUsedProduct);
 sellerRouter.delete('/used-products/:usedProductId', authMiddleware('seller'), removeUsedProduct);
+
+sellerRouter.put('/orders/status/:orderId', authMiddleware('seller'), updateOrderStatus);
 
 export default sellerRouter;

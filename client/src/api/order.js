@@ -128,4 +128,51 @@ const getOrders = async () => {
     }
 };
 
-export { addOrder, getStoreCharges, verifyOrder, getOrders };
+const cancelOrder = async (orderId) => {
+    try {
+        const res = await fetch(`http://localhost:3000/api/buyers/orders/cancel/${orderId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        const result = await res.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to cancel order");
+            throw new Error(result.message || "Failed to cancel order");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in cancel order:", error);
+        throw error;
+    }
+}
+
+const updateOrderStatus = async (orderId, status) => {
+    try {
+        const res = await fetch(`http://localhost:3000/api/sellers/orders/status/${orderId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ status })
+        });
+
+        const result = await res.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to update order status");
+            throw new Error(result.message || "Failed to update order status");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in update order status:", error);
+        throw error;
+    }
+}
+
+export { addOrder, getStoreCharges, verifyOrder, getOrders, cancelOrder, updateOrderStatus };

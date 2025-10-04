@@ -104,14 +104,14 @@ const handleUpdateStore = async (req, res, next) => {
 
 const handleDeliveryZone = async (req, res, next) => {
     try {
-        const { deliveryArea, areaName, deliveryCharge } = req.body;
+        const { deliveryArea, areaName, deliveryCharge, deliveryDays } = req.body;
         const { storeId } = req.params;
 
         if (!storeId || !deliveryArea || !areaName) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
-        if (typeof (storeId) !== 'string' || typeof (deliveryArea) !== 'string' || typeof (areaName) !== 'string' || typeof (deliveryCharge) !== 'number') {
+        if (typeof (storeId) !== 'string' || typeof (deliveryArea) !== 'string' || typeof (areaName) !== 'string' || typeof (deliveryCharge) !== 'number' || typeof (deliveryDays) !== 'number') {
             return res.status(400).json({ success: false, message: 'Invalid input format' });
         }
 
@@ -124,14 +124,15 @@ const handleDeliveryZone = async (req, res, next) => {
 
 const handleUpdateDeliveryZone = async (req, res, next) => {
     try {
-        const { deliveryArea, areaName, deliveryCharge } = req.body;
+        const { deliveryArea, areaName, deliveryCharge, deliveryDays } = req.body;
         const { zoneId } = req.params;
+        console.log(req.body)
 
         if (!zoneId || !deliveryArea || !areaName) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
-        if (typeof (zoneId) !== 'string' || typeof (deliveryArea) !== 'string' || typeof (areaName) !== 'string' || typeof (deliveryCharge) !== 'number') {
+        if (typeof (zoneId) !== 'string' || typeof (deliveryArea) !== 'string' || typeof (areaName) !== 'string' || typeof (deliveryCharge) !== 'number' || typeof (deliveryDays) !== 'number') {
             return res.status(400).json({ success: false, message: 'Invalid input format' });
         }
 

@@ -57,6 +57,8 @@ export default function Loader() {
     confirmingPayment: "Confirming Payment...",
     fetchStoreCharges: "Fetching Store Charges...",
     fetchOrder: "Fetching Orders...",
+    updateStatus: "Updating Order Status...",
+    cancelOrder: "Cancelling Order...",
     default: "Loading...",
   };
 
@@ -102,6 +104,8 @@ export default function Loader() {
     confirmingPayment: "text-emerald-500",
     fetchStoreCharges: "text-cyan-500",
     fetchOrder: "text-cyan-500",
+    updateStatus: "text-cyan-500",
+    cancelOrder: "text-cyan-500",
     default: "text-gray-500",
   };
 

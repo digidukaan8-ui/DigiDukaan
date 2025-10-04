@@ -1,14 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiStar } from "react-icons/fi";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const MAX_IMAGE_SIZE_MB = 10;
 const MAX_VIDEO_SIZE_MB = 50;
-
-const defaultProduct = {
-  id: "P123",
-  title: "Premium Bluetooth Headphones",
-  imageUrl: "https://via.placeholder.com/100x100?text=Product+Image",
-};
 
 const StarRating = ({ rating, setRating }) => {
   return (
@@ -30,7 +25,21 @@ const StarRating = ({ rating, setRating }) => {
 };
 
 export default function ReviewForm() {
-  const [rating, setRating] = useState(0);
+ const { state } = useLocation();
+const [rating, setRating] = useState(0);
+const navigate = useNavigate();
+
+const defaultProduct = {
+  id: state?.productId,
+  title: state?.productName,
+  img: state?.img,
+};
+
+useEffect(() => {
+  if (!state || !state.productId || !state.productName) {
+    navigate('/', { replace: true });
+  }
+}, []);
 
   const [includeText, setIncludeText] = useState(true);
   const [includeImage, setIncludeImage] = useState(false);
@@ -105,9 +114,9 @@ export default function ReviewForm() {
 
           <div className="flex items-center space-x-4 p-4 mb-6 border border-gray-200 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800">
             <img
-              src={product.imageUrl}
+              src={product.img}
               alt={product.title}
-              className="w-16 h-16 object-cover rounded-md flex-shrink-0"
+              className="w-24 h-24 object-cover rounded-md flex-shrink-0"
             />
             <div className="min-w-0">
               <p className="font-semibold text-gray-900 dark:text-gray-100 truncate">{product.title}</p>

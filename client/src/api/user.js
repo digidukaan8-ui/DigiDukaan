@@ -7,6 +7,7 @@ import useUsedProductStore from '../store/usedProduct';
 import useCartStore from '../store/cart';
 import useWishlistStore from '../store/wishlist';
 import useAddressStore from '../store/address';
+import useOrderStore from '../store/order';
 
 const registerUser = async (data) => {
     try {
@@ -82,6 +83,7 @@ const logoutUser = async () => {
             useCartStore.getState().clearCart();
             useWishlistStore.getState().clearWishlist();
             useAddressStore.getState().clearAddress();
+            useOrderStore.getState().clearOrders();
         }
 
         return result;

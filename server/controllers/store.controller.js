@@ -140,7 +140,7 @@ const updateStore = async (req, res) => {
 
 const addDeliveryZone = async (req, res) => {
     try {
-        const { deliveryArea, areaName, deliveryCharge } = req.body;
+        const { deliveryArea, areaName, deliveryCharge, deliveryDays } = req.body;
         const { storeId } = req.params;
 
         const store = await Store.findById(storeId);
@@ -152,7 +152,8 @@ const addDeliveryZone = async (req, res) => {
             storeId,
             deliveryArea,
             areaName,
-            deliveryCharge
+            deliveryCharge,
+            deliveryDays
         });
 
         await newDeliveryZone.save();
@@ -166,11 +167,11 @@ const addDeliveryZone = async (req, res) => {
 
 const updateDeliveryZone = async (req, res) => {
     try {
-        const { deliveryArea, areaName, deliveryCharge } = req.body;
+        const { deliveryArea, areaName, deliveryCharge, deliveryDays } = req.body;
         const { zoneId } = req.params;
         const updatedZone = await DeliveryZone.findByIdAndUpdate(
             zoneId,
-            { $set: { deliveryArea, areaName, deliveryCharge } },
+            { $set: { deliveryArea, areaName, deliveryCharge, deliveryDays } },
             { new: true }
         );
 

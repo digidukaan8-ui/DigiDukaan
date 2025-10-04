@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import useDeliveryStore from "../../store/deliveryZone";
-import { MapPin, Pencil, Trash2, Plus } from "lucide-react";
+import { MapPin, Pencil, Trash2 } from "lucide-react";
 import { addDeliveryZone, updateDeliveryZone, removeDeliveryZone } from "../../api/store";
 import useLoaderStore from "../../store/loader";
 import { toast } from "react-hot-toast";
@@ -28,7 +28,8 @@ const DeliveryForm = () => {
       storeId: store._id,
       deliveryArea: capitalizeFirst(data.deliveryArea),
       areaName: capitalizeFirst(data.areaName.trim()),
-      deliveryCharge: Number(data.deliveryCharge) || 0
+      deliveryCharge: Number(data.deliveryCharge) || 0,
+      deliveryDays: Number(data.deliveryDays) || 0
     };
 
     if (!correctData.deliveryArea || !correctData.areaName) {
@@ -43,7 +44,8 @@ const DeliveryForm = () => {
         updateZone(result.data._id, {
           deliveryArea: result.data.deliveryArea,
           areaName: result.data.areaName,
-          deliveryCharge: result.data.deliveryCharge
+          deliveryCharge: result.data.deliveryCharge,
+          deliveryDays: result.data.deliveryDays
         });
         setEditId(null);
         toast.success("Delivery Zone updated successfully");
@@ -61,13 +63,14 @@ const DeliveryForm = () => {
       }
     }
 
-    reset({ deliveryArea: "city", areaName: "", deliveryCharge: "" });
+    reset({ deliveryArea: "city", areaName: "", deliveryCharge: "", deliveryDays: "" });
   };
 
   const handleEdit = (zone) => {
     setValue("deliveryArea", zone.deliveryArea.toLowerCase());
     setValue("areaName", zone.areaName);
-    setValue("deliveryCharge", zone.deliveryCharge || "");
+    setValue("deliveryCharge", zone.deliveryCharge || 0);
+    setValue("deliveryDays", zone.deliveryDays || 0);
     setEditId(zone._id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -145,6 +148,22 @@ const DeliveryForm = () => {
               </p>
             </div>
 
+            <div className="space-y-2">
+              <label htmlFor="deliveryDays" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Delivery within (in days)
+              </label>
+              <input
+                id="deliveryDays"
+                type="number"
+                {...register("deliveryDays", { required: true })}
+                placeholder="Expected delivery within (days)"
+                className="w-full rounded-lg px-3 py-2 bg-gray-50 dark:bg-neutral-800 border border-black dark:border-white text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Applied to all deliveries in this zone
+              </p>
+            </div>
+
             <div className="flex gap-2 pt-2">
               <button
                 type="submit"
@@ -157,7 +176,7 @@ const DeliveryForm = () => {
                   type="button"
                   onClick={() => {
                     setEditId(null);
-                    reset({ deliveryArea: "city", areaName: "", deliveryCharge: "" });
+                    reset({ deliveryArea: "city", areaName: "", deliveryCharge: "", deliveryDays: "" });
                   }}
                   className="px-4 py-2 rounded-lg font-medium bg-gray-200 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-neutral-700 transition-colors text-sm"
                 >
@@ -227,6 +246,10 @@ const DeliveryForm = () => {
 
                   <div className="text-green-600 dark:text-green-400 font-semibold text-sm">
                     ₹{zone.deliveryCharge || 0}
+                  </div>
+
+                  <div className="text-sky-600 dark:text-sky-400 font-semibold text-sm">
+                    Expected Delivery within {zone.deliveryDays || 0} {zone.deliveryDays > 1 ? " days" : " day"}
                   </div>
                 </div>
               ))}

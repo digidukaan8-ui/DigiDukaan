@@ -1,13 +1,13 @@
 const handleAddOrder = (req, res, next) => {
     try {
-        let { products, subtotal, platfromTax, totalAmount, addressId, deliveryCharges } = req.body;
+        let { storeId, products, subtotal, deliveryCharge, platformTax, totalAmount, addressId } = req.body;
 
-        if (!addressId || !subtotal || !totalAmount || !products || !deliveryCharges) {
-            return res.status(400).json({ success: false, message: 'Missing required fields: addressId, subtotal, totalAmount, products, deliveryCharges.' });
+        if (!storeId || !addressId || !subtotal || !totalAmount || !products || !deliveryCharge) {
+            return res.status(400).json({ success: false, message: 'Missing required fields: storeId, addressId, subtotal, totalAmount, products, deliveryCharge.' });
         }
 
-        if (typeof addressId !== 'string') {
-            return res.status(400).json({ success: false, message: 'Invalid addressId format.' });
+        if (typeof storeId !== 'string' || typeof addressId !== 'string') {
+            return res.status(400).json({ success: false, message: 'Invalid storeId or addressId format.' });
         }
 
         const numSubtotal = Number(subtotal);
@@ -20,19 +20,15 @@ const handleAddOrder = (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Total Amount must be a non-negative number.' });
         }
 
-        if (platfromTax !== undefined) {
-            const numTax = Number(platfromTax);
+        if (platformTax !== undefined) {
+            const numTax = Number(platformTax);
             if (isNaN(numTax) || numTax < 0) {
-                return res.status(400).json({ success: false, message: 'Overall Tax must be a non-negative number.' });
+                return res.status(400).json({ success: false, message: 'Platform Tax must be a non-negative number.' });
             }
         }
 
         if (!Array.isArray(products) || products.length === 0) {
             return res.status(400).json({ success: false, message: 'Products must be a non-empty array.' });
-        }
-
-        if (!Array.isArray(deliveryCharges)) {
-            return res.status(400).json({ success: false, message: 'Delivery Charges must be an array.' });
         }
 
         for (let i = 0; i < products.length; i++) {
@@ -42,7 +38,7 @@ const handleAddOrder = (req, res, next) => {
                 return res.status(400).json({ success: false, message: `Product at index ${i} is missing required fields.` });
             }
 
-            if (!product.productId || typeof product.productId !== 'string') {
+            if (typeof product.productId !== 'string') {
                 return res.status(400).json({ success: false, message: `Invalid productId format at index ${i}.` });
             }
 
@@ -79,22 +75,27 @@ const handleAddOrder = (req, res, next) => {
                 return res.status(400).json({ success: false, message: `Discount must be a non-negative number at index ${i}.` });
             }
         }
+        
+        if (typeof deliveryCharge !== 'object' || deliveryCharge === null) {
+             return res.status(400).json({ success: false, message: 'Delivery Charge must be a valid object.' });
+        }
 
-        for (let i = 0; i < deliveryCharges.length; i++) {
-            const charge = deliveryCharges[i];
+        if (deliveryCharge.amount === undefined || !deliveryCharge.gst || deliveryCharge.deliverWithInDays === undefined) {
+            return res.status(400).json({ success: false, message: 'Delivery charge is missing required fields (amount, gst, or deliverWithInDays).' });
+        }
 
-            if (!charge.storeId || charge.amount === undefined) {
-                return res.status(400).json({ success: false, message: `Delivery charge at index ${i} is missing required fields (storeId or amount).` });
-            }
+        const numAmount = Number(deliveryCharge.amount);
+        if (isNaN(numAmount) || numAmount < 0) {
+            return res.status(400).json({ success: false, message: 'Delivery charge amount must be a non-negative number.' });
+        }
 
-            if (!charge.storeId || typeof charge.storeId !== 'string') {
-                return res.status(400).json({ success: false, message: `Invalid storeId format in delivery charge at index ${i}.` });
-            }
+        if (deliveryCharge.gst.rate === undefined || deliveryCharge.gst.amount === undefined) {
+             return res.status(400).json({ success: false, message: 'Delivery charge GST (rate/amount) is missing.' });
+        }
 
-            const numAmount = Number(charge.amount);
-            if (isNaN(numAmount) || numAmount < 0) {
-                return res.status(400).json({ success: false, message: `Delivery charge amount must be a non-negative number at index ${i}.` });
-            }
+        const numDays = Number(deliveryCharge.deliverWithInDays);
+        if (isNaN(numDays) || !Number.isInteger(numDays) || numDays < 0) {
+            return res.status(400).json({ success: false, message: 'Delivery days must be a non-negative integer.' });
         }
 
         return next();

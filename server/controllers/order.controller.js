@@ -2,19 +2,31 @@ import Product from "../models/product.model.js";
 import Order from "../models/order.model.js";
 import Store from "../models/store.model.js";
 import Address from "../models/address.model.js";
+import Cart from "../models/cart.model.js";
 import { getPlatformCharge, getTax } from "../utils/category.util.js";
 
 const CASHFREE_BASE_URL = "https://sandbox.cashfree.com/pg/orders";
 
 const addOrder = async (req, res) => {
     try {
-        const { products, subtotal, deliveryCharges, totalAmount, addressId, storeTax } = req.body;
+        const { storeId, products, subtotal, deliveryCharge, platformTax, totalAmount, addressId } = req.body;
         const userId = req.user._id;
 
+        const store = await Store.findById(storeId);
+        if (!store) {
+            return res.status(404).json({
+                success: false,
+                message: `Store not found with ID: ${storeId}`
+            });
+        }
+
         const validatedProducts = [];
+        let calculatedSubtotal = 0;
+        let calculatedTotalPlatformFee = 0;
+        let calculatedTotalTax = 0;
 
         for (let pro of products) {
-            const product = await Product.findById(pro.productId);
+            const product = await Product.findById(pro.productId).populate('subCategory');
             if (!product) {
                 return res.status(404).json({
                     success: false,
@@ -30,52 +42,72 @@ const addOrder = async (req, res) => {
                 });
             }
 
-            const subCat = product.subCategory?.name || "";
             const basePrice = product.price;
+            const qty = pro.quantity;
+            let discountAmount = 0;
 
-            const platformFeeRate = getPlatformCharge(subCat, basePrice);
-            const platformFeeAmount = (basePrice * platformFeeRate) / 100;
+            if (product.discount?.percentage) {
+                discountAmount = (basePrice * product.discount.percentage) / 100;
+            } else if (product.discount?.amount) {
+                discountAmount = product.discount.amount;
+            }
 
-            const taxRate = getTax(subCat, basePrice);
-            const taxAmount = (basePrice * taxRate) / 100;
+            const priceAfterDiscount = basePrice - discountAmount;
 
-            const finalPrice = basePrice + platformFeeAmount + taxAmount - (pro.priceDistribution?.discount || 0) + (pro.priceDistribution?.productCharge || 0);
+            const platformFeeRate = getPlatformCharge(product.subCategory?.name, 100);
+            const platformFeePerUnit = (priceAfterDiscount * platformFeeRate) / 100;
+            const platformFeeTotal = platformFeePerUnit * qty;
+
+            const productChargePerUnit = product.deliveryCharge || 0;
+            const priceWithProductCharge = priceAfterDiscount + productChargePerUnit;
+            const productChargeTotal = productChargePerUnit * qty;
+
+            const taxRate = getTax(product.subCategory?.name, 100);
+            const taxPerUnit = (priceWithProductCharge * taxRate) / 100;
+            const taxTotal = taxPerUnit * qty;
+
+            const itemSubtotal = (priceAfterDiscount + productChargePerUnit) * qty;
+            const itemTotal = itemSubtotal + platformFeeTotal + taxTotal;
+
+            calculatedSubtotal += itemSubtotal;
+            calculatedTotalPlatformFee += platformFeeTotal;
+            calculatedTotalTax += taxTotal;
 
             validatedProducts.push({
                 productId: pro.productId,
-                quantity: pro.quantity,
+                quantity: qty,
                 priceDistribution: {
-                    basePrice: basePrice,
-                    discount: pro.priceDistribution?.discount || 0,
-                    productCharge: pro.priceDistribution?.productCharge || 0,
+                    basePrice: Number(basePrice.toFixed(2)),
+                    discount: Number(discountAmount.toFixed(2)),
+                    productCharge: Number(productChargePerUnit.toFixed(2)),
                     platformFee: {
                         rate: platformFeeRate,
-                        amount: platformFeeAmount
+                        amount: Number(platformFeePerUnit.toFixed(2))
                     },
                     tax: {
                         rate: taxRate,
-                        amount: taxAmount
-                    },
-                    total: finalPrice * pro.quantity
+                        amount: Number(taxPerUnit.toFixed(2))
+                    }
                 },
-                finalPrice: finalPrice
+                finalPrice: Number((itemTotal / qty).toFixed(2))
             });
         }
 
-        const validatedDeliveryCharges = [];
-        for (let charge of deliveryCharges) {
-            const store = await Store.findById(charge.storeId);
-            if (!store) {
-                return res.status(404).json({
-                    success: false,
-                    message: `Store not found with ID: ${charge.storeId}`
-                });
-            }
+        const deliveryChargeAmount = deliveryCharge?.amount || 0;
+        const deliveryGstRate = deliveryCharge?.gst?.rate || 0;
+        const deliveryGstAmount = deliveryChargeAmount ? (deliveryChargeAmount * deliveryGstRate) / 100 : 0;
 
-            validatedDeliveryCharges.push({
-                storeId: charge.storeId,
-                amount: charge.amount,
-                gst: charge.gst
+        const storePlatformFeeGST = calculatedTotalPlatformFee * 0.18;
+
+        const calculatedTotalAmount = calculatedSubtotal + calculatedTotalPlatformFee + calculatedTotalTax + deliveryChargeAmount + deliveryGstAmount + storePlatformFeeGST;
+
+        const toleranceAmount = 1;
+        if (Math.abs(calculatedTotalAmount - totalAmount) > toleranceAmount) {
+            return res.status(400).json({
+                success: false,
+                message: 'Amount mismatch detected',
+                calculated: Number(calculatedTotalAmount.toFixed(2)),
+                received: totalAmount
             });
         }
 
@@ -100,7 +132,7 @@ const addOrder = async (req, res) => {
                 customer_phone: req.user.phone || "1234567890",
             },
             order_meta: {
-                return_url: `${process.env.CORS_ORIGIN}/buyer/order?orderId=${orderId}`
+                return_url: `${process.env.CORS_ORIGIN}/buyer/order?orderId={order_id}`
             }
         };
 
@@ -118,6 +150,7 @@ const addOrder = async (req, res) => {
         const cashfreeData = await cfResponse.json();
 
         if (!cfResponse.ok) {
+            console.error("Cashfree order creation error: ", cashfreeData);
             return res.status(400).json({
                 success: false,
                 message: cashfreeData.message || "Failed to create payment order"
@@ -126,12 +159,20 @@ const addOrder = async (req, res) => {
 
         const newOrder = await Order.create({
             userId: userId,
+            storeId: storeId,
             products: validatedProducts,
-            subtotal: subtotal,
-            deliveryCharges: validatedDeliveryCharges,
-            totalAmount: totalAmount,
+            subtotal: Number(calculatedSubtotal.toFixed(2)),
+            deliveryCharge: {
+                amount: Number(deliveryChargeAmount.toFixed(2)),
+                gst: {
+                    rate: deliveryGstRate,
+                    amount: Number(deliveryGstAmount.toFixed(2))
+                },
+                deliverWithInDays: deliveryCharge?.deliverWithInDays || 3
+            },
+            platformTax: Number(storePlatformFeeGST.toFixed(2)),
+            totalAmount: Number(totalAmount.toFixed(2)),
             addressId: addressId,
-            storeTax: storeTax,
             status: "PENDING",
             paymentStatus: "PENDING",
             paymentId: orderId,
@@ -140,7 +181,7 @@ const addOrder = async (req, res) => {
 
         return res.status(201).json({
             success: true,
-            message: 'Order created successfully',
+            message: 'Order created successfully. Proceed to payment.',
             data: {
                 order: newOrder,
                 payment_session_id: cashfreeData.payment_session_id,
@@ -156,14 +197,14 @@ const addOrder = async (req, res) => {
 
 const verifyOrderPayment = async (req, res) => {
     try {
-        const { orderId } = req.params; 
+        const { orderId } = req.params;
 
         if (!orderId || typeof orderId !== 'string') {
             return res.status(400).json({ success: false, message: "Missing or invalid orderId" });
         }
 
         const cfResponse = await fetch(
-            `${CASHFREE_BASE_URL}/pg/orders/${orderId}`, 
+            `${CASHFREE_BASE_URL}/${orderId}`,
             {
                 method: "GET",
                 headers: {
@@ -186,7 +227,11 @@ const verifyOrderPayment = async (req, res) => {
             });
         }
 
-        const order = await Order.findOne({ paymentId: orderId });
+        const userId = req.user._id;
+
+        const order = await Order.findOne({ paymentId: orderId })
+            .populate('storeId', 'name')
+            .populate('addressId');
 
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found in database for verification" });
@@ -200,17 +245,25 @@ const verifyOrderPayment = async (req, res) => {
         if (cfOrderStatus === "PAID") {
             updateData = {
                 paymentStatus: "SUCCESS",
-                status: "PLACED",
+                status: "CONFIRMED",
                 paymentMethod: cfData.payment_mode || "OTHER",
                 cfOrderId: cfData.cf_order_id,
             };
-            responseMessage = "Payment Confirmed and Order Placed";
+            responseMessage = "Payment Confirmed and Order Confirmed";
             successStatus = true;
 
-            if (order.status !== "PLACED") {
-                for (const item of order.products) {
-                    await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
-                }
+            if (order.status !== "CONFIRMED") {
+                const productUpdates = order.products.map(item =>
+                    Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } })
+                );
+
+                const productIdsToRemove = order.products.map(item => item.productId);
+                const cartRemoval = Cart.deleteMany({
+                    userId: userId,
+                    productId: { $in: productIdsToRemove }
+                });
+
+                await Promise.all([...productUpdates, cartRemoval]);
             }
 
         } else if (cfOrderStatus === "ACTIVE" || cfOrderStatus === "PENDING") {
@@ -219,23 +272,31 @@ const verifyOrderPayment = async (req, res) => {
                 status: "PENDING"
             };
 
-        } else { 
+        } else {
+            let paymentStatus = "FAILED";
+            if (cfOrderStatus === "REFUNDED") paymentStatus = "REFUNDED";
+
             updateData = {
-                paymentStatus: cfOrderStatus,
+                paymentStatus: paymentStatus,
                 status: "CANCELLED"
             };
+            responseMessage = `Payment ${cfOrderStatus}. Order Cancelled.`;
         }
-        
+
         const updatedOrder = await Order.findOneAndUpdate(
             { paymentId: orderId },
             updateData,
             { new: true }
-        );
+        ).populate('storeId', 'name').populate('addressId').populate({ path: "products.productId", select: "title unit img", });
 
         return res.json({
             success: successStatus,
             message: responseMessage,
-            data: updatedOrder,
+            data: {
+                ...updatedOrder.toObject(),
+                storeName: updatedOrder.storeId?.name,
+                address: updatedOrder.addressId
+            },
             cfData,
         });
 
@@ -249,13 +310,135 @@ const getOrders = async (req, res) => {
     try {
         const userId = req.user._id;
 
-        const orders = await Order.find({ userId });
+        let orders = await Order.find({ userId })
+            .populate({ path: "storeId", select: "name" })
+            .populate({ path: "products.productId", select: "title unit img" })
+            .populate({ path: "addressId" })
+            .sort({ createdAt: -1 });
 
-        return res.status(200).json({ success: true, message: 'Orders fetched successfully', data: orders });
+        if (!orders || orders.length === 0) {
+            const userStore = await Store.findOne({ userId });
+
+            if (userStore) {
+                orders = await Order.find({ storeId: userStore._id })
+                    .populate({ path: "storeId", select: "name" })
+                    .populate({ path: "products.productId", select: "title unit img" })
+                    .populate({ path: "addressId" })
+                    .sort({ createdAt: -1 });
+            }
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Orders fetched successfully',
+            data: orders || []
+        });
     } catch (error) {
-        console.error("Error get orders controller: ", error);
-        return res.status(500).json({ success: false, message: "Server error during order verification" });
+        console.error("Error get orders controller:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error during fetching orders"
+        });
     }
-}
+};
 
-export { addOrder, verifyOrderPayment, getOrders };
+const cancelOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        if (!orderId) {
+            return res.status(400).json({ success: false, message: 'Order ID is required.' });
+        }
+
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found.' });
+        }
+
+        if (order.status === "DELIVERED" || order.status === "CANCELLED" || order.status === "RETURNED") {
+            return res.status(400).json({ success: false, message: `Cannot cancel an order with status: ${order.status}.` });
+        }
+
+        if (order.paymentStatus === "SUCCESS" || order.paymentStatus === "PAID") {
+            const stockUpdates = order.products.map(item =>
+                Product.findByIdAndUpdate(
+                    item.productId,
+                    { $inc: { stock: item.quantity } }
+                )
+            );
+            await Promise.all(stockUpdates);
+        }
+
+        const updatedOrder = await Order.findByIdAndUpdate(
+            orderId,
+            {
+                status: "CANCELLED",
+            },
+            { new: true }
+        )
+            .populate({ path: "storeId", select: "name" })
+            .populate({ path: "products.productId", select: "title unit img" })
+            .populate({ path: "addressId" });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Order cancelled and stock refunded successfully.',
+            data: updatedOrder
+        });
+
+    } catch (error) {
+        console.error("Error cancel order controller:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error during cancel order"
+        });
+    }
+};
+
+const updateOrderStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        const { orderId } = req.params;
+
+        if (!orderId) {
+            return res.status(400).json({ success: false, message: 'Order id is required' });
+        }
+
+        if (!status) {
+            return res.status(400).json({ success: false, message: 'Status is required' });
+        }
+
+        const updatedOrder = await Order.findByIdAndUpdate(
+            orderId,
+            { status: status },
+            {
+                new: true,
+                runValidators: true
+            }
+        )
+            .populate({ path: "storeId", select: "name" })
+            .populate({ path: "products.productId", select: "title unit img" })
+            .populate({ path: "addressId" })
+            .sort({ createdAt: -1 });
+
+        if (!updatedOrder) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Order status updated successfully',
+            data: updatedOrder
+        });
+
+    } catch (error) {
+        console.error("Error update order status controller:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error during update order status"
+        });
+    }
+};
+
+export { addOrder, verifyOrderPayment, getOrders, cancelOrder, updateOrderStatus };

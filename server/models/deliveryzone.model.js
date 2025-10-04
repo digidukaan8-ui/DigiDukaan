@@ -43,6 +43,12 @@ const deliveryZoneSchema = new mongoose.Schema(
     deliveryCharge: {
       type: Number,
       default: 0
+    },
+    deliveryDays: {
+      type: Number,
+      required: true,
+      min: 1,
+      default: 3
     }
   },
   { timestamps: true }
