@@ -8,6 +8,7 @@ import {
 } from './pages/index.js'
 import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm } from './components/index.js';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ProductDetails from './components/ProductDetails.jsx';
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const router = createBrowserRouter(
       <Route path='support' element={<Support />} />
       <Route path='logout' element={<Logout />} />
       <Route path='product' element={<Product />} />
+      <Route path='product/:productId' element={<ProductDetails />} />
       <Route path='used-product' element={<UsedProduct />} />
       <Route path='category-product' element={<Category />} />
 

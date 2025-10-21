@@ -1,9 +1,14 @@
-import { useState, useCallback } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { NavLink, Link } from 'react-router-dom';
 import { FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
 import logo from '../assets/logo.webp'
 import useThemeStore from '../store/theme';
 import useAuthStore from '../store/auth';
+import axios from 'axios';
+
+// import { useEffect, useRef } from 'react';
+// import { Link } from 'react-router-dom';
+// import axios from 'axios';
 
 export default function Header() {
   const { isDark, toggleMode } = useThemeStore();
@@ -41,6 +46,42 @@ export default function Header() {
     }
   }
 
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const searchContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (query.length < 2) {
+      setResults([]);
+      setIsDropdownVisible(false);
+      return;
+    }
+    const fetchResults = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/api/products/search?q=${query}`);
+        setResults(response.data);
+        setIsDropdownVisible(true);
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+        setResults([]);
+      }
+    };
+    const timeoutId = setTimeout(fetchResults, 300);
+    return () => clearTimeout(timeoutId);
+  }, [query]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setIsDropdownVisible(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+
   return (
     <header className="bg-white dark:bg-neutral-900 w-full shadow-lg border-b border-gray-200 dark:border-neutral-800 fixed top-0 z-[90] h-20">
       <div className="w-full max-w-7xl mx-auto px-5 md:px-10 h-full flex justify-between items-center">
@@ -54,6 +95,35 @@ export default function Header() {
             DigiDukaan
           </span>
         </NavLink>
+
+        <div className="hidden md:flex flex-grow justify-center" ref={searchContainerRef}>
+          <div className="relative w-full max-w-sm">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search for products..."
+              className="w-full px-4 py-2 text-sm bg-gray-100 dark:bg-neutral-800 text-gray-800 dark:text-gray-200 border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+            />
+            {isDropdownVisible && results.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-lg shadow-lg z-10 max-h-80 overflow-y-auto">
+                {results.map((product) => (
+                  <Link
+                    to={`/product/${product._id}`}
+                    key={product._id}
+                    className="block px-4 py-3 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800"
+                    onClick={() => {
+                      setQuery('');
+                      setIsDropdownVisible(false);
+                    }}
+                  >
+                    {product.title}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
 
         <nav className="hidden md:flex items-center gap-2" aria-label="Main Navigation">
           {links().map((link) => (
