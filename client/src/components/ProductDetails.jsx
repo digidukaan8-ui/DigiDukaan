@@ -1,16 +1,18 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, Share2, Star, ShoppingCart, ChevronLeft, ChevronRight, Play, Edit, Trash2, Plus, Minus, AlertTriangle, Truck } from 'lucide-react';
 import useAuthStore from '../store/auth';
 import useProductStore from '../store/product';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useLoaderStore from '../store/loader';
 import { removeProduct, changeAvailability, getProductById, addToWishlist, removeFromWishlist, addToCart, addToViewed } from '../api/product';
 import { toast } from 'react-hot-toast';
 import useCategoryProductStore from '../store/categoryProducts';
 import useCartStore from '../store/cart';
 import useWishlistStore from '../store/wishlist';
+import axios from 'axios';                      
 
-const ProductDetail = ({ id }) => {
+const ProductDetail = ({}) => {
+  const { productId } = useParams();
   const navigate = useNavigate();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -18,8 +20,8 @@ const ProductDetail = ({ id }) => {
   const { wishlist } = useWishlistStore();
   const { startLoading, stopLoading } = useLoaderStore();
   const [product, setProduct] = useState(
-    useProductStore.getState().getProduct(id) ||
-    useCategoryProductStore.getState().getProductById(id)
+    useProductStore.getState().getProduct(productId) ||
+    useCategoryProductStore.getState().getProductById(productId)
   );
 
   useEffect(() => {
@@ -27,7 +29,7 @@ const ProductDetail = ({ id }) => {
       const fetchProduct = async () => {
         startLoading("fetching");
         try {
-          const result = await getProductById(id);
+          const result = await getProductById(productId);
           if (result.success) {
             setProduct(result.data);
             useProductStore.getState().addProduct(result.data);
@@ -38,7 +40,7 @@ const ProductDetail = ({ id }) => {
       };
       fetchProduct();
     }
-  }, [id, product, startLoading, stopLoading]);
+  }, [productId, product, startLoading, stopLoading]);
 
   useEffect(() => {
     if (!product?._id) return;

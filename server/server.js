@@ -15,6 +15,9 @@ import paymentRouter from './routes/payment.route.js';
 import chatRouter from './routes/chat.route.js';
 import http from "http";
 import { initSocket } from "./socket.js";
+//...
+import productRouter from './routes/product.route.js'; // YEH LINE ADD KAREIN
+//...
 
 dotenv.config();
 const app = express();
@@ -32,6 +35,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use('/api/products', productRouter); // YEH LINE ADD KAREIN
+//...
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000,

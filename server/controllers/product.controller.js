@@ -1015,6 +1015,39 @@ const getProductByCategory = async (req, res) => {
     }
 };
 
+const searchProducts = async (req, res) => {
+    try {
+        const query = req.query.q;
+
+        if (!query) {
+            return res.status(200).json([]);
+        }
+
+        const searchQuery = {
+            $or: [
+                { title: { $regex: query, $options: 'i' } },
+                { description: { $regex: query, $options: 'i' } },
+                { brand: { $regex: query, $options: 'i' } },
+                { 'category.name': { $regex: query, $options: 'i' } },
+                { 'subCategory.name': { $regex: query, $options: 'i' } },
+                { tags: { $regex: query, $options: 'i' } }
+            ]
+        };
+
+        const newProducts = await Product.find(searchQuery).limit(5);
+        const usedProducts = await UsedProduct.find(searchQuery).limit(5);
+
+        const combinedResults = [...newProducts, ...usedProducts];
+
+        console.log("✅ Combined products found:", combinedResults.length);
+        res.status(200).json(combinedResults);
+
+    } catch (error) {
+        console.error("Search Error:", error);
+        res.status(500).json({ message: 'Server error during search' });
+    }
+};
+
 export {
     addProduct, getProduct, updateProduct, removeProduct, changeAvailability,
     addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct,
@@ -1022,5 +1055,6 @@ export {
     addViewedProduct, addWishlistProduct, addCartProduct, addReview,
     removeViewedProduct, removeWishlistProduct, removeCartProduct, removeReview,
     updateCart, updateReview,
-    getProductById, getProductByCategory
+    getProductById, getProductByCategory,
+    searchProducts
 };
