@@ -1,4 +1,6 @@
 import Product from "../models/product.model.js";
+import multer from "multer";
+import path from "path";
 import Store from "../models/store.model.js";
 import { isValidCategory, isValidSubCategory, isValidUsedProductCategory, isValidUsedProductSubCategory } from "../utils/category.util.js";
 
@@ -452,4 +454,86 @@ const handleUpdateCart = (req, res, next) => {
     }
 };
 
-export { handleAddProduct, handleUpdateProduct, handleAddUsedProduct, handleUpdateUsedProduct, handleAddToCart, handleUpdateCart };
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, "./public/temp"),
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(null, file.fieldname + "-" + uniqueSuffix + ext);
+    },
+});
+
+const fileFilter = (req, file, cb) => {
+    const mime = file.mimetype;
+    if (mime.startsWith("image/") || mime.startsWith("video/")) {
+        cb(null, true);
+    } else {
+        cb(new Error("Only image or video files are allowed!"), false);
+    }
+};
+
+const uploadMedia = multer({
+    storage,
+    fileFilter,
+    limits: { fileSize: 50 * 1024 * 1024 }, 
+}).fields([
+    { name: "image", maxCount: 1 },
+    { name: "video", maxCount: 1 },
+]);
+
+const validateMediaSize = (req, res, next) => {
+    const images = req.files?.image || [];
+    const videos = req.files?.video || [];
+
+    for (const file of images) {
+        if (file.size > 10 * 1024 * 1024) {
+            return next(new Error("Image must be less than or equal to 10MB"));
+        }
+    }
+
+    for (const file of videos) {
+        if (file.size > 50 * 1024 * 1024) {
+            return next(new Error("Video must be less than or equal to 50MB"));
+        }
+    }
+
+    next();
+};
+
+const handleAddReview = async (req, res, next) => {
+    try {
+        const { productId, rating, text, imageTitle, videoTitle } = req.body;
+        
+        if (!productId || !rating) {
+            return res.status(400).json({ success: false, message: "Product Id or rating is missing" });
+        }
+
+        if (typeof productId !== 'string' || typeof rating !== 'number') {
+            return res.status(400).json({ success: false, message: "Invalid input format" });
+        }
+        
+        if (text && typeof text !== 'string') {
+            return res.status(400).json({ success: false, message: "Invalid text format" });
+        }
+        
+        if (imageTitle && typeof imageTitle !== 'string') {
+            return res.status(400).json({ success: false, message: "Invalid image title format" });
+        }
+        
+        if (videoTitle && typeof videoTitle !== 'string') {
+            return res.status(400).json({ success: false, message: "Invalid video title format" });
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found" });
+        }
+        
+        return next();
+    } catch (error) {
+        console.error("Error in add rating middleware: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
+
+export { handleAddProduct, handleUpdateProduct, handleAddUsedProduct, handleUpdateUsedProduct, handleAddToCart, handleUpdateCart,uploadMedia, validateMediaSize, handleAddReview };

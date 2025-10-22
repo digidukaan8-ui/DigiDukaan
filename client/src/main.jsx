@@ -6,7 +6,7 @@ import {
   Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct,
   Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout, Order, Whislist, View
 } from './pages/index.js'
-import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm } from './components/index.js';
+import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, Review } from './components/index.js';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -38,7 +38,8 @@ const router = createBrowserRouter(
         <Route path='order' element={<Order />} />
         <Route path='wishlist' element={<Whislist />} />
         <Route path='recently-viewed' element={<View />} />
-        <Route path='review' element={<ReviewForm />} />
+        <Route path='review-form' element={<ReviewForm />} />
+        <Route path='review' element={<Review />} />
       </Route>
 
       <Route path='seller' element={<SellerRoute />} >
@@ -50,6 +51,7 @@ const router = createBrowserRouter(
         <Route path='store-details' element={<StoreForm />} />
         <Route path='delivery-zone' element={<DeliveryForm />} />
         <Route path='order' element={<Order />} />
+        <Route path='review' element={<Review />} />
       </Route>
 
       <Route path='admin' element={<AdminRoute />} >

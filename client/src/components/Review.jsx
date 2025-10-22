@@ -1,11 +1,9 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/>import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Star, Quote, Play, ChevronLeft, ChevronRight } from 'lucide-react';
 
-// Simulated API call function
 const fetchReviews = async () => {
-  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 800));
-  
+
   return [
     {
       id: 1,
@@ -115,11 +113,10 @@ const ReviewsSection = () => {
         {[...Array(5)].map((_, i) => (
           <Star
             key={i}
-            className={`w-4 h-4 ${
-              i < rating
+            className={`w-4 h-4 ${i < rating
                 ? 'fill-yellow-400 text-yellow-400'
                 : 'text-gray-300 dark:text-gray-600'
-            }`}
+              }`}
           />
         ))}
       </div>
@@ -144,18 +141,18 @@ const ReviewsSection = () => {
         </div>
         <Quote className="w-8 h-8 text-blue-500 opacity-20" />
       </div>
-      
+
       <div className="mb-3">{renderStars(review.rating)}</div>
-      
+
       <p className="text-gray-700 dark:text-gray-300 leading-relaxed flex-grow">
         {review.text}
       </p>
-      
+
       <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-        {new Date(review.date).toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
+        {new Date(review.date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
         })}
       </p>
     </div>
@@ -171,7 +168,7 @@ const ReviewsSection = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
-      
+
       <div className="p-6 flex flex-col flex-grow">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white font-bold text-lg">
@@ -186,18 +183,18 @@ const ReviewsSection = () => {
             </p>
           </div>
         </div>
-        
+
         <div className="mb-3">{renderStars(review.rating)}</div>
-        
+
         <p className="text-gray-700 dark:text-gray-300 italic flex-grow">
           "{review.caption}"
         </p>
-        
+
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-          {new Date(review.date).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+          {new Date(review.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
           })}
         </p>
       </div>
@@ -216,7 +213,7 @@ const ReviewsSection = () => {
             onEnded={() => setPlayingVideo(null)}
           />
         ) : (
-          <div 
+          <div
             className="relative cursor-pointer group"
             onClick={() => setPlayingVideo(review.id)}
           >
@@ -233,7 +230,7 @@ const ReviewsSection = () => {
           </div>
         )}
       </div>
-      
+
       <div className="p-6 flex flex-col flex-grow">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-orange-600 flex items-center justify-center text-white font-bold text-lg">
@@ -248,18 +245,18 @@ const ReviewsSection = () => {
             </p>
           </div>
         </div>
-        
+
         <div className="mb-3">{renderStars(review.rating)}</div>
-        
+
         <p className="text-gray-700 dark:text-gray-300 flex-grow">
           Watch {review.name}'s video review
         </p>
-        
+
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-          {new Date(review.date).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+          {new Date(review.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
           })}
         </p>
       </div>
@@ -335,11 +332,10 @@ const ReviewsSection = () => {
             <button
               onClick={prevPage}
               disabled={currentPage === 0}
-              className={`p-3 rounded-full border transition-all ${
-                currentPage === 0
+              className={`p-3 rounded-full border transition-all ${currentPage === 0
                   ? 'bg-gray-100 dark:bg-neutral-900 text-gray-400 dark:text-gray-600 border-gray-200 dark:border-neutral-800 cursor-not-allowed'
                   : 'bg-white dark:bg-neutral-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800 hover:shadow-md'
-              }`}
+                }`}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -349,11 +345,10 @@ const ReviewsSection = () => {
                 <button
                   key={i}
                   onClick={() => setCurrentPage(i)}
-                  className={`w-10 h-10 rounded-full font-semibold transition-all ${
-                    i === currentPage
+                  className={`w-10 h-10 rounded-full font-semibold transition-all ${i === currentPage
                       ? 'bg-blue-600 text-white shadow-md scale-110'
                       : 'bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800'
-                  }`}
+                    }`}
                 >
                   {i + 1}
                 </button>
@@ -363,11 +358,10 @@ const ReviewsSection = () => {
             <button
               onClick={nextPage}
               disabled={currentPage === totalPages - 1}
-              className={`p-3 rounded-full border transition-all ${
-                currentPage === totalPages - 1
+              className={`p-3 rounded-full border transition-all ${currentPage === totalPages - 1
                   ? 'bg-gray-100 dark:bg-neutral-900 text-gray-400 dark:text-gray-600 border-gray-200 dark:border-neutral-800 cursor-not-allowed'
                   : 'bg-white dark:bg-neutral-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800 hover:shadow-md'
-              }`}
+                }`}
             >
               <ChevronRight className="w-5 h-5" />
             </button>

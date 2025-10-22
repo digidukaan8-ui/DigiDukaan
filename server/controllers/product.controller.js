@@ -5,6 +5,7 @@ import UsedProduct from "../models/usedProduct.model.js";
 import Cart from "../models/cart.model.js"
 import Wishlist from "../models/wishlist.model.js";
 import View from "../models/view.model.js";
+import Review from "../models/review.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.config.js";
 import { isValidCategory, isValidUsedProductCategory, isValidSubCategory, isValidUsedProductSubCategory } from '../utils/category.util.js'
 
@@ -806,7 +807,55 @@ const addCartProduct = async (req, res) => {
 
 const addReview = async (req, res) => {
     try {
+        const { productId, rating, text, imageTitle, videoTitle } = req.body;
+        const userId = req.user._id;
 
+        const reviewExist = await Review.findOne({ userId, productId });
+        if (reviewExist) {
+            return res.status(400).json({ success: false, message: 'Review already added' });
+        }
+
+        let imageData = null;
+        let videoData = null;
+
+        if (req.files?.image && req.files.image.length > 0) {
+            const imgFile = req.files.image[0];
+            const uploadRes = await uploadToCloudinary(imgFile.path);
+
+            if (uploadRes) {
+                imageData = {
+                    url: uploadRes.secure_url,
+                    publicId: uploadRes.public_id,
+                    title: imageTitle,
+                };
+            }
+        }
+
+        if (req.files?.video && req.files.video.length > 0) {
+            const vidFile = req.files.video[0];
+            const uploadRes = await uploadToCloudinary(vidFile.path);
+
+            if (uploadRes) {
+                videoData = {
+                    url: uploadRes.secure_url,
+                    publicId: uploadRes.public_id,
+                    title: videoTitle,
+                };
+            }
+        }
+
+        const review = new Review({
+            userId,
+            productId,
+            rating,
+            text,
+            img: imageData,
+            videos: videoData,
+        });
+
+        await review.save();
+
+        res.status(201).json({ success: true, message: "Review added successfully", data: review });
     } catch (error) {
         console.error('Error in Add Review controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });

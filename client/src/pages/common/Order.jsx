@@ -124,7 +124,7 @@ export default function Order() {
   };
 
   const handleReviewClick = (productId, productName, img) => {
-    navigate("/buyer/review", {
+    navigate("/buyer/review-form", {
       state: {
         productId,
         productName,
@@ -334,7 +334,7 @@ export default function Order() {
             </div>
 
             <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-neutral-800">
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-neutral-800">
+              <div className="bg-gray-100 dark:bg-neutral-950 px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-neutral-800">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Store: {selectedOrder.storeId?.name || 'N/A'}</h3>
               </div>
 
@@ -353,7 +353,7 @@ export default function Order() {
                         <th className="px-3 sm:px-6 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Platform Fee</th>
                         <th className="px-3 sm:px-6 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Tax</th>
                         <th className="px-3 sm:px-6 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Item Total</th>
-                        <th className="px-3 sm:px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Action</th>
+                        {user.role === "buyer" && selectedOrder.status !== "CANCELLED" && selectedOrder.status !== "RETURNED" && <th className="px-3 sm:px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Action</th>}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-neutral-800 cursor-pointer">
@@ -420,7 +420,7 @@ export default function Order() {
                             <td className="px-3 sm:px-6 py-3 text-right">
                               <p className="text-sm font-semibold text-blue-600 dark:text-blue-400 whitespace-nowrap">₹{finalPriceTotal.toFixed(2)}</p>
                             </td>
-                            <td className="px-3 sm:px-6 py-3 text-center">
+                            {user.role === "buyer" && selectedOrder.status !== "CANCELLED" && selectedOrder.status !== "RETURNED" && (<td className="px-3 sm:px-6 py-3 text-center">
                               <button
                                 onClick={() => handleReviewClick(productId, productTitle, productImg)}
                                 className="inline-flex cursor-pointer items-center gap-1 px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-medium rounded-lg transition-colors"
@@ -428,7 +428,7 @@ export default function Order() {
                                 <Star className="w-3.5 h-3.5" />
                                 Review
                               </button>
-                            </td>
+                            </td>)}
                           </tr>
                         );
                       })}

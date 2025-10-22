@@ -6,7 +6,7 @@ import {
     removeViewedProduct, removeWishlistProduct, removeCartProduct, removeReview,
     updateCart, updateReview
 } from '../controllers/product.controller.js';
-import { handleAddToCart, handleUpdateCart } from '../middlewares/product.middleware.js';
+import { handleAddToCart, handleUpdateCart, uploadMedia, validateMediaSize, handleAddReview } from '../middlewares/product.middleware.js';
 import { addAddress, updateAddress, removeAddress, getAddresses } from '../controllers/address.controller.js';
 import { handleAddAddress, handleUpdateAddress } from '../middlewares/address.middleware.js';
 import { getStoreDeliveryCharge } from '../controllers/store.controller.js';
@@ -16,14 +16,14 @@ const buyerRouter = express.Router();
 buyerRouter.get('/cart', authMiddleware('buyer'), getCartProducts);
 buyerRouter.get('/wishlist', authMiddleware('buyer'), getWishlistProducts);
 buyerRouter.get('/viewed', authMiddleware('buyer'), getViewedProducts);
-buyerRouter.get('/reviews', authMiddleware('buyer'), getReview);
+buyerRouter.get('/review/:productId', authMiddleware('buyer'), getReview);
 buyerRouter.get('/addresses', authMiddleware('buyer'), getAddresses);
 buyerRouter.get('/orders', authMiddleware('buyer', 'seller'), getOrders);
 
 buyerRouter.post('/cart/:productId', authMiddleware('buyer'), handleAddToCart, addCartProduct);
 buyerRouter.post('/wishlist/:productId', authMiddleware('buyer'), addWishlistProduct);
 buyerRouter.post('/viewed/:productId', authMiddleware('buyer'), addViewedProduct);
-buyerRouter.post('/review/:productId', authMiddleware('buyer'), addReview);
+buyerRouter.post('/review', authMiddleware('buyer'), uploadMedia, validateMediaSize, handleAddReview, addReview);
 buyerRouter.post('/address', authMiddleware('buyer'), handleAddAddress, addAddress);
 buyerRouter.post('/store/deliveryCharge', authMiddleware('buyer'), getStoreDeliveryCharge);
 
