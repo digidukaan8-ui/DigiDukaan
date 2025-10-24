@@ -62,10 +62,12 @@ export default function Location() {
 
     const initialLocationRef = useRef({});
     const initialSelectedFieldsRef = useRef([]);
+    const isInitialMount = useRef(true);
 
-    const locationToArray = (loc, fields = selectedFields) => {
-        return fields.map(k => loc[k]).filter(Boolean);
-    };
+    const locationToArray = useCallback((loc, fields) => {
+        const finalFields = fields && fields.length > 0 ? fields : selectedFields;
+        return finalFields.map(k => loc[k]).filter(Boolean);
+    }, [selectedFields]);
 
     const normalizeLocationData = (data) => {
         const normalized = {};
@@ -73,43 +75,40 @@ export default function Location() {
             normalized[key] = data[key] || '';
         });
         normalized.country = data.country || '';
-
         normalized.city = data.city || data.town || data.village || data.suburb || data.locality || data.district || '';
-
         return normalized;
     };
 
-    const fetchLocation = useCallback(async () => {
-        if (Object.keys(location).length > 0 || isFetching) return;
+    const fetchProductsAndUpdateStores = useCallback(async (locData, currentSelectedFields = null) => {
+        const normalizedData = normalizeLocationData(locData);
 
-        setIsFetching(true);
+        const fieldsToUse = currentSelectedFields || getInitialSelectedFields(normalizedData);
+        setSelectedFields(fieldsToUse);
+        initialSelectedFieldsRef.current = fieldsToUse;
+        initialLocationRef.current = normalizedData;
 
-        const fetchProductsAndUpdateStores = async (locData) => {
-            const normalizedData = normalizeLocationData(locData);
-
-            const newSelectedFields = getInitialSelectedFields(normalizedData);
-            setSelectedFields(newSelectedFields);
-            initialSelectedFieldsRef.current = newSelectedFields;
-
-            startLoading('fetching');
-            try {
-                const data = await getProducts(locationToArray(normalizedData, newSelectedFields));
-                if (data.success) {
-                    toast.success("Products fetched successfully");
-                    useStores.getState().clearStores();
-                    useStores.getState().addStores(data.stores);
-                    useCategoryProductStore.getState().clearCategories();
-                    useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
-                    useUsedCategoryProductStore.getState().clearUsedCategories();
-                    useUsedCategoryProductStore.getState().setAllUsedCategories(data.usedProductsByCategory);
-                }
-            } finally {
-                stopLoading();
-            }
-            return normalizedData;
-        };
-
+        startLoading('fetching');
         try {
+            const data = await getProducts(locationToArray(normalizedData, fieldsToUse));
+            if (data.success) {
+                toast.success("Products fetched successfully");
+                useStores.getState().clearStores();
+                useStores.getState().addStores(data.stores);
+                useCategoryProductStore.getState().clearCategories();
+                useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
+                useUsedCategoryProductStore.getState().clearUsedCategories();
+                useUsedCategoryProductStore.getState().setAllUsedCategories(data.usedProductsByCategory);
+            }
+        } finally {
+            stopLoading();
+        }
+        return normalizedData;
+    }, [startLoading, stopLoading, locationToArray]);
+
+    const fetchLocation = useCallback(async () => {
+        setIsFetching(true);
+        try {
+            let normalized;
             if (navigator.geolocation) {
                 const geoPromise = new Promise((resolve, reject) => {
                     navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -124,33 +123,28 @@ export default function Location() {
                     const { latitude, longitude } = pos.coords;
                     const result = await fetchLocationThroughGps(latitude, longitude);
                     if (result.success) {
-                        const normalized = await fetchProductsAndUpdateStores(result.data);
-                        setLocation(normalized);
-                        setEditedLocation(normalized);
-                        initialLocationRef.current = normalized;
+                        normalized = await fetchProductsAndUpdateStores(result.data);
                         toast.success("Location fetched successfully via GPS");
                     } else {
                         const resultIp = await fetchLocationThroughIp();
-                        const normalized = await fetchProductsAndUpdateStores(resultIp.data);
-                        setLocation(normalized);
-                        setEditedLocation(normalized);
-                        initialLocationRef.current = normalized;
+                        normalized = await fetchProductsAndUpdateStores(resultIp.data);
                     }
-                }).catch(async (error) => {
+                }).catch(async () => {
                     startLoading('fetchLocIp');
                     const result = await fetchLocationThroughIp();
-                    const normalized = await fetchProductsAndUpdateStores(result.data);
-                    setLocation(normalized);
-                    setEditedLocation(normalized);
-                    initialLocationRef.current = normalized;
+                    normalized = await fetchProductsAndUpdateStores(result.data);
                 });
             } else {
                 startLoading('fetchLocIp');
                 const result = await fetchLocationThroughIp();
-                const normalized = await fetchProductsAndUpdateStores(result.data);
-                setLocation(normalized);
-                setEditedLocation(normalized);
-                initialLocationRef.current = normalized;
+                normalized = await fetchProductsAndUpdateStores(result.data);
+            }
+
+            if (normalized) {
+                setTimeout(() => {
+                    setLocation(normalized);
+                    setEditedLocation(normalized);
+                }, 0);
             }
         } catch (error) {
             console.error("Location fetch error:", error);
@@ -159,10 +153,13 @@ export default function Location() {
             stopLoading();
             setIsFetching(false);
         }
-    }, [location, isFetching, setLocation, setEditedLocation, startLoading, stopLoading]);
+    }, [setLocation, setEditedLocation, fetchProductsAndUpdateStores, startLoading, stopLoading]);
 
     useEffect(() => {
-        fetchLocation();
+        if (isInitialMount.current && Object.keys(useLocationStore.getState().location).length === 0) {
+            fetchLocation();
+        }
+        isInitialMount.current = false;
     }, [fetchLocation]);
 
     useEffect(() => {
@@ -173,7 +170,6 @@ export default function Location() {
             initialLocationRef.current = location;
         }
     }, [location, selectedFields.length]);
-
 
     const checkChanges = useCallback((currentEditedLocation, currentSelectedFields) => {
         const currentLocValues = locationToArray(initialLocationRef.current, initialSelectedFieldsRef.current).join('|');
@@ -220,29 +216,17 @@ export default function Location() {
             return;
         }
 
+        const fieldsToUse = selectedFields;
+
         initialLocationRef.current = editedLocation;
-        initialSelectedFieldsRef.current = selectedFields;
+        initialSelectedFieldsRef.current = fieldsToUse;
 
         setLocation(editedLocation);
         setShowForm(false);
         toast.success("Location updated successfully");
         setIsEdited(false);
 
-        startLoading('fetching');
-        try {
-            const data = await getProducts(locationToArray(editedLocation, selectedFields));
-            if (data.success) {
-                toast.success("Products fetched successfully");
-                useStores.getState().clearStores();
-                useStores.getState().addStores(data.stores);
-                useCategoryProductStore.getState().clearCategories();
-                useCategoryProductStore.getState().setAllCategories(data.productsByCategory);
-                useUsedCategoryProductStore.getState().clearUsedCategories();
-                useUsedCategoryProductStore.getState().setAllUsedCategories(data.usedProductsByCategory);
-            }
-        } finally {
-            stopLoading();
-        }
+        await fetchProductsAndUpdateStores(editedLocation, fieldsToUse);
     };
 
     const handleRefresh = () => {
@@ -304,7 +288,6 @@ export default function Location() {
             }
 
             setIsEdited(checkChanges(editedLocation, newFields));
-
             return newFields;
         });
     };
@@ -428,7 +411,7 @@ export default function Location() {
                                                 onClick={() => handleFieldSelection(field.key)}
                                                 disabled={!isSelected && selectedFields.length >= 3}
                                                 className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium border transition-all duration-200
-                                                ${isSelected
+                                                    ${isSelected
                                                         ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
                                                         : 'bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-300 border-black dark:border-white hover:border-sky-500 hover:text-sky-600 dark:hover:text-sky-400 disabled:opacity-40 disabled:cursor-not-allowed'
                                                     }`}
