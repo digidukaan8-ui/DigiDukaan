@@ -685,12 +685,37 @@ const getCartProducts = async (req, res) => {
 
 const getReview = async (req, res) => {
     try {
+        const { productId } = req.params;
+        const userId = req.user._id;
 
+        if (!productId) {
+            return res.status(400).json({ success: false, message: 'Product Id is required' });
+        }
+
+        const review = await Review.findOne({ userId, productId });
+        return res.status(200).json({ success: true, message: 'Review fetched successfully', data: review });
     } catch (error) {
         console.error('Error in Get Review controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
+
+const getProductReviews = async (req, res) => {
+    try {
+        const { productId } = req.params;
+
+        if (!productId) {
+            return res.status(400).json({ success: false, message: 'Product Id is required' });
+        }
+
+        const reviews = await Review.find({ productId }).populate('userId', 'username name avatar');
+
+        return res.status(200).json({ success: true, message: 'Review fetched successfully', data: reviews });
+    } catch (error) {
+        console.error('Error in Get Product Reviews controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
 
 const addViewedProduct = async (req, res) => {
     try {
@@ -821,7 +846,6 @@ const addReview = async (req, res) => {
         if (req.files?.image && req.files.image.length > 0) {
             const imgFile = req.files.image[0];
             const uploadRes = await uploadToCloudinary(imgFile.path);
-
             if (uploadRes) {
                 imageData = {
                     url: uploadRes.secure_url,
@@ -834,7 +858,6 @@ const addReview = async (req, res) => {
         if (req.files?.video && req.files.video.length > 0) {
             const vidFile = req.files.video[0];
             const uploadRes = await uploadToCloudinary(vidFile.path);
-
             if (uploadRes) {
                 videoData = {
                     url: uploadRes.secure_url,
@@ -855,12 +878,30 @@ const addReview = async (req, res) => {
 
         await review.save();
 
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        product.reviews.push(review._id);
+
+        const currentTotal = product.rating.totalRating || 0;
+        const currentAvg = product.rating.avgRating || 0;
+
+        const newTotal = currentTotal + 1;
+        const newAvg = ((currentAvg * currentTotal) + rating) / newTotal;
+
+        product.rating.avgRating = Number(newAvg.toFixed(1));
+        product.rating.totalRating = newTotal;
+
+        await product.save();
+
         res.status(201).json({ success: true, message: "Review added successfully", data: review });
     } catch (error) {
         console.error('Error in Add Review controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
-}
+};
 
 const removeViewedProduct = async (req, res) => {
     try {
@@ -933,12 +974,38 @@ const removeCartProduct = async (req, res) => {
 
 const removeReview = async (req, res) => {
     try {
+        const { reviewId } = req.params;
+        if (!reviewId) {
+            return res.status(400).json({ success: false, message: 'Review Id is required' });
+        }
 
+        const review = await Review.findByIdAndDelete(reviewId);
+        if (!review) {
+            return res.status(404).json({ success: false, message: 'Review not found' });
+        }
+
+        const product = await Product.findById(review.productId);
+        if (product) {
+            product.reviews = product.reviews.filter(id => id.toString() !== reviewId.toString());
+
+            const allReviews = await Review.find({ productId: product._id });
+            if (allReviews.length > 0) {
+                const totalRating = allReviews.reduce((sum, r) => sum + (r.rating || 0), 0);
+                product.averageRating = totalRating / allReviews.length;
+            } else {
+                product.averageRating = 0;
+            }
+
+            product.totalReviews = allReviews.length;
+            await product.save();
+        }
+
+        return res.status(200).json({ success: true, message: 'Review removed successfully' });
     } catch (error) {
-        console.error('Error in Remove Review controller: ', error);
+        console.error('Error in Remove Review controller:', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
-}
+};
 
 const updateCart = async (req, res) => {
     try {
@@ -964,12 +1031,100 @@ const updateCart = async (req, res) => {
 
 const updateReview = async (req, res) => {
     try {
+        const { rating, text, imageTitle, videoTitle, imageData, videoData, deletedMedia } = req.body;
+        const { reviewId } = req.params;
+        const oldReview = await Review.findById(reviewId);
+        if (!oldReview) {
+            return res.status(404).json({ success: false, message: 'Review not found' });
+        }
 
+        let imageDataToSave = oldReview.img || null;
+        let videoDataToSave = oldReview.video || null;
+
+        let mediaToDelete = [];
+        if (deletedMedia) {
+            mediaToDelete = typeof deletedMedia === 'string' ? JSON.parse(deletedMedia) : deletedMedia;
+        }
+
+        if (mediaToDelete && mediaToDelete.length > 0) {
+            for (const publicId of mediaToDelete) {
+                try {
+                    await deleteFromCloudinary(publicId);
+                } catch (error) {
+                    console.error('Error deleting from Cloudinary:', error);
+                }
+            }
+        }
+
+        if (req.files?.image && req.files.image.length > 0) {
+            const imgFile = req.files.image[0];
+            const uploadRes = await uploadToCloudinary(imgFile.path);
+            if (uploadRes) {
+                imageDataToSave = {
+                    url: uploadRes.secure_url,
+                    publicId: uploadRes.public_id,
+                    title: imageTitle || '',
+                };
+            }
+        } else if (imageData) {
+            const parsedImageData = typeof imageData === 'string' ? JSON.parse(imageData) : imageData;
+            imageDataToSave = parsedImageData;
+        } else if (req.body.image === 'null' || req.body.image === null) {
+            imageDataToSave = null;
+        }
+
+        if (req.files?.video && req.files.video.length > 0) {
+            const vidFile = req.files.video[0];
+            const uploadRes = await uploadToCloudinary(vidFile.path);
+            if (uploadRes) {
+                videoDataToSave = {
+                    url: uploadRes.secure_url,
+                    publicId: uploadRes.public_id,
+                    title: videoTitle || '',
+                };
+            }
+        } else if (videoData) {
+            const parsedVideoData = typeof videoData === 'string' ? JSON.parse(videoData) : videoData;
+            videoDataToSave = parsedVideoData;
+        } else if (req.body.video === 'null' || req.body.video === null) {
+            videoDataToSave = null;
+        }
+
+        const updatedReview = await Review.findByIdAndUpdate(
+            reviewId,
+            {
+                rating: Number(rating),
+                text: text || null,
+                img: imageDataToSave,
+                video: videoDataToSave,
+            },
+            { new: true }
+        );
+
+        if (Number(rating) !== oldReview.rating) {
+            const product = await Product.findById(oldReview.productId);
+            if (product) {
+                const allReviews = await Review.find({ productId: product._id });
+                if (allReviews.length > 0) {
+                    const total = allReviews.reduce((sum, r) => sum + (r.rating || 0), 0);
+                    const avg = total / allReviews.length;
+                    product.rating.avgRating = Number(avg.toFixed(1));
+                    product.rating.totalRating = allReviews.length;
+                    await product.save();
+                } else {
+                    product.rating.avgRating = 0;
+                    product.rating.totalRating = 0;
+                    await product.save();
+                }
+            }
+        }
+
+        res.status(200).json({ success: true, message: "Review updated successfully", data: updatedReview });
     } catch (error) {
         console.error('Error in Update Review controller: ', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
-}
+};
 
 const getProductByCategory = async (req, res) => {
     try {
@@ -1055,6 +1210,6 @@ export {
     addViewedProduct, addWishlistProduct, addCartProduct, addReview,
     removeViewedProduct, removeWishlistProduct, removeCartProduct, removeReview,
     updateCart, updateReview,
-    getProductById, getProductByCategory,
+    getProductById, getProductByCategory, getProductReviews,
     searchProducts
 };

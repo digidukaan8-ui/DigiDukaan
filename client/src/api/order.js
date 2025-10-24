@@ -128,6 +128,29 @@ const getOrders = async () => {
     }
 };
 
+const getOrdersCount = async () => {
+    try {
+        const res = await fetch(`http://localhost:3000/api/buyers/orders/count`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        const result = await res.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get orders count");
+            throw new Error(result.message || "Failed to get orders count");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in get orders count:", error);
+        throw error;
+    }
+};
+
 const cancelOrder = async (orderId) => {
     try {
         const res = await fetch(`http://localhost:3000/api/buyers/orders/cancel/${orderId}`, {
@@ -175,4 +198,4 @@ const updateOrderStatus = async (orderId, status) => {
     }
 }
 
-export { addOrder, getStoreCharges, verifyOrder, getOrders, cancelOrder, updateOrderStatus };
+export { addOrder, getStoreCharges, verifyOrder, getOrders, getOrdersCount, cancelOrder, updateOrderStatus };

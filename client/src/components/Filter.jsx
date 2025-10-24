@@ -1,7 +1,6 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/>import { useState, useEffect } from 'react';
-import { ShoppingCart, Heart, Star, Filter, X, ChevronDown, Search, Tag, Package } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ShoppingCart, Star, Search } from 'lucide-react';
 
-// Simulated API call function
 const fetchProducts = async () => {
   await new Promise(resolve => setTimeout(resolve, 1000));
   

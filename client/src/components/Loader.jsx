@@ -59,6 +59,9 @@ export default function Loader() {
     fetchOrder: "Fetching Orders...",
     updateStatus: "Updating Order Status...",
     cancelOrder: "Cancelling Order...",
+    addReview: "Adding Review...",
+    updateReview: "Updating Review...",
+    removeReview: "Removing Review...",
     default: "Loading...",
   };
 
@@ -106,6 +109,9 @@ export default function Loader() {
     fetchOrder: "text-cyan-500",
     updateStatus: "text-cyan-500",
     cancelOrder: "text-cyan-500",
+    addReview: "text-purple-500",
+    updateReview: "text-purple-500",
+    removeReview: "text-purple-500",
     default: "text-gray-500",
   };
 

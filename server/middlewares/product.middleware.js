@@ -2,6 +2,7 @@ import Product from "../models/product.model.js";
 import multer from "multer";
 import path from "path";
 import Store from "../models/store.model.js";
+import Review from "../models/review.model.js";
 import { isValidCategory, isValidSubCategory, isValidUsedProductCategory, isValidUsedProductSubCategory } from "../utils/category.util.js";
 
 const handleAddProduct = async (req, res, next) => {
@@ -475,7 +476,7 @@ const fileFilter = (req, file, cb) => {
 const uploadMedia = multer({
     storage,
     fileFilter,
-    limits: { fileSize: 50 * 1024 * 1024 }, 
+    limits: { fileSize: 50 * 1024 * 1024 },
 }).fields([
     { name: "image", maxCount: 1 },
     { name: "video", maxCount: 1 },
@@ -503,7 +504,7 @@ const validateMediaSize = (req, res, next) => {
 const handleAddReview = async (req, res, next) => {
     try {
         const { productId, rating, text, imageTitle, videoTitle } = req.body;
-        
+
         if (!productId || !rating) {
             return res.status(400).json({ success: false, message: "Product Id or rating is missing" });
         }
@@ -511,15 +512,15 @@ const handleAddReview = async (req, res, next) => {
         if (typeof productId !== 'string' || typeof rating !== 'number') {
             return res.status(400).json({ success: false, message: "Invalid input format" });
         }
-        
+
         if (text && typeof text !== 'string') {
             return res.status(400).json({ success: false, message: "Invalid text format" });
         }
-        
+
         if (imageTitle && typeof imageTitle !== 'string') {
             return res.status(400).json({ success: false, message: "Invalid image title format" });
         }
-        
+
         if (videoTitle && typeof videoTitle !== 'string') {
             return res.status(400).json({ success: false, message: "Invalid video title format" });
         }
@@ -528,7 +529,7 @@ const handleAddReview = async (req, res, next) => {
         if (!product) {
             return res.status(404).json({ success: false, message: "Product not found" });
         }
-        
+
         return next();
     } catch (error) {
         console.error("Error in add rating middleware: ", error);
@@ -536,4 +537,74 @@ const handleAddReview = async (req, res, next) => {
     }
 }
 
-export { handleAddProduct, handleUpdateProduct, handleAddUsedProduct, handleUpdateUsedProduct, handleAddToCart, handleUpdateCart,uploadMedia, validateMediaSize, handleAddReview };
+const handleUpdateReview = async (req, res, next) => {
+    try {
+        const { rating, text, imageTitle, videoTitle, imageData, videoData } = req.body;
+        const { reviewId } = req.params;
+
+        if (!reviewId) {
+            return res.status(400).json({ success: false, message: "Review ID is missing" });
+        }
+
+        if (!rating) {
+            return res.status(400).json({ success: false, message: "Rating is required" });
+        }
+
+        const ratingNum = Number(rating);
+        if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+            return res.status(400).json({ success: false, message: "Rating must be between 1 and 5" });
+        }
+
+        if (text && typeof text !== 'string') {
+            return res.status(400).json({ success: false, message: "Invalid text format" });
+        }
+
+        if (imageTitle && typeof imageTitle !== 'string') {
+            return res.status(400).json({ success: false, message: "Invalid image title format" });
+        }
+
+        if (videoTitle && typeof videoTitle !== 'string') {
+            return res.status(400).json({ success: false, message: "Invalid video title format" });
+        }
+
+        if (imageData) {
+            try {
+                const parsedImageData = typeof imageData === 'string' ? JSON.parse(imageData) : imageData;
+                if (!parsedImageData.url || !parsedImageData.publicId) {
+                    return res.status(400).json({ success: false, message: "Invalid image data format" });
+                }
+            } catch (error) {
+                return res.status(400).json({ success: false, message: "Invalid image data format" });
+            }
+        }
+
+        if (videoData) {
+            try {
+                const parsedVideoData = typeof videoData === 'string' ? JSON.parse(videoData) : videoData;
+                if (!parsedVideoData.url || !parsedVideoData.publicId) {
+                    return res.status(400).json({ success: false, message: "Invalid video data format" });
+                }
+            } catch (error) {
+                return res.status(400).json({ success: false, message: "Invalid video data format" });
+            }
+        }
+
+        const reviewExist = await Review.findById(reviewId);
+        if (!reviewExist) {
+            return res.status(404).json({ success: false, message: "Review not found" });
+        }
+
+        if (reviewExist.userId.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: "You are not authorized to update this review" });
+        }
+
+        req.oldReview = reviewExist;
+
+        return next();
+    } catch (error) {
+        console.error("Error in update review middleware: ", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+export { handleAddProduct, handleUpdateProduct, handleAddUsedProduct, handleUpdateUsedProduct, handleAddToCart, handleUpdateCart, uploadMedia, validateMediaSize, handleAddReview, handleUpdateReview };

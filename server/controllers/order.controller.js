@@ -342,6 +342,19 @@ const getOrders = async (req, res) => {
     }
 };
 
+const getOrdersCount = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        const count = await Order.countDocuments({ userId });
+
+        return res.status(200).json({ success: true, message: 'Order count fetched successfully', count });
+    } catch (error) {
+        console.error('Error in Get Orders Count controller: ', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
 const cancelOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
@@ -441,4 +454,4 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
-export { addOrder, verifyOrderPayment, getOrders, cancelOrder, updateOrderStatus };
+export { addOrder, verifyOrderPayment, getOrders, getOrdersCount, cancelOrder, updateOrderStatus };

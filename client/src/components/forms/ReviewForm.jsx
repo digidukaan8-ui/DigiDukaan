@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { Star, Check, FileText, Image as ImageIcon, Video } from "lucide-react";
+import { Star, Check, FileText, ImageIcon, Video, X, Trash2 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { addReview } from "../../api/review.js";
+import { addReview, getReview, updateReview, removeReview } from "../../api/product.js";
+import useLoaderStore from "../../store/loader.js";
+import { toast } from 'react-hot-toast';
 
 const MAX_IMAGE_SIZE_MB = 10;
 const MAX_VIDEO_SIZE_MB = 50;
@@ -31,6 +33,9 @@ const StarRating = ({ rating, setRating, disabled = false }) => {
 export default function ReviewForm() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const { startLoading, stopLoading } = useLoaderStore();
+
+  const [existingReview, setExistingReview] = useState(null);
   const [rating, setRating] = useState(0);
   const [ratingConfirmed, setRatingConfirmed] = useState(false);
 
@@ -43,10 +48,14 @@ export default function ReviewForm() {
   const [imageTitle, setImageTitle] = useState("");
   const [reviewImage, setReviewImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [originalImageData, setOriginalImageData] = useState(null);
+  const [imageChanged, setImageChanged] = useState(false);
 
   const [videoTitle, setVideoTitle] = useState("");
   const [reviewVideo, setReviewVideo] = useState(null);
   const [previewVideo, setPreviewVideo] = useState(null);
+  const [originalVideoData, setOriginalVideoData] = useState(null);
+  const [videoChanged, setVideoChanged] = useState(false);
 
   useEffect(() => {
     if (!state || !state.productId || !state.productName || !state.img) {
@@ -60,25 +69,71 @@ export default function ReviewForm() {
     img: state?.img,
   };
 
-  const handleFileChange = (e, setFileState, setPreviewState, maxMB, type) => {
+  useEffect(() => {
+    const fetchReview = async () => {
+      const result = await getReview(state?.productId);
+      if (result?.success && result?.data) {
+        setExistingReview(result.data);
+        setRating(result.data.rating);
+        setRatingConfirmed(true);
+        
+        if (result.data.text) {
+          setIncludeText(true);
+          setReviewText(result.data.text);
+        }
+        
+        if (result.data.img) {
+          setIncludeImage(true);
+          setImageTitle(result.data.img.title);
+          setPreviewImage(result.data.img.url);
+          setReviewImage(result.data.img.url);
+          setOriginalImageData(result.data.img);
+        }
+        
+        if (result.data.video) {
+          setIncludeVideo(true);
+          setVideoTitle(result.data.video.title);
+          setPreviewVideo(result.data.video.url);
+          setReviewVideo(result.data.video.url);
+          setOriginalVideoData(result.data.video);
+        }
+      }
+    };
+    fetchReview();
+  }, [state?.productId]);
+
+  const handleFileChange = (e, setFileState, setPreviewState, maxMB, type, setChangedFlag) => {
     const file = e.target.files[0];
     if (!file) {
-      setFileState(null);
-      setPreviewState(null);
       return;
     }
 
     const fileSizeMB = file.size / (1024 * 1024);
     if (fileSizeMB > maxMB) {
       alert(`${type} size should not exceed ${maxMB}MB.`);
-      setFileState(null);
-      setPreviewState(null);
       e.target.value = "";
       return;
     }
 
     setFileState(file);
     setPreviewState(URL.createObjectURL(file));
+    if (setChangedFlag) {
+      setChangedFlag(true);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setReviewImage(null);
+    setPreviewImage(null);
+    setImageTitle("");
+    setImageChanged(true);
+  };
+
+  const handleRemoveVideo = () => {
+    setReviewVideo(null);
+    setPreviewVideo(null);
+    setVideoTitle("");
+    setVideoChanged(true);
   };
 
   const handleConfirmRating = () => {
@@ -104,8 +159,105 @@ export default function ReviewForm() {
       video: includeVideo ? reviewVideo : null,
     };
 
-    const result = await addReview(reviewData);
-    console.log("Review Submitted:", result);
+    try {
+      if (existingReview) {
+        startLoading('updateReview');
+        const updateData = {
+          productId: product.id,
+          rating,
+          text: includeText ? reviewText.trim() : null,
+        };
+        if (includeImage && reviewImage) {
+          if (imageChanged) {
+            updateData.image = reviewImage;
+            updateData.imageTitle = imageTitle.trim();
+          } else if (originalImageData) {
+            if (imageTitle.trim() !== originalImageData.title) {
+              updateData.image = {
+                ...originalImageData,
+                title: imageTitle.trim()
+              };
+            } else {
+              updateData.image = originalImageData;
+            }
+          }
+        } else if (!includeImage && originalImageData) {
+          updateData.image = null;
+        }
+
+        if (includeVideo && reviewVideo) {
+          if (videoChanged) {
+            updateData.video = reviewVideo;
+            updateData.videoTitle = videoTitle.trim();
+          } else if (originalVideoData) {
+            if (videoTitle.trim() !== originalVideoData.title) {
+              updateData.video = {
+                ...originalVideoData,
+                title: videoTitle.trim()
+              };
+            } else {
+              updateData.video = originalVideoData;
+            }
+          }
+        } else if (!includeVideo && originalVideoData) {
+          updateData.video = null;
+        }
+
+        const deletedMedia = [];
+        if (!includeImage && originalImageData?.publicId) {
+          deletedMedia.push(originalImageData.publicId);
+        } else if (imageChanged && originalImageData?.publicId && reviewImage instanceof File) {
+          deletedMedia.push(originalImageData.publicId);
+        }
+        
+        if (!includeVideo && originalVideoData?.publicId) {
+          deletedMedia.push(originalVideoData.publicId);
+        } else if (videoChanged && originalVideoData?.publicId && reviewVideo instanceof File) {
+          deletedMedia.push(originalVideoData.publicId);
+        }
+
+        if (deletedMedia.length > 0) {
+          updateData.deletedMedia = deletedMedia;
+        }
+
+        const result = await updateReview(updateData, existingReview._id);
+        if (result.success) {
+          toast.success('Review updated successfully');
+          navigate(-1);
+        }
+      } else {
+        startLoading('addReview');
+        const result = await addReview(reviewData);
+        if (result.success) {
+          toast.success('Review added successfully');
+          navigate(-1);
+        }
+      }
+    } catch (error) {
+      toast.error('Something went wrong');
+    } finally {
+      stopLoading();
+    }
+  };
+
+  const deleteReviewHandler = async () => {
+    if (!existingReview) return;
+    
+    const confirmed = window.confirm('Are you sure you want to delete this review?');
+    if (!confirmed) return;
+
+    try {
+      startLoading('removeReview');
+      const result = await removeReview(existingReview._id);
+      if (result.success) {
+        toast.success('Review removed successfully');
+        navigate(-1);
+      }
+    } catch (error) {
+      toast.error('Failed to remove review');
+    } finally {
+      stopLoading();
+    }
   };
 
   const isTextValid = !includeText || reviewText.trim().length > 0;
@@ -120,9 +272,21 @@ export default function ReviewForm() {
     <div className="min-h-screen bg-gray-50 dark:bg-neutral-950 pt-40 pb-20 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="bg-white dark:bg-neutral-900 rounded-lg border border-gray-200 dark:border-neutral-800 shadow-lg p-6">
-          <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">
-            Add Review
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              {existingReview ? 'Edit Review' : 'Add Review'}
+            </h2>
+            {existingReview && (
+              <button
+                type="button"
+                onClick={deleteReviewHandler}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer transition"
+              >
+                <Trash2 size={18} />
+                Delete Review
+              </button>
+            )}
+          </div>
 
           <div className="flex items-center gap-4 p-4 mb-6 border border-gray-200 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800">
             <img
@@ -275,18 +439,26 @@ export default function ReviewForm() {
                               setReviewImage,
                               setPreviewImage,
                               MAX_IMAGE_SIZE_MB,
-                              "Image"
+                              "Image",
+                              setImageChanged
                             )
                           }
                           className="w-full cursor-pointer text-sm text-gray-900 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-purple-100 file:text-purple-700 dark:file:bg-purple-900/30 dark:file:text-purple-400 hover:file:bg-purple-200"
                         />
                         {previewImage && (
-                          <div className="mt-3">
+                          <div className="mt-3 relative">
                             <img
                               src={previewImage}
                               alt="Preview"
                               className="rounded-lg max-h-48 w-full object-contain border border-gray-300 dark:border-neutral-600"
                             />
+                            <button
+                              type="button"
+                              onClick={handleRemoveImage}
+                              className="absolute top-2 right-2 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full cursor-pointer transition"
+                            >
+                              <X size={16} />
+                            </button>
                           </div>
                         )}
                       </div>
@@ -314,18 +486,26 @@ export default function ReviewForm() {
                               setReviewVideo,
                               setPreviewVideo,
                               MAX_VIDEO_SIZE_MB,
-                              "Video"
+                              "Video",
+                              setVideoChanged
                             )
                           }
                           className="w-full text-sm cursor-pointer text-gray-900 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-pink-100 file:text-pink-700 dark:file:bg-pink-900/30 dark:file:text-pink-400 hover:file:bg-pink-200"
                         />
                         {previewVideo && (
-                          <div className="mt-3">
+                          <div className="mt-3 relative">
                             <video
                               src={previewVideo}
                               controls
                               className="rounded-lg max-h-48 w-full object-contain border border-gray-300 dark:border-neutral-600"
                             />
+                            <button
+                              type="button"
+                              onClick={handleRemoveVideo}
+                              className="absolute top-2 right-2 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full cursor-pointer transition"
+                            >
+                              <X size={16} />
+                            </button>
                           </div>
                         )}
                       </div>
@@ -342,7 +522,7 @@ export default function ReviewForm() {
                         : "bg-gray-300 dark:bg-neutral-700 text-gray-500 cursor-not-allowed"
                         }`}
                     >
-                      Submit Review
+                      {existingReview ? 'Update Review' : 'Submit Review'}
                     </button>
                   </div>
                 </div>

@@ -9,10 +9,8 @@ import { toast } from 'react-hot-toast';
 import useCategoryProductStore from '../store/categoryProducts';
 import useCartStore from '../store/cart';
 import useWishlistStore from '../store/wishlist';
-import axios from 'axios';                      
 
-const ProductDetail = ({}) => {
-  const { productId } = useParams();
+const ProductDetail = ({ id }) => {
   const navigate = useNavigate();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -20,8 +18,8 @@ const ProductDetail = ({}) => {
   const { wishlist } = useWishlistStore();
   const { startLoading, stopLoading } = useLoaderStore();
   const [product, setProduct] = useState(
-    useProductStore.getState().getProduct(productId) ||
-    useCategoryProductStore.getState().getProductById(productId)
+    useProductStore.getState().getProduct(id) ||
+    useCategoryProductStore.getState().getProductById(id)
   );
 
   useEffect(() => {
@@ -29,7 +27,7 @@ const ProductDetail = ({}) => {
       const fetchProduct = async () => {
         startLoading("fetching");
         try {
-          const result = await getProductById(productId);
+          const result = await getProductById(id);
           if (result.success) {
             setProduct(result.data);
             useProductStore.getState().addProduct(result.data);
@@ -40,7 +38,7 @@ const ProductDetail = ({}) => {
       };
       fetchProduct();
     }
-  }, [productId, product, startLoading, stopLoading]);
+  }, [id, product, startLoading, stopLoading]);
 
   useEffect(() => {
     if (!product?._id) return;
@@ -343,7 +341,7 @@ const ProductDetail = ({}) => {
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-5 h-5 ${i < Math.round(rating || 0)
+                        className={`w-5 h-5 ${i < Math.round(rating.avgRating || 0)
                           ? 'text-yellow-400 fill-yellow-400'
                           : 'text-gray-300 dark:text-neutral-600'
                           }`}
@@ -351,7 +349,7 @@ const ProductDetail = ({}) => {
                     ))}
                   </div>
                   <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    {rating || '0'} ratings
+                    {rating.avgRating?.toFixed(1) || '0'} ({rating.totalRating || 0} {rating.totalRating === 1 ? "review" : "reviews"})
                   </span>
                 </div>
                 {user.role === "seller" && (

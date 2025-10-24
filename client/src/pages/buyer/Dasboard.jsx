@@ -5,13 +5,14 @@ import Card from "../../components/Card.jsx";
 import UsedProductCard from "../../components/UsedProductCard.jsx";
 import useAuthStore from "../../store/auth.js";
 import useCartStore from "../../store/cart.js";
-import { Heart, Package, ShoppingCart, Eye, Star, Clock, Edit3, ArrowRight, MessageSquare, User, ImageDown, MapPin } from "lucide-react";
+import { Heart, Package, ShoppingCart, Eye, Clock, Edit3, ArrowRight, MessageSquare, User, ImageDown, MapPin } from "lucide-react";
 import { getWishlistProducts, getViewedProduct } from "../../api/product.js";
 import { useNavigate } from "react-router-dom";
 import useLoaderStore from "../../store/loader.js";
 import { toast } from 'react-hot-toast';
 import { changeAvatar, removeAvatar, updateProfile } from "../../api/user.js";
 import { getChatsCount } from "../../api/chat.js";
+import { getOrdersCount } from "../../api/order.js";
 
 export default function Dashboard() {
   const { user, isAuthenticated } = useAuthStore();
@@ -28,13 +29,12 @@ export default function Dashboard() {
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showChangeAvatarModal, setShowChangeAvatarModal] = useState(false);
 
-  const { data: orders = [] } = useQuery({
-    queryKey: ["orders"],
-    queryFn: () => fetch("/api/orders").then((res) => res.json()),
+  const { data: orders = { count: 0 } } = useQuery({
+    queryKey: ["ordersCount"],
+    queryFn: getOrdersCount,
     enabled: !!isAuthenticated,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    refetchOnReconnect: false,
   });
 
   const { data: wishlistData = { newProductWishlist: [], usedProductWishlist: [] } } = useQuery({
@@ -42,6 +42,7 @@ export default function Dashboard() {
     queryFn: getWishlistProducts,
     enabled: !!isAuthenticated,
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   const { data: viewedData = { newProductViewed: [], usedProductViewed: [] } } = useQuery({
@@ -49,6 +50,7 @@ export default function Dashboard() {
     queryFn: getViewedProduct,
     enabled: !!isAuthenticated,
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   const { register: registerProfile, handleSubmit: handleSubmitProfile, reset: resetProfile } = useForm();
@@ -218,7 +220,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <p className="text-xs font-medium text-indigo-700 dark:text-indigo-300 mb-1">Total Orders</p>
-                <h3 className="text-2xl font-bold text-indigo-900 dark:text-white">{orders.length}</h3>
+                <h3 className="text-2xl font-bold text-indigo-900 dark:text-white">{orders.count}</h3>
               </div>
 
               <div
@@ -260,60 +262,6 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">
-          <div className="flex justify-between items-center mb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-                <Star className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Your Orders</h2>
-            </div>
-            <span onClick={() => navigate('/buyer/orders', { replace: true })} className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
-              View All <ArrowRight size={16} />
-            </span>
-          </div>
-          {orders.length === 0 ? (
-            <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
-              <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Package className="w-8 h-8 text-gray-400" />
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 font-medium">No orders yet</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Start shopping to see your orders here</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
-              <div className="flex gap-4 pb-2">
-                {orders.slice(0, 10).map((order) => (
-                  <div key={order._id} className="w-[320px] flex-shrink-0 bg-gray-50 dark:bg-neutral-800 rounded-xl p-5 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Order ID</p>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">#{order._id.slice(-8)}</p>
-                      </div>
-                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${order.status === 'delivered' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' :
-                        order.status === 'shipped' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400' :
-                          'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400'
-                        }`}>
-                        {order.status}
-                      </span>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Date</span>
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">{new Date(order.createdAt).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-neutral-700">
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Amount</span>
-                        <span className="text-xl font-bold text-gray-900 dark:text-white">₹{order.totalAmount?.toFixed(2) || '0.00'}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">

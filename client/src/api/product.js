@@ -662,11 +662,212 @@ const getProductByCategory = async (catgeory, page) => {
     }
 }
 
+const addReview = async (data) => {
+    try {
+        let body;
+        let headers = { "Content-Type": "application/json" };
+
+        if ((data.image instanceof File) || data.video instanceof File) {
+            const formData = new FormData();
+            formData.append('productId', data.productId);
+            formData.append('rating', data.rating);
+            formData.append('text', data.text);
+            formData.append('imageTitle', data.imageTitle);
+            formData.append('videoTitle', data.videoTitle);
+            if (data.img) {
+                formData.append("image", data.image);
+            }
+            if (data.video) {
+                formData.append("video", data.video);
+            }
+            body = formData;
+            headers = {};
+        } else {
+            body = JSON.stringify({
+                productId: data.productId,
+                rating: data.rating,
+                text: data.text,
+            });
+        }
+
+        const response = await fetch("http://localhost:3000/api/buyers/review", {
+            method: "POST",
+            credentials: "include",
+            headers,
+            body,
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to add review");
+            throw new Error(result.message || "Failed to add review");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in adding review: ", error);
+        throw error;
+    }
+};
+
+const updateReview = async (data, reviewId) => {
+    try {
+        let body;
+        let headers = { "Content-Type": "application/json" };
+
+        const hasNewFiles = (data.image instanceof File) || (data.video instanceof File);
+
+        if (hasNewFiles) {
+            const formData = new FormData();
+            formData.append('rating', data.rating);
+            
+            if (data.text) {
+                formData.append('text', data.text);
+            }
+            
+            if (data.image instanceof File) {
+                formData.append('image', data.image);
+                formData.append('imageTitle', data.imageTitle || '');
+            } else if (data.image && typeof data.image === 'object') {
+                formData.append('imageData', JSON.stringify(data.image));
+            }
+            
+            if (data.video instanceof File) {
+                formData.append('video', data.video);
+                formData.append('videoTitle', data.videoTitle || '');
+            } else if (data.video && typeof data.video === 'object') {
+                formData.append('videoData', JSON.stringify(data.video));
+            }
+            
+            if (data.deletedMedia && data.deletedMedia.length > 0) {
+                formData.append('deletedMedia', JSON.stringify(data.deletedMedia));
+            }
+            
+            body = formData;
+            headers = {};
+        } else {
+            const updateData = {
+                rating: data.rating,
+                text: data.text || null,
+            };
+            
+            if (data.image !== undefined) {
+                updateData.image = data.image;
+            }
+            
+            if (data.video !== undefined) {
+                updateData.video = data.video;
+            }
+            
+            if (data.deletedMedia && data.deletedMedia.length > 0) {
+                updateData.deletedMedia = data.deletedMedia;
+            }
+            
+            body = JSON.stringify(updateData);
+        }
+
+        const response = await fetch(`http://localhost:3000/api/buyers/review/${reviewId}`, {
+            method: "PUT",
+            credentials: "include",
+            headers,
+            body,
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to update review");
+            throw new Error(result.message || "Failed to update review");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in updating review: ", error);
+        throw error;
+    }
+};
+
+const getReview = async (productId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/review/${productId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+            credentials: "include",
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get review");
+            throw new Error(result.message || "Failed to get review");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in get review: ", error);
+        throw error;
+    }
+}
+
+const getProductReviews = async (productId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/products/reviews/${productId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+            credentials: "include",
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get product review");
+            throw new Error(result.message || "Failed to get product review");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in get product review: ", error);
+        throw error;
+    }
+}
+
+const removeReview = async (reviewId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/buyers/review/${reviewId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'DELETE',
+            credentials: "include",
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to delete review");
+            throw new Error(result.message || "Failed to delete review");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in delete review: ", error);
+        throw error;
+    }
+}
+
 export {
     addProduct, getProduct, updateProduct, removeProduct, changeAvailability,
     addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct,
     getProducts, getProductById, getWishlistProducts, getProductByCategory,
     addToCart, getCart, updateCart, removeCart,
     addToWishlist, removeFromWishlist,
-    addToViewed, getViewedProduct
+    addToViewed, getViewedProduct,
+    addReview, updateReview, getReview, getProductReviews, removeReview
 };

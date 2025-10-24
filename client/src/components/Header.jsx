@@ -4,11 +4,6 @@ import { FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
 import logo from '../assets/logo.webp'
 import useThemeStore from '../store/theme';
 import useAuthStore from '../store/auth';
-import axios from 'axios';
-
-// import { useEffect, useRef } from 'react';
-// import { Link } from 'react-router-dom';
-// import axios from 'axios';
 
 export default function Header() {
   const { isDark, toggleMode } = useThemeStore();
@@ -59,7 +54,13 @@ export default function Header() {
     }
     const fetchResults = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/products/search?q=${query}`);
+        const response = await fetch(`http://localhost:3000/api/products/search?q=${query}`, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          method: 'GET',
+          credentials: 'include',
+        });
         setResults(response.data);
         setIsDropdownVisible(true);
       } catch (error) {
