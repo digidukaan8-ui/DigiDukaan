@@ -21,15 +21,15 @@ import productRouter from './routes/product.route.js'; // YEH LINE ADD KAREIN
 
 dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 app.use(helmet());
 app.use(compression());
 app.use(morgan('dev'));
 
 app.use(cors({
-  origin: process.env.CORS_ORIGIN,
-  credentials: true,
+  origin: process.env.CORS_ORIGIN,
+  credentials: true,
 }));
 
 app.use(express.json());
@@ -39,17 +39,17 @@ app.use('/api/products', productRouter); // YEH LINE ADD KAREIN
 //...
 
 const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000,
-  max: 100,
-  message: { success: false, message: "Too many requests, try again later" },
-  standardHeaders: true,
-  legacyHeaders: false,
+  windowMs: 1 * 60 * 1000,
+  max: 100,
+  message: { success: false, message: "Too many requests, try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 app.use(limiter);
 
 app.get('/', (req, res) => {
-  res.send('API is running...');
+  res.send('API is running...');
 });
 
 connectDB();
@@ -62,17 +62,13 @@ app.use('/api/chats', chatRouter);
 app.use('/api/payments', paymentRouter);
 
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ success: false, message: 'Something went wrong!' });
+  console.error(err.stack);
+  res.status(500).json({ success: false, message: 'Something went wrong!' });
 });
 
 const server = http.createServer(app);
 initSocket(server);
 
-server.listen(4000, () => {
-  console.log("Server running on port 4000");
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Server and WebSocket running on http://localhost:${PORT}`);
 });
