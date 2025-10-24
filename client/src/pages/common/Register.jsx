@@ -10,15 +10,19 @@ import { useState } from 'react'
 const Register = () => {
   const { startLoading, stopLoading } = useLoaderStore();
   const [captchaToken, setCaptchaToken] = useState("");
-  const [phone, setPhone] = useState("+91");
   const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     reset,
     watch,
     formState: { errors }
-  } = useForm()
+  } = useForm({
+    defaultValues: {
+      phone: "+91"
+    }
+  })
 
   const password = watch('password');
 
@@ -31,6 +35,7 @@ const Register = () => {
     const { confirmPassword, ...cleanData } = data;
     if (!captchaToken) {
       toast.error("Please complete the captcha");
+      stopLoading();
       return;
     }
 
@@ -169,14 +174,12 @@ const Register = () => {
             id="phone"
             name="phone"
             type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
             placeholder="+919876543210"
             {...register('phone', {
               required: 'Phone number is required',
               pattern: {
                 value: /^\+91[6-9]\d{9}$/,
-                message: 'Invalid phone number format',
+                message: 'Invalid phone number format (+91 followed by 10 digits)',
               },
             })}
             className="w-full px-3 py-2 border border-black dark:border-white rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
