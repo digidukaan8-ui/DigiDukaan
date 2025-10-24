@@ -51,8 +51,8 @@ const loginUser = async (req, res) => {
 
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
-            secure: process.env.PRODUCTION ? true : false,
-            sameSite: 'lax',
+            secure: process.env.PRODUCTION === "true" ? true : false,
+            sameSite: process.env.PRODUCTION === "true" ? 'None' : 'lax',
             maxAge: Number(process.env.ACCESS_TOKEN_COOKIE_EXPIRY)
         });
 
@@ -62,8 +62,8 @@ const loginUser = async (req, res) => {
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: process.env.PRODUCTION ? true : false,
-            sameSite: 'lax',
+            secure: process.env.PRODUCTION === "true" ? true : false,
+            sameSite: process.env.PRODUCTION === "true" ? 'None' : 'lax',
             maxAge: Number(process.env.REFRESH_TOKEN_COOKIE_EXPIRY)
         });
 
@@ -110,14 +110,14 @@ const logoutUser = async (req, res) => {
     try {
         res.clearCookie('accessToken', {
             httpOnly: true,
-            secure: process.env.PRODUCTION ? true : false,
-            sameSite: 'lax'
+            secure: process.env.PRODUCTION === "true" ? true : false,
+            sameSite: process.env.PRODUCTION === "true" ? 'None' : 'lax'
         });
 
         res.clearCookie('refreshToken', {
             httpOnly: true,
-            secure: process.env.PRODUCTION ? true : false,
-            sameSite: 'lax'
+            secure: process.env.PRODUCTION === "true" ? true : false,
+            sameSite: process.env.PRODUCTION === "true" ? 'None' : 'lax'
         });
 
         return res.status(200).json({ success: true, message: 'Logout successfully' });

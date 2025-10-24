@@ -42,8 +42,8 @@ const authMiddleware = (...allowedRoles) => {
 
         res.cookie("accessToken", newAccessToken, {
           httpOnly: true,
-          secure: process.env.PRODUCTION ? true : false,
-          sameSite: "lax",
+          secure: process.env.PRODUCTION === "true" ? true : false,
+          sameSite: process.env.PRODUCTION === "true" ? 'None' : 'lax',
           maxAge: parseInt(process.env.ACCESS_TOKEN_COOKIE_EXPIRY),
         });
 
