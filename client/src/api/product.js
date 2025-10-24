@@ -24,7 +24,7 @@ const addProduct = async (data) => {
         formData.append('brand', data.brand);
         formData.append('tags', JSON.stringify(data.tags));
         formData.append('deliveryCharge', Number(data.deliveryCharge));
-        const response = await fetch(`http://localhost:3000/api/sellers/stores/${data.storeId}/products`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/stores/${data.storeId}/products`, {
             method: "POST",
             credentials: "include",
             body: formData,
@@ -47,7 +47,7 @@ const addProduct = async (data) => {
 
 const getProduct = async (storeId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/sellers/stores/${storeId}/products`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/stores/${storeId}/products`, {
             method: "GET",
             credentials: "include"
         });
@@ -124,7 +124,7 @@ const updateProduct = async (data) => {
             });
         }
 
-        const response = await fetch(`http://localhost:3000/api/sellers/products/${data.productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/products/${data.productId}`, {
             method: "PATCH",
             credentials: "include",
             headers,
@@ -148,7 +148,7 @@ const updateProduct = async (data) => {
 
 const removeProduct = async (productId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/sellers/products/${productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/products/${productId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -173,7 +173,7 @@ const removeProduct = async (productId) => {
 
 const changeAvailability = async (productId, available) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/sellers/products/${productId}/availability`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/products/${productId}/availability`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -222,7 +222,7 @@ const addUsedProduct = async (data) => {
         formData.append('isNegotiable', data.isNegotiable);
         formData.append('billAvailable', data.billAvailable);
         formData.append('condition', data.condition);
-        const response = await fetch(`http://localhost:3000/api/sellers/stores/${data.storeId}/used-products`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/stores/${data.storeId}/used-products`, {
             method: "POST",
             credentials: "include",
             body: formData
@@ -244,7 +244,7 @@ const addUsedProduct = async (data) => {
 
 const getUsedProduct = async (storeId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/sellers/stores/${storeId}/used-products`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/stores/${storeId}/used-products`, {
             method: "GET",
             credentials: "include"
         });
@@ -325,7 +325,7 @@ const updateUsedProduct = async (data) => {
             });
         }
 
-        const response = await fetch(`http://localhost:3000/api/sellers/used-products/${data.usedProductId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/used-products/${data.usedProductId}`, {
             method: "PATCH",
             credentials: "include",
             headers,
@@ -349,7 +349,7 @@ const updateUsedProduct = async (data) => {
 
 const removeUsedProduct = async (productId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/sellers/used-products/${productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/used-products/${productId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -374,7 +374,7 @@ const removeUsedProduct = async (productId) => {
 
 const getProducts = async (data) => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/products', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/products`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -398,7 +398,7 @@ const getProducts = async (data) => {
 
 const getProductById = async (productId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/users/product/${productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/product/${productId}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -422,7 +422,7 @@ const getProductById = async (productId) => {
 
 const addToCart = async (productId, quantity) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/cart/${productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/cart/${productId}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -447,7 +447,7 @@ const addToCart = async (productId, quantity) => {
 
 const updateCart = async (cartId, quantity) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/cart/${cartId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/cart/${cartId}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -472,7 +472,7 @@ const updateCart = async (cartId, quantity) => {
 
 const removeCart = async (cartId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/cart/${cartId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/cart/${cartId}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -496,7 +496,7 @@ const removeCart = async (cartId) => {
 
 const getCart = async () => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/cart`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/cart`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -520,7 +520,7 @@ const getCart = async () => {
 
 const addToWishlist = async (productId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/wishlist/${productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/wishlist/${productId}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -544,7 +544,7 @@ const addToWishlist = async (productId) => {
 
 const getWishlistProducts = async () => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/wishlist`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/wishlist`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -568,7 +568,7 @@ const getWishlistProducts = async () => {
 
 const removeFromWishlist = async (wishlistId, productId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/wishlist/${wishlistId}/${productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/wishlist/${wishlistId}/${productId}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -592,7 +592,7 @@ const removeFromWishlist = async (wishlistId, productId) => {
 
 const addToViewed = async (productId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/viewed/${productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/viewed/${productId}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -616,7 +616,7 @@ const addToViewed = async (productId) => {
 
 const getViewedProduct = async () => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/viewed`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/viewed`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -640,7 +640,7 @@ const getViewedProduct = async () => {
 
 const getProductByCategory = async (catgeory, page) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/users/category-products/${catgeory}?page=${page}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/category-products/${catgeory}?page=${page}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -690,7 +690,7 @@ const addReview = async (data) => {
             });
         }
 
-        const response = await fetch("http://localhost:3000/api/buyers/review", {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/review`, {
             method: "POST",
             credentials: "include",
             headers,
@@ -768,7 +768,7 @@ const updateReview = async (data, reviewId) => {
             body = JSON.stringify(updateData);
         }
 
-        const response = await fetch(`http://localhost:3000/api/buyers/review/${reviewId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/review/${reviewId}`, {
             method: "PUT",
             credentials: "include",
             headers,
@@ -792,7 +792,7 @@ const updateReview = async (data, reviewId) => {
 
 const getReview = async (productId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/review/${productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/review/${productId}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -816,7 +816,7 @@ const getReview = async (productId) => {
 
 const getProductReviews = async (productId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/products/reviews/${productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/products/reviews/${productId}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -840,7 +840,7 @@ const getProductReviews = async (productId) => {
 
 const removeReview = async (reviewId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/review/${reviewId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/review/${reviewId}`, {
             headers: {
                 'Content-Type': 'application/json'
             },

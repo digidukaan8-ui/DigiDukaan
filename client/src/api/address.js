@@ -3,7 +3,7 @@ import logoutHelper from '../utils/logoutHelper';
 
 const addAddress = async (data) => {
     try {
-        const response = await fetch('http://localhost:3000/api/buyers/address', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/address`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -28,7 +28,7 @@ const addAddress = async (data) => {
 
 const updateAddress = async (data, addressId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/address/${addressId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/address/${addressId}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -53,7 +53,7 @@ const updateAddress = async (data, addressId) => {
 
 const removeAddress = async (addressId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/address/${addressId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/address/${addressId}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -77,7 +77,7 @@ const removeAddress = async (addressId) => {
 
 const getAddress = async () => {
     try {
-        const response = await fetch('http://localhost:3000/api/buyers/addresses', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/addresses`, {
             headers: {
                 'Content-Type': 'application/json',
             },

@@ -11,7 +11,7 @@ import useOrderStore from '../store/order';
 
 const registerUser = async (data) => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/register', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -33,7 +33,7 @@ const registerUser = async (data) => {
 
 const loginUser = async (data) => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/login', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -65,7 +65,7 @@ const loginUser = async (data) => {
 
 const logoutUser = async () => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/logout', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/logout`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -95,7 +95,7 @@ const logoutUser = async () => {
 
 const sendOtp = async (email, captchaToken) => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/send-otp', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/send-otp`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -118,7 +118,7 @@ const sendOtp = async (email, captchaToken) => {
 
 const verifyOtp = async (data) => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/verify-otp', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/verify-otp`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -141,7 +141,7 @@ const verifyOtp = async (data) => {
 
 const resetPassword = async (data) => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/reset-password', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/reset-password`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -164,7 +164,7 @@ const resetPassword = async (data) => {
 
 const sendMessage = async (message) => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/contact', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/contact`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -189,7 +189,7 @@ const changeAvatar = async (img) => {
     try {
         const formData = new FormData();
         formData.append('img', img);
-        const response = await fetch('http://localhost:3000/api/users/avatar', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/avatar`, {
             method: 'PUT',
             credentials: 'include',
             body: formData
@@ -210,7 +210,7 @@ const changeAvatar = async (img) => {
 
 const removeAvatar = async () => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/avatar', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/avatar`, {
             method: 'DELETE',
             credentials: 'include',
         });
@@ -230,7 +230,7 @@ const removeAvatar = async () => {
 
 const updateProfile = async (data) => {
     try {
-        const response = await fetch('http://localhost:3000/api/users/update', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/update`, {
             headers: {
                 'Content-Type': 'application/json'
             },

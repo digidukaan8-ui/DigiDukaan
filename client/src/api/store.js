@@ -10,7 +10,7 @@ const createStore = async (data) => {
         formData.append("addresses", JSON.stringify(data.addresses));
         formData.append("img", data.img);
 
-        const response = await fetch("http://localhost:3000/api/sellers/stores", {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/stores`, {
             method: "POST",
             credentials: "include",
             body: formData,
@@ -55,7 +55,7 @@ const updateStore = async (data) => {
             });
         }
 
-        const response = await fetch(`http://localhost:3000/api/sellers/stores/${data.storeId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/stores/${data.storeId}`, {
             method: "PATCH",
             credentials: "include",
             headers,
@@ -79,7 +79,7 @@ const updateStore = async (data) => {
 
 const addDeliveryZone = async (data) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/sellers/stores/${data.storeId}/delivery-zones`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/stores/${data.storeId}/delivery-zones`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -105,7 +105,7 @@ const addDeliveryZone = async (data) => {
 
 const updateDeliveryZone = async (data) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/sellers/delivery-zones/${data.zoneId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/delivery-zones/${data.zoneId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -131,7 +131,7 @@ const updateDeliveryZone = async (data) => {
 
 const removeDeliveryZone = async (zoneId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/sellers/delivery-zones/${zoneId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/delivery-zones/${zoneId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -156,7 +156,7 @@ const removeDeliveryZone = async (zoneId) => {
 
 const getStoreInfo = async (storeId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/sellers/stores/${storeId}/info`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/stores/${storeId}/info`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

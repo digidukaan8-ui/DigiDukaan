@@ -54,7 +54,7 @@ export default function Header() {
     }
     const fetchResults = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/products/search?q=${query}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/products/search?q=${query}`, {
           headers: {
             'Content-Type': 'application/json'
           },

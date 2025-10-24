@@ -18,7 +18,7 @@ const addMessage = async (type, data) => {
             if (data.storeId) bodyData.append('storeId', data.storeId);
         }
 
-        const response = await fetch('http://localhost:3000/api/chats/add', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/chats/add`, {
             headers,
             method: 'POST',
             credentials: 'include',
@@ -47,7 +47,7 @@ const addMessage = async (type, data) => {
 
 const getChatMessages = async (chatId, skip = 0) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/chats/messages/${chatId}?skip=${skip}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/chats/messages/${chatId}?skip=${skip}`, {
             credentials: "include",
         });
 
@@ -68,7 +68,7 @@ const getChatMessages = async (chatId, skip = 0) => {
 
 const getChats = async () => {
     try {
-        const response = await fetch(`http://localhost:3000/api/chats`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/chats`, {
             credentials: "include",
         });
 
@@ -89,7 +89,7 @@ const getChats = async () => {
 
 const updateMessage = async (messageId, message) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/chats/messages/${messageId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/chats/messages/${messageId}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -115,7 +115,7 @@ const updateMessage = async (messageId, message) => {
 
 const removeMessage = async (messageId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/chats/messages/${messageId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/chats/messages/${messageId}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -140,7 +140,7 @@ const removeMessage = async (messageId) => {
 
 const markAllMessagesSeen = async (chatId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/chats/messages/seen/${chatId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/chats/messages/seen/${chatId}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -165,7 +165,7 @@ const markAllMessagesSeen = async (chatId) => {
 
 const getChatsCount = async () => {
     try {
-        const response = await fetch(`http://localhost:3000/api/chats/messages`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/chats/messages`, {
             headers: {
                 'Content-Type': 'application/json',
             },

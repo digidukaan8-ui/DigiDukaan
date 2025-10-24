@@ -3,7 +3,7 @@ import logoutHelper from '../utils/logoutHelper';
 
 const addOrder = async (data) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/payments/order`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/payments/order`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -58,7 +58,7 @@ const addOrder = async (data) => {
 
 const getStoreCharges = async (storeIds) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/buyers/store/deliveryCharge`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/store/deliveryCharge`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -84,7 +84,7 @@ const getStoreCharges = async (storeIds) => {
 
 const verifyOrder = async (orderId) => {
     try {
-        const res = await fetch(`http://localhost:3000/api/payments/verify/${orderId}`, {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/payments/verify/${orderId}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -107,7 +107,7 @@ const verifyOrder = async (orderId) => {
 
 const getOrders = async () => {
     try {
-        const res = await fetch(`http://localhost:3000/api/buyers/orders`, {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/orders`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -130,7 +130,7 @@ const getOrders = async () => {
 
 const getOrdersCount = async () => {
     try {
-        const res = await fetch(`http://localhost:3000/api/buyers/orders/count`, {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/orders/count`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -153,7 +153,7 @@ const getOrdersCount = async () => {
 
 const cancelOrder = async (orderId) => {
     try {
-        const res = await fetch(`http://localhost:3000/api/buyers/orders/cancel/${orderId}`, {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/orders/cancel/${orderId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -176,7 +176,7 @@ const cancelOrder = async (orderId) => {
 
 const updateOrderStatus = async (orderId, status) => {
     try {
-        const res = await fetch(`http://localhost:3000/api/sellers/orders/status/${orderId}`, {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/orders/status/${orderId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             credentials: "include",

@@ -3,7 +3,7 @@ import logoutHelper from '../utils/logoutHelper';
 
 const fetchLocationThroughGps = async (lat, lon) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/users/reverse-geocode/${lat}/${lon}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/reverse-geocode/${lat}/${lon}`, {
             method: "GET",
             credentials: "include"
         });

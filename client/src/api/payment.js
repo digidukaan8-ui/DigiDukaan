@@ -3,14 +3,12 @@ import logoutHelper from "../utils/logoutHelper";
 
 const payNow = async (data) => {
     try {
-        const res = await fetch(
-            "http://localhost:3000/api/payments/used-product/create-order",
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify(data),
-            }
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/payments/used-product/create-order`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(data),
+        }
         );
 
         const result = await res.json();
@@ -53,7 +51,7 @@ const payNow = async (data) => {
 
 const verifyPayment = async (orderId, productId) => {
     try {
-        const res = await fetch("http://localhost:3000/api/payments/used-product/verify", {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/payments/used-product/verify`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
