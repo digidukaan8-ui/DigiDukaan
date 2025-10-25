@@ -21,8 +21,9 @@ import SellerDashboard from "./seller/SellerDashboard";
 import Order from "./common/Order";
 import Whislist from "./buyer/Whislist";
 import View from "./buyer/View";
+import Search from "./common/Search";
 
 export {
     Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct,
-    Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout, Order, Whislist, View
+    Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout, Order, Whislist, View, Search
 };

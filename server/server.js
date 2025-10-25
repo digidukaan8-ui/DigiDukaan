@@ -15,9 +15,7 @@ import paymentRouter from './routes/payment.route.js';
 import chatRouter from './routes/chat.route.js';
 import http from "http";
 import { initSocket } from "./socket.js";
-//...
-import productRouter from './routes/product.route.js'; // YEH LINE ADD KAREIN
-//...
+import productRouter from './routes/product.route.js';
 
 dotenv.config();
 const app = express();
@@ -36,8 +34,6 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use('/api/products', productRouter); // YEH LINE ADD KAREIN
-//...
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000,
@@ -50,7 +46,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.get('/', (req, res) => {
-  res.send('API is running...');
+    res.send('API is running...');
 });
 
 connectDB();
@@ -61,6 +57,7 @@ app.use('/api/sellers', sellerRouter);
 app.use('/api/admins', adminRouter);
 app.use('/api/chats', chatRouter);
 app.use('/api/payments', paymentRouter);
+app.use('/api/products', productRouter); 
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

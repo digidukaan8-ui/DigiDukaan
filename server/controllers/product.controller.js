@@ -8,6 +8,7 @@ import View from "../models/view.model.js";
 import Review from "../models/review.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.config.js";
 import { isValidCategory, isValidUsedProductCategory, isValidSubCategory, isValidUsedProductSubCategory } from '../utils/category.util.js'
+import { message } from "./user.controller.js";
 
 const MAX_VIEWS = 100;
 
@@ -1192,11 +1193,7 @@ const searchProducts = async (req, res) => {
         const newProducts = await Product.find(searchQuery).limit(5);
         const usedProducts = await UsedProduct.find(searchQuery).limit(5);
 
-        const combinedResults = [...newProducts, ...usedProducts];
-
-        console.log("✅ Combined products found:", combinedResults.length);
-        res.status(200).json(combinedResults);
-
+        res.status(200).json({ success: true, message: 'Product searched successfully', newProducts, usedProducts });
     } catch (error) {
         console.error("Search Error:", error);
         res.status(500).json({ message: 'Server error during search' });

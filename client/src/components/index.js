@@ -17,5 +17,6 @@ import Location from "./Location";
 import Recaptcha from "./forms/Recaptcha";
 import ScrollToTop from "./ScrollToTop.jsx";
 import Review from "./Review.jsx";
+import Filter from "./Filter.jsx";
 
-export { Header, Footer, Card, UsedProductCard, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, ProductDetails, QuickView, UsedProductDetails, Location, Recaptcha, ScrollToTop, Review };
+export { Header, Footer, Card, UsedProductCard, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, ProductDetails, QuickView, UsedProductDetails, Location, Recaptcha, ScrollToTop, Review, Filter };

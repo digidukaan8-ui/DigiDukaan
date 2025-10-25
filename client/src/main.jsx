@@ -4,9 +4,9 @@ import App from './App.jsx'
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
 import {
   Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct,
-  Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout, Order, Whislist, View
+  Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout, Order, Whislist, View, Search
 } from './pages/index.js'
-import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, Review } from './components/index.js';
+import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, Review, Filter } from './components/index.js';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ProductDetails from './components/ProductDetails.jsx';
 
@@ -29,6 +29,8 @@ const router = createBrowserRouter(
       <Route path='product/:productId' element={<ProductDetails />} />
       <Route path='used-product' element={<UsedProduct />} />
       <Route path='category-product' element={<Category />} />
+      <Route path='filter' element={<Filter />} />
+      <Route path='search' element={<Search />} />
 
       <Route path='buyer' element={<BuyerRoute />} >
         <Route path='dashboard' element={<Dashboard />} />
