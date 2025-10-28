@@ -6,7 +6,10 @@ import {
   Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct,
   Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout, Order, Whislist, View, Search
 } from './pages/index.js'
-import { BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, Review, Filter } from './components/index.js';
+import {
+  BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm,
+  Review, Filter
+} from './components/index.js';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ProductDetails from './components/ProductDetails.jsx';
 

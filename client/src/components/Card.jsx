@@ -322,17 +322,22 @@ export default function Card({ product, userRole = "buyer", onQuickView }) {
         </div>
 
         <div className="flex items-center gap-2 mb-3">
-          <div className="flex">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star
-                key={i}
-                className={`h-4 w-4 ${i < Math.floor(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300 dark:text-gray-600"}`}
-              />
-            ))}
+          <div className="flex items-center gap-2">
+            <div className="flex">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-5 h-5 ${i < Math.round(rating.avgRating || 0)
+                    ? 'text-yellow-400 fill-yellow-400'
+                    : 'text-gray-300 dark:text-neutral-600'
+                    }`}
+                />
+              ))}
+            </div>
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {rating.avgRating?.toFixed(1) || '0'} ({rating.totalRating || 0} {rating.totalRating === 1 ? "review" : "reviews"})
+            </span>
           </div>
-          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-            {rating > 0 ? rating.toFixed(1) : "New"}
-          </span>
         </div>
 
         <div className="mt-auto">

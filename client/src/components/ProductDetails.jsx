@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Heart, Share2, Star, ShoppingCart, ChevronLeft, ChevronRight, Play, Edit, Trash2, Plus, Minus, AlertTriangle, Truck } from 'lucide-react';
 import useAuthStore from '../store/auth';
 import useProductStore from '../store/product';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useLoaderStore from '../store/loader';
 import { removeProduct, changeAvailability, getProductById, addToWishlist, removeFromWishlist, addToCart, addToViewed } from '../api/product';
 import { toast } from 'react-hot-toast';
@@ -23,7 +23,7 @@ const ProductDetail = ({ id }) => {
   );
 
   useEffect(() => {
-    if (!product) {
+    if (!product || product._id !== id) {
       const fetchProduct = async () => {
         startLoading("fetching");
         try {
@@ -38,7 +38,7 @@ const ProductDetail = ({ id }) => {
       };
       fetchProduct();
     }
-  }, [id, product, startLoading, stopLoading]);
+  }, [id]);
 
   useEffect(() => {
     if (!product?._id) return;

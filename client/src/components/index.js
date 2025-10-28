@@ -18,5 +18,10 @@ import Recaptcha from "./forms/Recaptcha";
 import ScrollToTop from "./ScrollToTop.jsx";
 import Review from "./Review.jsx";
 import Filter from "./Filter.jsx";
+import RecommendProduct from "./RecommendProduct.jsx";
 
-export { Header, Footer, Card, UsedProductCard, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm, ProductDetails, QuickView, UsedProductDetails, Location, Recaptcha, ScrollToTop, Review, Filter };
+export {
+    Header, Footer, Card, UsedProductCard, BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm,
+    ReviewForm, DeliveryForm, ProductDetails, QuickView, UsedProductDetails, Location, Recaptcha, ScrollToTop, Review, Filter,
+    RecommendProduct
+};

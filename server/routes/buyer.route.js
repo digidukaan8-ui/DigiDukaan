@@ -11,6 +11,7 @@ import { addAddress, updateAddress, removeAddress, getAddresses } from '../contr
 import { handleAddAddress, handleUpdateAddress } from '../middlewares/address.middleware.js';
 import { getStoreDeliveryCharge } from '../controllers/store.controller.js';
 import { cancelOrder, getOrders, getOrdersCount } from '../controllers/order.controller.js';
+import { getBestRatedProducts, getMostViewedProducts, getRelatedProducts, getSimilarProducts, getBestSellers, getSimilarBrandProducts } from '../controllers/recommendation.controller.js';
 const buyerRouter = express.Router();
 
 buyerRouter.get('/cart', authMiddleware('buyer'), getCartProducts);
@@ -21,6 +22,9 @@ buyerRouter.get('/products/reviews/:productId', authMiddleware('buyer'), getProd
 buyerRouter.get('/addresses', authMiddleware('buyer'), getAddresses);
 buyerRouter.get('/orders', authMiddleware('buyer', 'seller'), getOrders);
 buyerRouter.get('/orders/count', authMiddleware('buyer', 'seller'), getOrdersCount);
+buyerRouter.get('/products/similar-product/:productId', authMiddleware('buyer'), getSimilarProducts);
+buyerRouter.get('/products/related-product/:productId', authMiddleware('buyer'), getRelatedProducts);
+buyerRouter.get('/products/similar-brand-product/:productId', authMiddleware('buyer'), getSimilarBrandProducts);
 
 buyerRouter.post('/cart/:productId', authMiddleware('buyer'), handleAddToCart, addCartProduct);
 buyerRouter.post('/wishlist/:productId', authMiddleware('buyer'), addWishlistProduct);
@@ -30,7 +34,7 @@ buyerRouter.post('/address', authMiddleware('buyer'), handleAddAddress, addAddre
 buyerRouter.post('/store/deliveryCharge', authMiddleware('buyer'), getStoreDeliveryCharge);
 
 buyerRouter.put('/cart/:cartId', authMiddleware('buyer'), handleUpdateCart, updateCart);
-buyerRouter.put('/review/:reviewId', authMiddleware('buyer'),uploadMedia, validateMediaSize, handleUpdateReview, updateReview);
+buyerRouter.put('/review/:reviewId', authMiddleware('buyer'), uploadMedia, validateMediaSize, handleUpdateReview, updateReview);
 buyerRouter.put('/address/:addressId', authMiddleware('buyer'), handleUpdateAddress, updateAddress);
 buyerRouter.put('/orders/cancel/:orderId', authMiddleware('buyer'), cancelOrder);
 
