@@ -2,7 +2,7 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import { handleLogin, handleRegister, handleMessage } from '../middlewares/user.middleware.js';
 import { loginUser, logoutUser, registerUser, sendOTP, verifyOTP, resetPassword, message } from '../controllers/user.controller.js';
-import { getProducts, getProductByCategory, getProductById } from '../controllers/product.controller.js';
+import { getProducts, getProductByCategory, getProductById, searchProducts } from '../controllers/product.controller.js';
 import handleLocationAccess from '../middlewares/location.middleware.js';
 import reverseGeocode from '../controllers/location.controller.js';
 import { userAvatar, removeUserAvatar, updateProfile } from '../controllers/user.controller.js';
@@ -74,10 +74,11 @@ userRouter.post('/contact', messageLimiter, handleMessage, message);
 
 userRouter.get('/products/:location', productsLimiter, getProducts);
 userRouter.get('/product/:productId', productsLimiter, getProductById);
-userRouter.get('/category-products/:category', productsLimiter, getProductByCategory);
+userRouter.get('/search/:loc', searchProducts);
+userRouter.get('/category-products/:category/:location', productsLimiter, getProductByCategory);
 
-userRouter.put('/update', authMiddleware('buyer','seller'), updateProfile);
-userRouter.put('/avatar', authMiddleware('buyer','seller'), validateFileSizes, uploadProductMedia, userAvatar);
-userRouter.delete('/avatar', authMiddleware('buyer','seller'), removeUserAvatar);
+userRouter.put('/update', authMiddleware('buyer', 'seller'), updateProfile);
+userRouter.put('/avatar', authMiddleware('buyer', 'seller'), validateFileSizes, uploadProductMedia, userAvatar);
+userRouter.delete('/avatar', authMiddleware('buyer', 'seller'), removeUserAvatar);
 
 export default userRouter;

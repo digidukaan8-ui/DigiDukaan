@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import useCategoryProductStore from "../../store/categoryProducts";
 import useUsedCategoryProductStore from "../../store/categoryUsedProduct";
-import { Location, QuickView, Card, UsedProductCard } from "../../components/index";
+import { Location, QuickView, Card, UsedProductCard, HomeRecommendation } from "../../components/index";
 import useAuthStore from "../../store/auth";
 import { getCart, getWishlistProducts } from "../../api/product";
 import useCartStore from "../../store/cart";
@@ -87,6 +87,8 @@ const Home = () => {
             ))}
           </div>
 
+          <HomeRecommendation />
+          
           <div className="space-y-12 bg-gray-100 dark:bg-neutral-950 pb-20">
             {currentCategories.map((categoryObj, index) => {
               const [categoryName, products] = Object.entries(categoryObj)[0];

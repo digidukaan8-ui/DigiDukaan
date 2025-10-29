@@ -3,25 +3,50 @@ import { useSearchParams } from "react-router-dom";
 import { getProductByCategory } from "../../api/product";
 import useLoaderStore from "../../store/loader";
 import { Card, UsedProductCard, Location } from "../../components/index";
+import useLocationStore from "../../store/location";
 
 function Category() {
     const { startLoading, stopLoading } = useLoaderStore();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
 
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalProducts, setTotalProducts] = useState(0);
     const [loading, setLoading] = useState(false);
+    const { editedLocation } = useLocationStore();
+    const [location, setLocation] = useState(() => {
+        if (editedLocation.pincode) {
+            return editedLocation.pincode;
+        } else if (editedLocation.city) {
+            return editedLocation.city;
+        } else if (editedLocation.town) {
+            return editedLocation.town;
+        } else if (editedLocation.locality) {
+            return editedLocation.locality;
+        }
+    });
 
     const slug = searchParams.get("slug");
     const type = searchParams.get("show") || "new";
+
+    useEffect(() => {
+        if (editedLocation.pincode) {
+            setLocation(editedLocation.pincode);
+        } else if (editedLocation.city) {
+            setLocation(editedLocation.city);
+        } else if (editedLocation.town) {
+            setLocation(editedLocation.town);
+        } else if (editedLocation.locality) {
+            setLocation(editedLocation.locality);
+        }
+    }, [editedLocation]);
 
     const fetchProducts = async (slug, page) => {
         setLoading(true);
         startLoading("fetching");
         try {
-            const res = await getProductByCategory(slug, page, type);
+            const res = await getProductByCategory(slug, page, location);
             if (res.success) {
                 setProducts(res.data);
                 setTotalPages(res.pagination.pages);
@@ -35,7 +60,7 @@ function Category() {
 
     useEffect(() => {
         if (slug) fetchProducts(slug, page);
-    }, [slug, page, type]);
+    }, [slug, page, type, location]);
 
     useEffect(() => {
         setPage(1);
@@ -51,7 +76,7 @@ function Category() {
 
             {products.length === 0 && !loading && <p className="h-screen">No products found!</p>}
 
-            <div className="flex justify-around items-center flex-wrap gap-6 px-5">
+            <div className="flex justify-around items-start flex-wrap gap-6 px-5">
                 {products.map((product) =>
                     type === "used" ? (
                         <UsedProductCard key={product._id} product={product} userRole="buyer" />

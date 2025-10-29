@@ -13,8 +13,18 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef(null);
-  const [loc, setLoc] = useState("");
   const { editedLocation } = useLocationStore();
+  const [loc, setLoc] = useState(() => {
+    if (editedLocation.pincode) {
+      return editedLocation.pincode;
+    } else if (editedLocation.city) {
+      return editedLocation.city;
+    } else if (editedLocation.town) {
+      return editedLocation.town;
+    } else if (editedLocation.locality) {
+      return editedLocation.locality;
+    }
+  });
 
   const toggleDropdown = useCallback(() => setDropdownOpen(prev => !prev), []);
 
@@ -48,8 +58,16 @@ export default function Header() {
   }
 
   useEffect(() => {
-    setLoc(editedLocation);
-  }, [editedLocation])
+    if (editedLocation.pincode) {
+      setLoc(editedLocation.pincode);
+    } else if (editedLocation.city) {
+      setLoc(editedLocation.city);
+    } else if (editedLocation.town) {
+      setLoc(editedLocation.town);
+    } else if (editedLocation.locality) {
+      setLoc(editedLocation.locality);
+    }
+  }, [editedLocation]);
 
   const getCurrentLabel = () => {
     const currentLink = links().find(link => link.to === location.pathname);
@@ -64,7 +82,7 @@ export default function Header() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/products/search/${loc}?q=${encodeURIComponent(query.trim())}`,
+        `${import.meta.env.VITE_BACKEND_URL}/users/search/${loc}?q=${encodeURIComponent(query.trim())}`,
         {
           headers: {
             'Content-Type': 'application/json'

@@ -637,9 +637,9 @@ const getViewedProduct = async () => {
     }
 }
 
-const getProductByCategory = async (catgeory, page) => {
+const getProductByCategory = async (catgeory, page, location) => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/category-products/${catgeory}?page=${page}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/category-products/${catgeory}/${location}?page=${page}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -721,29 +721,29 @@ const updateReview = async (data, reviewId) => {
         if (hasNewFiles) {
             const formData = new FormData();
             formData.append('rating', data.rating);
-            
+
             if (data.text) {
                 formData.append('text', data.text);
             }
-            
+
             if (data.image instanceof File) {
                 formData.append('image', data.image);
                 formData.append('imageTitle', data.imageTitle || '');
             } else if (data.image && typeof data.image === 'object') {
                 formData.append('imageData', JSON.stringify(data.image));
             }
-            
+
             if (data.video instanceof File) {
                 formData.append('video', data.video);
                 formData.append('videoTitle', data.videoTitle || '');
             } else if (data.video && typeof data.video === 'object') {
                 formData.append('videoData', JSON.stringify(data.video));
             }
-            
+
             if (data.deletedMedia && data.deletedMedia.length > 0) {
                 formData.append('deletedMedia', JSON.stringify(data.deletedMedia));
             }
-            
+
             body = formData;
             headers = {};
         } else {
@@ -751,19 +751,19 @@ const updateReview = async (data, reviewId) => {
                 rating: data.rating,
                 text: data.text || null,
             };
-            
+
             if (data.image !== undefined) {
                 updateData.image = data.image;
             }
-            
+
             if (data.video !== undefined) {
                 updateData.video = data.video;
             }
-            
+
             if (data.deletedMedia && data.deletedMedia.length > 0) {
                 updateData.deletedMedia = data.deletedMedia;
             }
-            
+
             body = JSON.stringify(updateData);
         }
 

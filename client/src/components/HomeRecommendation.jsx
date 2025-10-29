@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
-import { getRelatedProducts, getSimilarProducts, getSimilarBrandProducts } from "../api/recommendation";
+import { getBestRatedProducts, getMostViewedProducts, getBestSellerProducts } from "../api/recommendation";
 import useAuthStore from '../store/auth';
 import { Card, QuickView } from "../components/index";
 import useLocationStore from '../store/location';
 
-function RecommendProduct({ id }) {
+function HomeRecommendation() {
     const { user } = useAuthStore();
     const [products, setProducts] = useState({
-        similarProducts: [],
-        relatedProducts: [],
-        similarBrandProducts: []
+        bestRated: [],
+        bestSeller: [],
+        mostViewed: []
     });
     const [quickViewProduct, setQuickViewProduct] = useState(null);
     const { editedLocation } = useLocationStore();
-    const [location, setLocation] = useState(()=>{
-         if (editedLocation.pincode) {
+    const [location, setLocation] = useState(() => {
+        if (editedLocation.pincode) {
             return editedLocation.pincode;
         } else if (editedLocation.city) {
             return editedLocation.city;
@@ -40,32 +40,32 @@ function RecommendProduct({ id }) {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const [similarResult, relatedResult, similarBrandResult] = await Promise.all([
-                    getSimilarProducts(id, location),
-                    getRelatedProducts(id, location),
-                    getSimilarBrandProducts(id, location),
+                const [bestRated, bestSeller, mostViewed] = await Promise.all([
+                    getBestRatedProducts(location),
+                    getBestSellerProducts(location),
+                    getMostViewedProducts(location),
                 ]);
 
                 setProducts({
-                    similarProducts: Array.isArray(similarResult) ? similarResult : [],
-                    relatedProducts: Array.isArray(relatedResult) ? relatedResult : [],
-                    similarBrandProducts: Array.isArray(similarBrandResult) ? similarBrandResult : [],
+                    bestRated: Array.isArray(bestRated) ? bestRated : [],
+                    bestSeller: Array.isArray(bestSeller) ? bestSeller : [],
+                    mostViewed: Array.isArray(mostViewed) ? mostViewed : [],
                 });
             } catch (error) {
-                setProducts({ similarProducts: [], relatedProducts: [], similarBrandResult: [] });
+                setProducts({ bestRated: [], bestSeller: [], mostViewed: [] });
             }
         }
 
-        if (id && user?.role === "buyer") {
+        if (user?.role === "buyer") {
             fetchProducts();
         }
-    }, [id, location]);
+    }, [location]);
 
     if (user?.role === "seller" || user?.role === "admin") {
         return null;
     }
 
-    const hasProducts = products.similarProducts.length > 0 || products.relatedProducts.length > 0;
+    const hasProducts = products.bestRated.length > 0 || products.bestSeller.length > 0;
     if (!hasProducts) {
         return null;
     }
@@ -101,9 +101,9 @@ function RecommendProduct({ id }) {
     return (
         <>
             <div className="bg-gray-100 dark:bg-neutral-950 pb-10">
-                {renderProductSection(`More From ${products.similarBrandProducts[0]?.brand}`, products.similarBrandProducts)}
-                {renderProductSection("Similar Products", products.similarProducts)}
-                {renderProductSection("Related Products", products.relatedProducts)}
+                {renderProductSection("Best Rated", products.bestRated)}
+                {renderProductSection("Most Purchased", products.bestSeller)}
+                {renderProductSection("Most Viewed", products.mostViewed)}
             </div>
             <QuickView
                 product={quickViewProduct}
@@ -115,4 +115,4 @@ function RecommendProduct({ id }) {
     );
 }
 
-export default RecommendProduct;
+export default HomeRecommendation;

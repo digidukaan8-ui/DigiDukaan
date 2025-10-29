@@ -40,7 +40,6 @@ export default function Location() {
             city: data.city || data.town || data.village || data.suburb || data.locality || data.district || '',
             town: data.town || '',
             locality: data.locality || '',
-            country: data.country || ''
         };
     };
 
@@ -197,7 +196,6 @@ export default function Location() {
             city: '',
             town: '',
             locality: '',
-            country: location.country || ''
         };
         updatedLocation[tempSelectedField] = tempLocationValue;
 

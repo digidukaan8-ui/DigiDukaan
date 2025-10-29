@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router-dom";
-import { UsedProductDetails, Location } from "../../components/index";
+import { UsedProductDetails, Location, RecommendUsedProduct } from "../../components/index";
 
 function UsedProduct() {
   const [searchParams] = useSearchParams();
@@ -9,6 +9,7 @@ function UsedProduct() {
     <>
       <Location />
       <UsedProductDetails id={productId} />
+      <RecommendUsedProduct id={productId} />
     </>
   );
 }

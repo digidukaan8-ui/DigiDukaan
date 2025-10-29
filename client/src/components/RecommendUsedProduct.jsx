@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { getRelatedProducts, getSimilarProducts, getSimilarBrandProducts } from "../api/recommendation";
+import { getRelatedUsedProducts, getSimilarUsedProducts, getSimilarBrandUsedProducts } from "../api/recommendation";
 import useAuthStore from '../store/auth';
-import { Card, QuickView } from "../components/index";
+import { UsedProductCard, QuickView } from "../components/index";
 import useLocationStore from '../store/location';
 
-function RecommendProduct({ id }) {
+function RecommendUsedProduct({ id }) {
     const { user } = useAuthStore();
     const [products, setProducts] = useState({
         similarProducts: [],
@@ -13,8 +13,8 @@ function RecommendProduct({ id }) {
     });
     const [quickViewProduct, setQuickViewProduct] = useState(null);
     const { editedLocation } = useLocationStore();
-    const [location, setLocation] = useState(()=>{
-         if (editedLocation.pincode) {
+    const [location, setLocation] = useState(() => {
+        if (editedLocation.pincode) {
             return editedLocation.pincode;
         } else if (editedLocation.city) {
             return editedLocation.city;
@@ -41,9 +41,9 @@ function RecommendProduct({ id }) {
         const fetchProducts = async () => {
             try {
                 const [similarResult, relatedResult, similarBrandResult] = await Promise.all([
-                    getSimilarProducts(id, location),
-                    getRelatedProducts(id, location),
-                    getSimilarBrandProducts(id, location),
+                    getRelatedUsedProducts(id, location),
+                    getSimilarUsedProducts(id, location),
+                    getSimilarBrandUsedProducts(id, location),
                 ]);
 
                 setProducts({
@@ -86,7 +86,7 @@ function RecommendProduct({ id }) {
                 <div className="flex items-start gap-4 sm:gap-6 pt-2 overflow-x-auto hide-scrollbar scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent px-4">
                     {productList.map((product) => (
                         <div key={product._id} className="flex-shrink-0 w-[320px]">
-                            <Card
+                            <UsedProductCard
                                 product={product}
                                 userRole="buyer"
                                 onQuickView={() => setQuickViewProduct(product)}
@@ -102,12 +102,12 @@ function RecommendProduct({ id }) {
         <>
             <div className="bg-gray-100 dark:bg-neutral-950 pb-10">
                 {renderProductSection(`More From ${products.similarBrandProducts[0]?.brand}`, products.similarBrandProducts)}
-                {renderProductSection("Similar Products", products.similarProducts)}
-                {renderProductSection("Related Products", products.relatedProducts)}
+                {renderProductSection("Similar Used Products", products.similarProducts)}
+                {renderProductSection("Related Used Products", products.relatedProducts)}
             </div>
             <QuickView
                 product={quickViewProduct}
-                type={"new"}
+                type={"used"}
                 isOpen={!!quickViewProduct}
                 onClose={() => setQuickViewProduct(null)}
             />
@@ -115,4 +115,4 @@ function RecommendProduct({ id }) {
     );
 }
 
-export default RecommendProduct;
+export default RecommendUsedProduct;

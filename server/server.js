@@ -13,9 +13,9 @@ import sellerRouter from './routes/seller.route.js';
 import adminRouter from './routes/admin.route.js';
 import paymentRouter from './routes/payment.route.js';
 import chatRouter from './routes/chat.route.js';
+import recommendRouter from './routes/recommend.route.js';
 import http from "http";
 import { initSocket } from "./socket.js";
-import productRouter from './routes/product.route.js';
 
 dotenv.config();
 const app = express();
@@ -57,7 +57,7 @@ app.use('/api/sellers', sellerRouter);
 app.use('/api/admins', adminRouter);
 app.use('/api/chats', chatRouter);
 app.use('/api/payments', paymentRouter);
-app.use('/api/products', productRouter); 
+app.use('/api/recommends', recommendRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
