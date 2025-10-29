@@ -58,7 +58,7 @@ const Home = () => {
   return (
     <>
       {user.role === "buyer" && (
-        <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pt-10">
+        <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pt-30">
           <Location />
 
           <div className="flex flex-wrap justify-center gap-4 pb-8 pt-4">

@@ -4,8 +4,6 @@ import { Toaster } from 'react-hot-toast';
 import useThemeStore from "./store/theme.js";
 import { useEffect } from "react";
 import Loader from "./components/Loader.jsx";
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ProductDetails from './components/ProductDetails.jsx';
 
 function App() {
   const { isDark } = useThemeStore();

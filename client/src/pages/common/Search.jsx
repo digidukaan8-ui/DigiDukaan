@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useLocation } from "react-router-dom";
 import { ShoppingBag, Box, SearchIcon } from 'lucide-react';
-import { QuickView, Card, UsedProductCard } from "../../components/index";
+import { QuickView, Card, UsedProductCard, Location } from "../../components/index";
 
 function Search() {
     const location = useLocation();
-
-
     const searchResults = location.state?.results || null;
-    const [searchQuery] = useState(location.state?.query || '');
-    ;
+    const [searchQuery, setSearchQuery] = useState(location.state?.query || '');
 
     const [productsData, setProductsData] = useState({
         newProducts: [],
@@ -28,6 +25,7 @@ function Search() {
                 usedProducts: usedProds
             });
             setHasSearched(true);
+            setSearchQuery(location.state?.query || "");
         }
     }, [searchResults]);
 
@@ -46,6 +44,7 @@ function Search() {
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pt-30 pb-20">
+            <Location />
 
             {!hasSearched && (
                 <div className="flex flex-col items-center justify-center py-20 pt-32 text-gray-600 dark:text-gray-300">

@@ -3,7 +3,7 @@ import { searchProducts, getProductById } from '../controllers/product.controlle
 
 const router = express.Router();
 
-router.get('/search', searchProducts);
+router.get('/search/:loc', searchProducts);
 router.get('/:id', getProductById);
 
 export default router;

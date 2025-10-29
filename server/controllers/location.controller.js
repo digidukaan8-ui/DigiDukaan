@@ -14,7 +14,7 @@ const reverseGeocode = async (req, res) => {
 
         const response = await fetch(url, {
             headers: {
-                "User-Agent": `CollegeProject/1.0 (${process.env.APP_EMAIL || "test@example.com"})`,
+                "User-Agent": `CollegeProject/1.0 (${process.env.APP_EMAIL})`,
             },
         });
 
@@ -28,25 +28,16 @@ const reverseGeocode = async (req, res) => {
         const address = data.address || {};
 
         const result = {
-            state: address.state || "",
-            city:
-                address.city ||
-                address.town ||
-                address.village ||
-                address.locality ||
-                address.municipality ||
-                "",
+            city: address.city || "",
+            town: address.town || "",
             pincode: address.postcode || "",
-            country: address.country || "",
-            district: address.county || address.district || "",
+            locality: address.area || address.locality || address.suburb || "",
         };
 
         return res.json({ success: true, data: result });
     } catch (error) {
         console.error("Error fetching location from OSM:", error);
-        return res
-            .status(500)
-            .json({ success: false, message: "Internal server error" });
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
 

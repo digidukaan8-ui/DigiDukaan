@@ -372,14 +372,13 @@ const removeUsedProduct = async (productId) => {
     }
 }
 
-const getProducts = async (data) => {
+const getProducts = async (location) => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/products`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/products/${location}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
-            method: 'POST',
-            body: JSON.stringify(data)
+            method: 'GET',
         });
 
         const result = await response.json();

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getProductByCategory } from "../../api/product";
 import useLoaderStore from "../../store/loader";
-import { Card, UsedProductCard } from "../../components";
+import { Card, UsedProductCard, Location } from "../../components/index";
 
 function Category() {
     const { startLoading, stopLoading } = useLoaderStore();
@@ -43,6 +43,7 @@ function Category() {
 
     return (
         <section className="w-full bg-gray-100 dark:bg-neutral-950 pt-30 text-black dark:text-white">
+            <Location />
             <p className="mb-4 px-5 text-gray-700 dark:text-gray-300 text-lg">
                 Showing results for <span className="font-semibold capitalize">{slug}</span> -
                 <span className="font-medium text-blue-600 dark:text-blue-400"> {totalProducts} products</span> found

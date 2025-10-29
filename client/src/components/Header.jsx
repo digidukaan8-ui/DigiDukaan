@@ -4,6 +4,7 @@ import { FiSun, FiMoon, FiChevronDown, FiSearch } from 'react-icons/fi';
 import logo from '../assets/logo.webp'
 import useThemeStore from '../store/theme';
 import useAuthStore from '../store/auth';
+import useLocationStore from '../store/location';
 
 export default function Header() {
   const { isDark, toggleMode } = useThemeStore();
@@ -12,6 +13,8 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef(null);
+  const [loc, setLoc] = useState("");
+  const { editedLocation } = useLocationStore();
 
   const toggleDropdown = useCallback(() => setDropdownOpen(prev => !prev), []);
 
@@ -44,6 +47,10 @@ export default function Header() {
     }
   }
 
+  useEffect(() => {
+    setLoc(editedLocation);
+  }, [editedLocation])
+
   const getCurrentLabel = () => {
     const currentLink = links().find(link => link.to === location.pathname);
     return currentLink ? currentLink.label : 'Menu';
@@ -57,7 +64,7 @@ export default function Header() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/products/search?q=${encodeURIComponent(query.trim())}`,
+        `${import.meta.env.VITE_BACKEND_URL}/products/search/${loc}?q=${encodeURIComponent(query.trim())}`,
         {
           headers: {
             'Content-Type': 'application/json'

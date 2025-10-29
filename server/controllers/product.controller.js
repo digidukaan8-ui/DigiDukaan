@@ -6,9 +6,10 @@ import Cart from "../models/cart.model.js"
 import Wishlist from "../models/wishlist.model.js";
 import View from "../models/view.model.js";
 import Review from "../models/review.model.js";
+import CityMapping from "../models/citymapping.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary.config.js";
-import { isValidCategory, isValidUsedProductCategory, isValidSubCategory, isValidUsedProductSubCategory } from '../utils/category.util.js'
-import { message } from "./user.controller.js";
+import { isValidCategory, isValidUsedProductCategory } from '../utils/category.util.js';
+import mongoose from "mongoose";
 
 const MAX_VIEWS = 100;
 
@@ -482,17 +483,86 @@ const removeUsedProduct = async (req, res) => {
 
 const getProducts = async (req, res) => {
     try {
-        const locations = req.body;
+        const { location } = req.params;
 
-        if (!Array.isArray(locations) || locations.length === 0) {
-            return res.status(400).json({ success: false, message: "Locations array required" });
+        if (!location || !location.trim()) {
+            return res.status(400).json({ success: false, message: "Location is required" });
         }
 
-        const storeZones = await DeliveryZone.find({
-            areaName: { $in: locations }
-        }).select("storeId");
+        const searchLocation = location.trim().toLowerCase();
+        const baseLocation = searchLocation
+            .replace(/\s*(east|west|north|south|central)\s*/gi, '')
+            .trim();
+        const locationRegex = new RegExp(baseLocation.split(' ').join('\\s*'), 'i');
 
-        const storeIds = storeZones.map((z) => z.storeId);
+        const isPincode = /^\d{6}$/.test(searchLocation);
+
+        const cityMapping = await CityMapping.findOne({
+            $or: [
+                { name: searchLocation },
+                { name: baseLocation },
+                { pincodes: searchLocation }
+            ]
+        });
+
+        let zoneSearchQuery;
+        let productAreaMatchArray = [];
+        let productPincodeMatchArray = [];
+        let productCityMatchArray = [];
+        let areaStringsForMatch = [];
+        let pincodeStringsForMatch = [];
+        let cityNamesForMatch = [];
+
+        if (cityMapping) {
+            productAreaMatchArray = [
+                ...cityMapping.areas.map(area => new RegExp(area.split(' ').join('\\s*'), 'i')),
+                new RegExp(cityMapping.name.split(' ').join('\\s*'), 'i')
+            ];
+            productPincodeMatchArray = cityMapping.pincodes.map(p => p.toString());
+            productCityMatchArray = [new RegExp(cityMapping.name.split(' ').join('\\s*'), 'i')];
+
+            areaStringsForMatch = [...cityMapping.areas, cityMapping.name];
+            pincodeStringsForMatch = cityMapping.pincodes.map(p => p.toString());
+            cityNamesForMatch = [cityMapping.name.toLowerCase(), cityMapping.name];
+
+            zoneSearchQuery = {
+                $or: [
+                    { areaName: { $in: productAreaMatchArray } },
+                    { areaName: { $in: productPincodeMatchArray } }
+                ]
+            };
+        } else {
+            zoneSearchQuery = {
+                areaName: locationRegex
+            };
+
+            productAreaMatchArray = [locationRegex];
+            productPincodeMatchArray = isPincode ? [searchLocation] : [];
+            productCityMatchArray = [locationRegex];
+            
+            areaStringsForMatch = [searchLocation, baseLocation];
+            pincodeStringsForMatch = isPincode ? [searchLocation] : [];
+            cityNamesForMatch = [searchLocation, baseLocation];
+        }
+
+        console.log("=== DEBUG INFO ===");
+        console.log("Search Location:", searchLocation);
+        console.log("Base Location:", baseLocation);
+        console.log("Is Pincode:", isPincode);
+        console.log("Area Strings:", areaStringsForMatch);
+        console.log("Pincode Strings:", pincodeStringsForMatch);
+        console.log("City Names:", cityNamesForMatch);
+        console.log("City Mapping Found:", !!cityMapping);
+        if (cityMapping) {
+            console.log("City Mapping Name:", cityMapping.name);
+            console.log("City Mapping Pincodes:", cityMapping.pincodes);
+            console.log("City Mapping Areas:", cityMapping.areas);
+        }
+
+        const storeZones = await DeliveryZone.find(zoneSearchQuery).select("storeId");
+        const storeIds = [...new Set(storeZones.map((z) => z.storeId.toString()))];
+
+        console.log("Store IDs from zones:", storeIds.length);
 
         if (storeIds.length === 0) {
             return res.status(200).json({
@@ -503,10 +573,12 @@ const getProducts = async (req, res) => {
             });
         }
 
+        const mappedStoreIds = storeIds.map(id => new mongoose.Types.ObjectId(id));
+
         const productPipeline = [
             {
                 $match: {
-                    storeId: { $in: storeIds },
+                    storeId: { $in: mappedStoreIds },
                     isAvailable: true
                 }
             },
@@ -524,22 +596,63 @@ const getProducts = async (req, res) => {
             }
         ];
 
+        const testUsedProducts = await UsedProduct.find({ 
+            isSold: false, 
+            paid: true 
+        }).limit(3);
+
+        console.log("=== SAMPLE USEDPRODUCTS IN DB ===");
+        console.log(JSON.stringify(testUsedProducts.map(p => ({
+            title: p.title,
+            deliveryType: p.delivery?.type,
+            pickupPincode: p.delivery?.pickupLocation?.pincode,
+            pickupCity: p.delivery?.pickupLocation?.city,
+            shippingLocations: p.delivery?.shippingLocations?.map(sl => sl.areaName)
+        })), null, 2));
+
+        const usedProductOrConditions = [];
+
+        if (pincodeStringsForMatch.length > 0) {
+            usedProductOrConditions.push({
+                "delivery.pickupLocation.pincode": { $in: pincodeStringsForMatch }
+            });
+        }
+
+        cityNamesForMatch.forEach(cityName => {
+            usedProductOrConditions.push({
+                "delivery.pickupLocation.city": new RegExp(cityName.split(' ').join('\\s*'), 'i')
+            });
+            usedProductOrConditions.push({
+                "delivery.pickupLocation.address": new RegExp(cityName.split(' ').join('\\s*'), 'i')
+            });
+        });
+
+        areaStringsForMatch.forEach(areaStr => {
+            usedProductOrConditions.push({
+                "delivery.shippingLocations.areaName": new RegExp(areaStr.split(' ').join('\\s*'), 'i')
+            });
+        });
+
+        if (pincodeStringsForMatch.length > 0) {
+            pincodeStringsForMatch.forEach(pin => {
+                usedProductOrConditions.push({
+                    "delivery.shippingLocations.areaName": pin
+                });
+            });
+        }
+
+        const usedProductMatchQuery = {
+            isSold: false,
+            paid: true,
+            $or: usedProductOrConditions
+        };
+
+        console.log("=== USEDPRODUCT OR CONDITIONS COUNT ===");
+        console.log("Total $or conditions:", usedProductOrConditions.length);
+
         const usedProductPipeline = [
             {
-                $match: {
-                    $and: [
-                        { isSold: false },
-                        { paid: true },
-                        {
-                            $or: [
-                                { "delivery.pickupLocation.state": { $in: locations } },
-                                { "delivery.pickupLocation.city": { $in: locations } },
-                                { "delivery.pickupLocation.pincode": { $in: locations } },
-                                { "delivery.shippingLocations.areaName": { $in: locations } }
-                            ]
-                        }
-                    ]
-                }
+                $match: usedProductMatchQuery
             },
             { $sort: { createdAt: -1 } },
             {
@@ -555,8 +668,19 @@ const getProducts = async (req, res) => {
             }
         ];
 
-        const aggregatedProducts = await Product.aggregate(productPipeline);
-        const aggregatedUsedProducts = await UsedProduct.aggregate(usedProductPipeline);
+        const [aggregatedProducts, aggregatedUsedProducts] = await Promise.all([
+            Product.aggregate(productPipeline),
+            UsedProduct.aggregate(usedProductPipeline)
+        ]);
+
+        console.log("=== RESULTS ===");
+        console.log("Regular Products Categories:", aggregatedProducts.length);
+        console.log("UsedProducts Categories:", aggregatedUsedProducts.length);
+        console.log("Total UsedProducts:", aggregatedUsedProducts.reduce((sum, cat) => sum + cat.products.length, 0));
+        
+        if (aggregatedUsedProducts.length > 0) {
+            console.log("Sample matched product:", aggregatedUsedProducts[0].products[0]?.title);
+        }
 
         const productsByCategory = aggregatedProducts.map((item) => ({
             [item._id]: item.products
@@ -570,7 +694,7 @@ const getProducts = async (req, res) => {
             cat.products.map((p) => p.storeId.toString())
         );
 
-        const allStoreIds = [...new Set([...storeIds.map(String), ...usedStoreIds])];
+        const allStoreIds = [...new Set([...storeIds, ...usedStoreIds])];
 
         const stores = await Store.find({ _id: { $in: allStoreIds } });
 
@@ -1173,13 +1297,70 @@ const getProductByCategory = async (req, res) => {
 
 const searchProducts = async (req, res) => {
     try {
+        const { loc } = req.params;
         const query = req.query.q;
 
         if (!query) {
-            return res.status(200).json([]);
+            return res.status(200).json({ success: true, message: 'No query provided', newProducts: [], usedProducts: [] });
+        }
+        
+        if (!loc || !loc.trim()) {
+            return res.status(400).json({ success: false, message: "Location is required for searching" });
         }
 
-        const searchQuery = {
+        const searchLocation = loc.trim().toLowerCase();
+        const baseLocation = searchLocation
+            .replace(/\s*(east|west|north|south|central)\s*/gi, '')
+            .trim();
+        const locationRegex = new RegExp(baseLocation.split(' ').join('\\s*'), 'i');
+        const isPincode = /^\d{6}$/.test(searchLocation);
+
+        const cityMapping = await CityMapping.findOne({
+            $or: [
+                { name: searchLocation },
+                { name: baseLocation },
+                { pincodes: searchLocation }
+            ]
+        });
+
+        let zoneSearchQuery;
+        let productAreaMatchArray = [];
+        let productPincodeMatchArray = [];
+        let productCityMatchArray = [];
+
+        if (cityMapping) {
+            productAreaMatchArray = [
+                ...cityMapping.areas.map(area => new RegExp(area.split(' ').join('\\s*'), 'i')),
+                new RegExp(cityMapping.name.split(' ').join('\\s*'), 'i')
+            ];
+            productPincodeMatchArray = cityMapping.pincodes.map(p => p.toString());
+            productCityMatchArray = [new RegExp(cityMapping.name.split(' ').join('\\s*'), 'i')];
+
+            zoneSearchQuery = {
+                $or: [
+                    { areaName: { $in: productAreaMatchArray } },
+                    { areaName: { $in: productPincodeMatchArray } }
+                ]
+            };
+        } else {
+            zoneSearchQuery = {
+                areaName: locationRegex
+            };
+
+            productAreaMatchArray = [locationRegex];
+            productPincodeMatchArray = isPincode ? [searchLocation] : [];
+            productCityMatchArray = [locationRegex];
+        }
+
+        const storeZones = await DeliveryZone.find(zoneSearchQuery).select("storeId");
+        const storeIds = [...new Set(storeZones.map((z) => z.storeId.toString()))];
+        const mappedStoreIds = storeIds.map(id => new mongoose.Types.ObjectId(id));
+        
+        if (storeIds.length === 0) {
+             return res.status(200).json({ success: true, message: 'No stores found in location', newProducts: [], usedProducts: [] });
+        }
+
+        const baseSearchQuery = {
             $or: [
                 { title: { $regex: query, $options: 'i' } },
                 { description: { $regex: query, $options: 'i' } },
@@ -1189,9 +1370,45 @@ const searchProducts = async (req, res) => {
                 { tags: { $regex: query, $options: 'i' } }
             ]
         };
+        
+        const finalNewSearchQuery = {
+            $and: [
+                baseSearchQuery,
+                { storeId: { $in: mappedStoreIds } },
+                { isAvailable: true }
+            ]
+        };
 
-        const newProducts = await Product.find(searchQuery).limit(5);
-        const usedProducts = await UsedProduct.find(searchQuery).limit(5);
+        const usedProductOrConditions = [
+            { "delivery.pickupLocation.pincode": { $in: productPincodeMatchArray } },
+            { "delivery.pickupLocation.city": { $in: productCityMatchArray } },
+            { "delivery.pickupLocation.address": locationRegex }, 
+            {
+                "delivery.shippingLocations": {
+                    $elemMatch: {
+                        $or: [
+                            { areaName: { $in: productAreaMatchArray } },
+                            { areaName: { $in: productPincodeMatchArray } }
+                        ]
+                    }
+                }
+            }
+        ];
+
+        const finalUsedSearchQuery = {
+            $and: [
+                baseSearchQuery,
+                { isSold: false },
+                { paid: true },
+                { $or: usedProductOrConditions }
+            ]
+        };
+
+        const [newProducts, usedProducts] = await Promise.all([
+            Product.find(finalNewSearchQuery).limit(10),
+            UsedProduct.find(finalUsedSearchQuery).limit(10),
+        ]);
+
 
         res.status(200).json({ success: true, message: 'Product searched successfully', newProducts, usedProducts });
     } catch (error) {

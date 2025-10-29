@@ -28,12 +28,8 @@ const fetchLocationThroughIp = async () =>{
         const data = await response.json();
 
         const result = {
-            country: data.country_name || '',
-            state: data.region || '',
-            district: '',
             city: data.city || '',
             town: data.city || '',
-            village: '',
             locality: data.org || '',
             pincode: data.postal || ''
         };

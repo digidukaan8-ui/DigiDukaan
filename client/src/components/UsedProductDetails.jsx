@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Heart, Share2, Edit, Trash2, MessageCircle, ShoppingCart, ChevronLeft, ChevronRight, Play, Truck, Package, CheckCircle, XCircle, FileText, AlertTriangle, IndianRupee } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useAuthStore from "../store/auth";
@@ -14,40 +14,46 @@ import useStores from "../store/stores";
 
 const UsedProductDetail = ({ id }) => {
     const navigate = useNavigate();
-    let { user } = useAuthStore();
-    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const { user } = useAuthStore();
     const { wishlist } = useWishlistStore();
     const { startLoading, stopLoading } = useLoaderStore();
-    const [product, setProduct] = useState(
+    const orderId = searchParams.get("orderId");
+    
+    const initialProductState = useMemo(() => (
         useUsedProductStore.getState().getUsedProduct(id) ||
         useUsedCategoryProductStore.getState().getUsedProductById(id)
-    );
-    const [searchParams, setSearchParams] = useSearchParams();
-    const orderId = searchParams.get("orderId");
+    ), [id]);
+
+    const [product, setProduct] = useState(initialProductState);
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+    const finalUserRole = user?.role || "buyer";
 
     useEffect(() => {
-        if (!product) {
-            const fetchProduct = async () => {
-                startLoading("fetching");
-                try {
-                    const result = await getProductById(id);
-                    if (result.success) {
-                        setProduct(result.data);
-                        useUsedProductStore.getState().addProduct(result.data);
-                    }
-                } finally {
-                    stopLoading();
+        if (product) return;
+
+        const fetchProduct = async () => {
+            startLoading("fetching");
+            try {
+                const result = await getProductById(id);
+                if (result.success) {
+                    setProduct(result.data);
+                    useUsedProductStore.getState().addUsedProduct(result.data);
                 }
-            };
-            fetchProduct();
-        }
-    }, [id, product, startLoading, stopLoading]);
+            } finally {
+                stopLoading();
+            }
+        };
+        fetchProduct();
+    }, [id, product]); 
 
     useEffect(() => {
         if (!product?._id) return;
 
         const addToRecentlyViewed = async () => {
-            if (!user?._id || !user?.name || user?.role === "seller" || user?.role === "admin") {
+            if (!user?._id || !user?.name || finalUserRole === "seller" || finalUserRole === "admin") {
                 return;
             }
             try {
@@ -58,8 +64,30 @@ const UsedProductDetail = ({ id }) => {
         };
 
         addToRecentlyViewed();
-    }, [product?._id, user?.role, user?._id, user?.name]);
+    }, [product?._id, user?._id, user?.name, finalUserRole]);
 
+    useEffect(() => {
+        if (!orderId) return;
+        if (product?.paid) return;
+
+        const fetchPaymentDetail = async () => {
+            startLoading('confirmingPayment');
+            try {
+                const result = await verifyPayment(orderId, product?._id);
+                if (result.success) {
+                    setProduct(result.product); 
+                    useUsedProductStore.getState().updateUsedProduct(result.product);
+                    toast.success("Payment confirmed");
+                    
+                    searchParams.delete('orderId');
+                    setSearchParams(searchParams, { replace: true });
+                }
+            } finally {
+                stopLoading();
+            }
+        };
+        fetchPaymentDetail();
+    }, [orderId, product?.paid, product?._id, setSearchParams]); 
 
     if (!product) {
         return (
@@ -78,29 +106,10 @@ const UsedProductDetail = ({ id }) => {
             </div>
         );
     }
-
-    useEffect(() => {
-        if (!orderId) return;
-        if (product.paid) return;
-        const fetchPaymentDetail = async () => {
-            startLoading('confirmingPayment')
-            try {
-                const result = await verifyPayment(orderId, product?._id);
-                if (result.success) {
-                    useUsedProductStore.getState().updateUsedProduct(result.product);
-                    toast.success("Payment confirmed");
-                    searchParams.delete('orderId');
-                    setSearchParams(searchParams);
-                }
-            } finally {
-                stopLoading();
-            }
-        }
-        fetchPaymentDetail();
-    }, [orderId]);
-
+    
     const productIds = useWishlistStore((state) => state.wishlist.productIds);
     const isWishlisted = productIds.includes(product._id);
+    
     const {
         title,
         description,
@@ -119,13 +128,14 @@ const UsedProductDetail = ({ id }) => {
         tags,
         isSold,
         paid,
+        storeId,
     } = product;
 
     const hasDiscount = discount?.percentage || discount?.amount;
     const finalPrice = hasDiscount
         ? discount?.percentage
-            ? price - (price * discount.percentage) / 100
-            : price - discount.amount
+              ? price - (price * discount.percentage) / 100
+              : price - discount.amount
         : price;
     const discountValue = product.discount?.percentage || product.discount?.amount;
     const discountType = product.discount?.percentage ? "%" : "₹";
@@ -138,7 +148,7 @@ const UsedProductDetail = ({ id }) => {
             navigate(`/login`);
             toast.error("Login First");
             return;
-        } else if (user?.role === "buyer" || user?.role === "admin") {
+        } else if (finalUserRole === "buyer" || finalUserRole === "admin") {
             toast.error("Only for seller");
             return;
         }
@@ -150,7 +160,7 @@ const UsedProductDetail = ({ id }) => {
             navigate(`/login`);
             toast.error("Login First");
             return;
-        } else if (user?.role === "buyer" || user?.role === "admin") {
+        } else if (finalUserRole === "buyer" || finalUserRole === "admin") {
             toast.error("Only for seller");
             return;
         }
@@ -174,7 +184,7 @@ const UsedProductDetail = ({ id }) => {
             navigate(`/login`);
             toast.error("Login First");
             return;
-        } else if (user?.role === "seller" || user?.role === "admin") {
+        } else if (finalUserRole === "seller" || finalUserRole === "admin") {
             toast.error("Only for buyer");
             return;
         }
@@ -209,7 +219,7 @@ const UsedProductDetail = ({ id }) => {
 
     const payAmount = async () => {
         const data = {
-            storeId: product?.storeId,
+            storeId: storeId,
             productId: product?._id
         }
         startLoading("creatingOrder");
@@ -219,7 +229,7 @@ const UsedProductDetail = ({ id }) => {
                 startLoading('redirecting');
             }
         } finally {
-            stopLoading()
+            stopLoading();
         }
     }
 
@@ -229,7 +239,7 @@ const UsedProductDetail = ({ id }) => {
             navigate(`/login`);
             toast.error("Login First");
             return;
-        } else if (user?.role === "seller" || user?.role === "admin") {
+        } else if (finalUserRole === "seller" || finalUserRole === "admin") {
             toast.error("Only for buyer");
             return;
         }
@@ -237,9 +247,9 @@ const UsedProductDetail = ({ id }) => {
         const store = useStores.getState().getStore(storeId);
         navigate(`/buyer/chat?storeId=${storeId}`, {
             state: {
-                img: store[0]?.img?.url,
-                name: store[0]?.name,
-                seller: store[0]?.userId
+                img: store?.[0]?.img?.url,
+                name: store?.[0]?.name,
+                seller: store?.[0]?.userId
             }
         });
     };
@@ -259,13 +269,7 @@ const UsedProductDetail = ({ id }) => {
         }
     };
 
-    if (!user) {
-        user = { role: "buyer" };
-    } else if (!user.role) {
-        user.role = "buyer";
-    }
-
-    const showSellerWarning = user.role === "seller" && (isSold || !paid);
+    const showSellerWarning = finalUserRole === "seller" && (isSold || !paid);
 
     let warningMessage = "";
     if (isSold) {
@@ -511,7 +515,7 @@ const UsedProductDetail = ({ id }) => {
                             </div>
                         )}
 
-                        {user.role === "buyer" && (
+                        {finalUserRole === "buyer" && (
                             <div className="bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-2xl p-6 shadow-sm space-y-5">
                                 <button
                                     disabled={isSold}
@@ -546,7 +550,7 @@ const UsedProductDetail = ({ id }) => {
                             </div>
                         )}
 
-                        {user.role === "seller" && (
+                        {finalUserRole === "seller" && (
                             <div className="bg-white dark:bg-neutral-900 border border-black dark:border-white rounded-2xl p-6 shadow-sm space-y-4">
                                 <h2 className="text-xl font-bold">Seller Actions</h2>
                                 <div className="grid grid-cols-2 gap-3">

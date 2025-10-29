@@ -1,10 +1,8 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/><script>import React from 'react';
 import { FileDown, Store, User, Calendar, FileText } from 'lucide-react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-const BillGenerator = ({ billData }) => {
-  // Default data for demo purposes
+const Bill = ({ billData }) => {
   const defaultData = {
     store: {
       name: "DigiDukaan Mart",
@@ -31,7 +29,6 @@ const BillGenerator = ({ billData }) => {
 
   const data = billData || defaultData;
 
-  // Calculate totals
   const calculateSubtotal = () => {
     return data.products.reduce((sum, product) => {
       return sum + (product.quantity * product.price);
@@ -39,21 +36,18 @@ const BillGenerator = ({ billData }) => {
   };
 
   const subtotal = calculateSubtotal();
-  const gstRate = 0.18; // 18% GST
+  const gstRate = 0.18; 
   const gstAmount = data.store.gstNumber ? subtotal * gstRate : 0;
   const grandTotal = subtotal + gstAmount;
 
-  // Generate PDF
   const generatePDF = () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     
-    // Colors
-    const primaryColor = [79, 70, 229]; // Indigo
-    const secondaryColor = [100, 116, 139]; // Slate
+    const primaryColor = [79, 70, 229]; 
+    const secondaryColor = [100, 116, 139]; 
     const lightGray = [241, 245, 249];
 
-    // Header Section
     doc.setFillColor(...primaryColor);
     doc.rect(0, 0, pageWidth, 40, 'F');
     
@@ -62,7 +56,6 @@ const BillGenerator = ({ billData }) => {
     doc.setFont('helvetica', 'bold');
     doc.text(data.store.name, 20, 25);
 
-    // Invoice Details (Top Right)
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Invoice: ${data.billId}`, pageWidth - 20, 20, { align: 'right' });
@@ -70,7 +63,6 @@ const BillGenerator = ({ billData }) => {
 
     let yPos = 50;
 
-    // Store Details Section
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
@@ -89,7 +81,6 @@ const BillGenerator = ({ billData }) => {
       yPos += 35;
     }
 
-    // Buyer Details Section
     yPos += 10;
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
@@ -104,7 +95,6 @@ const BillGenerator = ({ billData }) => {
 
     yPos += 40;
 
-    // Product Table
     const tableData = data.products.map(product => [
       product.name,
       product.quantity.toString(),
@@ -137,7 +127,6 @@ const BillGenerator = ({ billData }) => {
 
     yPos = doc.lastAutoTable.finalY + 15;
 
-    // Summary Section
     const summaryX = pageWidth - 70;
     
     doc.setFillColor(...lightGray);
@@ -160,7 +149,6 @@ const BillGenerator = ({ billData }) => {
     doc.text('Grand Total:', summaryX, yPos);
     doc.text(`₹${grandTotal.toFixed(2)}`, summaryX + 50, yPos, { align: 'right' });
 
-    // Footer
     const footerY = doc.internal.pageSize.getHeight() - 20;
     doc.setFillColor(...primaryColor);
     doc.rect(0, footerY - 5, pageWidth, 30, 'F');
@@ -170,22 +158,18 @@ const BillGenerator = ({ billData }) => {
     doc.setFont('helvetica', 'italic');
     doc.text('Thank you for shopping with us – DigiDukaan', pageWidth / 2, footerY + 5, { align: 'center' });
 
-    // Save PDF
     doc.save(`Invoice_${data.billId}_${data.buyer.name.replace(/\s+/g, '_')}.pdf`);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-indigo-900 mb-2">Invoice Generator</h1>
           <p className="text-slate-600">Generate professional invoices instantly</p>
         </div>
 
-        {/* Bill Preview Card */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Header Section */}
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-8">
             <div className="flex justify-between items-start">
               <div>
@@ -209,9 +193,7 @@ const BillGenerator = ({ billData }) => {
           </div>
 
           <div className="p-8">
-            {/* Store and Buyer Details */}
             <div className="grid md:grid-cols-2 gap-8 mb-8">
-              {/* Store Details */}
               <div className="bg-slate-50 rounded-lg p-6">
                 <h3 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
                   <Store className="w-5 h-5 text-indigo-600" />
@@ -228,7 +210,6 @@ const BillGenerator = ({ billData }) => {
                 </div>
               </div>
 
-              {/* Buyer Details */}
               <div className="bg-indigo-50 rounded-lg p-6">
                 <h3 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
                   <User className="w-5 h-5 text-indigo-600" />
@@ -243,7 +224,6 @@ const BillGenerator = ({ billData }) => {
               </div>
             </div>
 
-            {/* Product Table */}
             <div className="mb-8 overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
@@ -269,7 +249,6 @@ const BillGenerator = ({ billData }) => {
               </table>
             </div>
 
-            {/* Summary Section */}
             <div className="flex justify-end mb-8">
               <div className="w-full md:w-80 bg-slate-50 rounded-lg p-6">
                 <div className="space-y-3">
@@ -291,7 +270,6 @@ const BillGenerator = ({ billData }) => {
               </div>
             </div>
 
-            {/* Download Button */}
             <div className="flex justify-center">
               <button
                 onClick={generatePDF}
@@ -303,13 +281,11 @@ const BillGenerator = ({ billData }) => {
             </div>
           </div>
 
-          {/* Footer */}
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-center py-4">
             <p className="text-sm italic">Thank you for shopping with us – DigiDukaan ✨</p>
           </div>
         </div>
 
-        {/* Usage Instructions */}
         <div className="mt-8 bg-white rounded-lg shadow-md p-6">
           <h3 className="text-lg font-bold text-slate-800 mb-3">Usage Instructions</h3>
           <div className="text-sm text-slate-600 space-y-2">
@@ -324,4 +300,4 @@ const BillGenerator = ({ billData }) => {
   );
 };
 
-export default BillGenerator;</script>
+export default Bill;

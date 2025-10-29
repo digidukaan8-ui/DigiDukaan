@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router-dom";
-import { ProductDetails, Review, RecommendProduct } from "../../components/index";
+import { ProductDetails, Review, RecommendProduct, Location } from "../../components/index";
 
 function Product() {
   const [searchParams] = useSearchParams();
@@ -7,6 +7,7 @@ function Product() {
 
   return (
     <>
+      <Location />
       <ProductDetails id={productId} />
       <RecommendProduct id={productId} />
       <Review id={productId} />

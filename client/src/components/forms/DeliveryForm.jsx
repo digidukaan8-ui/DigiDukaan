@@ -14,11 +14,7 @@ const DeliveryForm = () => {
   const { register, handleSubmit, reset, setValue } = useForm();
   const [editId, setEditId] = useState(null);
 
-  const options = [
-    "state", "district", "city", "town", "village",
-    "suburb", "area", "taluka", "tehsil", "locality", "street",
-    "landmark", "pincode"
-  ];
+  const options = ["city", "town", "area", "pincode"];
 
   const capitalizeFirst = (str) =>
     str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";

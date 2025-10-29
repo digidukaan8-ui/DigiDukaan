@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import { ShoppingBag, Box } from 'lucide-react';
-import { QuickView, Card, UsedProductCard } from "../../components/index";
+import { QuickView, Card, UsedProductCard, Location } from "../../components/index";
 import { getViewedProduct } from "../../api/product.js";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -27,6 +27,7 @@ function View() {
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pt-30 pb-20">
+            <Location />
             <div className="flex flex-wrap justify-center gap-4 pb-8 pt-4">
                 {["new", "used"].map((tab) => (
                     <button

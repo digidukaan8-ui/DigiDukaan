@@ -72,7 +72,7 @@ userRouter.get('/reverse-geocode/:lat/:lon', locationLimiter, handleLocationAcce
 
 userRouter.post('/contact', messageLimiter, handleMessage, message);
 
-userRouter.post('/products', productsLimiter, getProducts);
+userRouter.get('/products/:location', productsLimiter, getProducts);
 userRouter.get('/product/:productId', productsLimiter, getProductById);
 userRouter.get('/category-products/:category', productsLimiter, getProductByCategory);
 
