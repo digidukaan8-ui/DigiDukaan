@@ -128,6 +128,29 @@ const ProductDetail = ({ id }) => {
     }
   };
 
+  // const handleBuyNow = async () => {
+  //   if (!user?._id || !user?.name) {
+  //     navigate(`/login`);
+  //     toast.error("Login First");
+  //     return;
+  //   } else if (user?.role === "seller" || user?.role === "admin") {
+  //     toast.error("Only for buyer");
+  //     return;
+  //   }
+  //   navigate('/buyer/checkout', { replace: true, state: product });
+  // }
+
+  const handleShare =async () => {
+    try {
+      const currentUrl = window.location.href;
+      await navigator.clipboard.writeText(currentUrl);
+      toast.success('URL copied to clickBoard');
+    } catch (err) {
+      console.error('Failed to copy URL: ', err);
+      toast.success('Failed to copy URL');
+    }
+  }
+
   const handleWishList = async () => {
     if (!user?._id || !user?.name) {
       navigate(`/login`);
@@ -253,7 +276,7 @@ const ProductDetail = ({ id }) => {
   const showSellerWarning = user.role === "seller" && (!isAvailable || stock <= 0);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-28 pb-10">
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 pt-40 sm:pt-28 pb-10">
       <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
 
         {showSellerWarning && (
@@ -381,11 +404,11 @@ const ProductDetail = ({ id }) => {
                   {discountType === "₹" && "₹"}{discountValue}{discountType === "%" && "%"} OFF
                 </span>
               )}
-              <div className="flex items-baseline gap-3">
-                <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">₹{finalPrice.toFixed(2)}</span>
+              <div className="flex flex-wrap items-baseline gap-3">
+                <span className="text-xl md:text-3xl font-bold text-emerald-600 dark:text-emerald-400">₹{finalPrice.toFixed(2)}</span>
                 {hasDiscount > 0 && (
                   <>
-                    <span className="line-through text-gray-500 dark:text-gray-400 text-lg">₹{price.toFixed(2)}</span>
+                    <span className="line-through text-gray-500 dark:text-gray-400 text-sm md:text-lg">₹{price.toFixed(2)}</span>
                     <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-full">
                       Save ₹{(price - finalPrice).toFixed(2)}
                     </span>
@@ -491,7 +514,8 @@ const ProductDetail = ({ id }) => {
                     <ShoppingCart className="w-5 h-5" />
                     {stock === 0 || !isAvailable ? 'Out of Stock' : handleCartBtn(product._id) ? 'Added to Cart' : 'Add to Cart'}
                   </button>
-                  <button
+                  {/* <button
+                    onClick={() => handleBuyNow()}
                     disabled={stock === 0 || !isAvailable}
                     className={`flex items-center justify-center cursor-pointer w-full gap-2 py-3.5 px-6 rounded-xl font-semibold text-base transition-all shadow-sm hover:shadow-md
                       ${stock === 0 || !isAvailable
@@ -500,7 +524,7 @@ const ProductDetail = ({ id }) => {
                   >
                     <ShoppingCart className="w-5 h-5" />
                     Buy Now
-                  </button>
+                  </button> */}
                 </div>
 
                 <div className="flex justify-center items-center gap-3 pt-2">
@@ -516,6 +540,7 @@ const ProductDetail = ({ id }) => {
                   </button>
 
                   <button
+                    onClick={handleShare}
                     className="w-12 h-12 flex items-center justify-center cursor-pointer rounded-full bg-gray-100 text-gray-600 dark:bg-neutral-950 border border-black dark:border-white dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-800 transition-all hover:scale-110"
                   >
                     <Share2 className="w-5 h-5" />

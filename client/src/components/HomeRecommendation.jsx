@@ -85,7 +85,7 @@ function HomeRecommendation() {
 
                 <div className="flex items-start gap-4 sm:gap-6 pt-2 overflow-x-auto hide-scrollbar scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent px-4">
                     {productList.map((product) => (
-                        <div key={product._id} className="flex-shrink-0 w-[320px]">
+                        <div key={product._id} className="flex-shrink-0 w-[280px] md:w-[320px]">
                             <Card
                                 product={product}
                                 userRole="buyer"

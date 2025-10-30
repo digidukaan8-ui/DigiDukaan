@@ -128,7 +128,7 @@ export default function Login() {
   }
 
   return (
-    <div className='min-h-screen py-8 flex justify-center items-center bg-gray-50 dark:bg-neutral-950 px-4'>
+    <div className='min-h-screen pb-10 pt-30 flex justify-center items-center bg-gray-50 dark:bg-neutral-950 px-4'>
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

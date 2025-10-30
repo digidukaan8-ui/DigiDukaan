@@ -28,6 +28,30 @@ export default function Header() {
 
   const toggleDropdown = useCallback(() => setDropdownOpen(prev => !prev), []);
 
+  const HIDE_SEARCH_PATHS = [
+    '/about',
+    '/contact',
+    '/login',
+    '/register',  
+    '/faq',
+    '/termsofservice',
+    '/privacypolicy',
+    '/support',
+    '/logout',
+    '/buyer/dashboard',
+    '/buyer/cart',
+    '/buyer/chat',
+    '/buyer/address',
+    '/buyer/checkout',
+    '/buyer/order',
+    '/buyer/wishlist',
+    '/buyer/recently-viewed',
+    '/buyer/review-form',
+    '/buyer/review',
+  ];
+  
+  const shouldShowSearch = !HIDE_SEARCH_PATHS.includes(location.pathname);
+
   const links = () => {
     if (isAuthenticated && user?.role === 'buyer') {
       return [
@@ -140,7 +164,7 @@ export default function Header() {
           </span>
         </NavLink>
 
-        {user?.role !== "seller" && <div className="flex-grow max-w-lg">
+        {shouldShowSearch && user?.role !== "seller" && <div className="flex-grow max-w-lg">
           <form onSubmit={handleSearch} className="relative" role="search">
             <label htmlFor="desktop-search" className="sr-only">Search products</label>
             <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-lg pointer-events-none" />
@@ -208,14 +232,14 @@ export default function Header() {
       </div>
 
       <div className="md:hidden">
-        <div className="flex w-full px-5 h-16 justify-between items-center border-b border-gray-100 dark:border-neutral-800">
+        <div className="flex w-full px-5 h-20 justify-between items-center border-b border-gray-100 dark:border-neutral-800">
           <NavLink to="/" className="flex justify-center items-center gap-2 group">
             <img
               src={logo}
               alt="DigiDukaan"
-              className="w-10 h-fit object-cover transition-transform duration-200 group-hover:scale-105"
+              className="w-6 h-fit object-cover transition-transform duration-200 group-hover:scale-105"
             />
-            <span className="text-lg font-bold bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-400 dark:to-blue-400 bg-clip-text text-transparent">
+            <span className="text-base font-bold bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-400 dark:to-blue-400 bg-clip-text text-transparent">
               DigiDukaan
             </span>
           </NavLink>
@@ -269,7 +293,7 @@ export default function Header() {
           </div>
         </div>
 
-        {user?.role !== "seller" &&
+        {shouldShowSearch && user?.role !== "seller" &&
           <div className="sticky top-16 z-[80] bg-white dark:bg-neutral-900 px-5 py-2 md:static shadow-sm">
             <form onSubmit={handleSearch} className="relative" role="search">
               <label htmlFor="mobile-search" className="sr-only">Search products</label>

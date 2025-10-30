@@ -330,13 +330,13 @@ export default function UsedProductCard({ product, userRole = "buyer", onQuickVi
         </div>
 
         <div className="mt-auto">
-          <div className="flex items-baseline gap-2 mb-3">
-            <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+          <div className="flex flex-wrap items-baseline gap-2 mb-3">
+            <span className="text-lg md:text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               ₹{finalPrice.toFixed(2)}
             </span>
             {hasDiscount > 0 && (
               <>
-                <span className="line-through text-gray-500 dark:text-gray-400 text-sm">
+                <span className="line-through text-gray-500 dark:text-gray-400 text-xs md:text-sm">
                   ₹{product.price.toFixed(2)}
                 </span>
                 <span className="text-emerald-600 dark:text-emerald-400 text-xs font-medium bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full">

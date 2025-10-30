@@ -155,11 +155,11 @@ export default function Dashboard() {
   const totalWishlistItems = wishlistData.newProductWishlist.length + wishlistData.usedProductWishlist.length;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-neutral-950 pt-24 sm:pt-28 pb-10 px-3 sm:px-4 lg:px-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-950 pt-28 pb-10 px-3 sm:px-4 lg:px-6">
       <div className="max-w-[1400px] mx-auto space-y-6">
         <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">
           <div className="flex flex-col xl:flex-row xl:items-center gap-8">
-            <div className="flex items-start gap-5">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
               {buyerInfo.avatarUrl ? (
                 <img
                   src={buyerInfo.avatarUrl}
@@ -185,11 +185,11 @@ export default function Dashboard() {
                     className="p-2.5 rounded-xl bg-gray-100 dark:bg-neutral-800 text-blue-600 dark:text-blue-400 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors flex-shrink-0 border border-black dark:border-white cursor-pointer"
                     onClick={() => setShowEditProfileModal(true)}
                   >
-                    <Edit3 size={20} />
+                    <Edit3 size={16} />
                   </button>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap justify-center items-center gap-2">
                   <button
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors border border-black dark:border-white cursor-pointer"
                     onClick={() => navigate('/buyer/address')}
@@ -264,137 +264,129 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">
-          <div className="flex justify-between items-center mb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-rose-100 dark:bg-rose-900/30 rounded-lg flex items-center justify-center">
-                <Heart className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">New Products Wishlist</h2>
+        <div className="flex justify-between items-center mb-5">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-6 h-6 md:w-10 md:h-10 bg-rose-100 dark:bg-rose-900/30 rounded-lg flex items-center justify-center">
+              <Heart className="w-3 h-3 md:w-5 md:h-5 text-rose-600 dark:text-rose-400" />
             </div>
-            <a href="/buyer/wishlist?show=new" className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
-              View All <ArrowRight size={16} />
-            </a>
+            <h2 className="text-base md:text-xl font-bold text-gray-900 dark:text-white">New Products Wishlist</h2>
           </div>
-          {wishlistData.newProductWishlist.length === 0 ? (
-            <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
-              <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart className="w-8 h-8 text-gray-400" />
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 font-medium">No items in wishlist</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Add products you love to your wishlist</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
-              <div className="flex gap-4 pb-2">
-                {wishlistData.newProductWishlist.slice(0, 10).map((p) => (
-                  <div key={p._id} className="w-[320px] flex-shrink-0">
-                    <Card product={p} userRole="buyer" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <a href="/buyer/wishlist?show=new" className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
+            View All <ArrowRight size={16} />
+          </a>
         </div>
+        {wishlistData.newProductWishlist.length === 0 ? (
+          <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
+            <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Heart className="w-8 h-8 text-gray-400" />
+            </div>
+            <p className="text-gray-500 dark:text-gray-400 font-medium">No items in wishlist</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Add products you love to your wishlist</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
+            <div className="flex gap-4 pb-2">
+              {wishlistData.newProductWishlist.slice(0, 10).map((p) => (
+                <div key={p._id} className="w-[280px] md:w-[320px] flex-shrink-0">
+                  <Card product={p} userRole="buyer" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">
-          <div className="flex justify-between items-center mb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-rose-100 dark:bg-rose-900/30 rounded-lg flex items-center justify-center">
-                <Heart className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Used Products Wishlist</h2>
+        <div className="flex justify-between items-center mb-5">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-6 h-6 md:w-10 md:h-10 bg-rose-100 dark:bg-rose-900/30 rounded-lg flex items-center justify-center">
+              <Heart className="w-3 h-3 md:w-5 md:h-5 text-rose-600 dark:text-rose-400" />
             </div>
-            <span onClick={() => navigate('/buyer/wishlist?show=used', { replace: true })} className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
-              View All <ArrowRight size={16} />
-            </span>
+            <h2 className="text-base md:text-xl font-bold text-gray-900 dark:text-white">Used Products Wishlist</h2>
           </div>
-          {wishlistData.usedProductWishlist.length === 0 ? (
-            <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
-              <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart className="w-8 h-8 text-gray-400" />
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 font-medium">No items in wishlist</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Add used products you love to your wishlist</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
-              <div className="flex gap-4 pb-2">
-                {wishlistData.usedProductWishlist.slice(0, 10).map((p) => (
-                  <div key={p._id} className="w-[320px] flex-shrink-0">
-                    <UsedProductCard product={p} userRole="buyer" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <span onClick={() => navigate('/buyer/wishlist?show=used', { replace: true })} className="text-xs md:text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
+            View All <ArrowRight size={16} />
+          </span>
         </div>
+        {wishlistData.usedProductWishlist.length === 0 ? (
+          <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
+            <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Heart className="w-8 h-8 text-gray-400" />
+            </div>
+            <p className="text-gray-500 dark:text-gray-400 font-medium">No items in wishlist</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Add used products you love to your wishlist</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
+            <div className="flex gap-4 pb-2">
+              {wishlistData.usedProductWishlist.slice(0, 10).map((p) => (
+                <div key={p._id} className="w-[280px] md:w-[320px] flex-shrink-0">
+                  <UsedProductCard product={p} userRole="buyer" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">
-          <div className="flex justify-between items-center mb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recently Viewed New Products</h2>
+        <div className="flex justify-between items-center mb-5">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-6 h-6 md:w-10 md:h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+              <Clock className="w-3 h-3 md:w-5 md:h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <span onClick={() => navigate('/buyer/recently-viewed?show=new', { replace: true })} className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
-              View All <ArrowRight size={16} />
-            </span>
+            <h2 className="text-base md:text-xl font-bold text-gray-900 dark:text-white">Recently Viewed New Products</h2>
           </div>
-          {viewedData.newProductViewed.length === 0 ? (
-            <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
-              <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Eye className="w-8 h-8 text-gray-400" />
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 font-medium">No recently viewed products</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Products you view will appear here</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
-              <div className="flex gap-4 pb-2">
-                {viewedData.newProductViewed.slice(0, 10).map((p) => (
-                  <div key={p._id} className="w-[320px] flex-shrink-0">
-                    <Card product={p} userRole="buyer" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <span onClick={() => navigate('/buyer/recently-viewed?show=new', { replace: true })} className="text-xs md:text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
+            View All <ArrowRight size={16} />
+          </span>
         </div>
+        {viewedData.newProductViewed.length === 0 ? (
+          <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
+            <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Eye className="w-8 h-8 text-gray-400" />
+            </div>
+            <p className="text-gray-500 dark:text-gray-400 font-medium">No recently viewed products</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Products you view will appear here</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
+            <div className="flex gap-4 pb-2">
+              {viewedData.newProductViewed.slice(0, 10).map((p) => (
+                <div key={p._id} className="w-[280px] md:w-[320px] flex-shrink-0">
+                  <Card product={p} userRole="buyer" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-6 border border-black dark:border-white">
-          <div className="flex justify-between items-center mb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recently Viewed Used Products</h2>
+        <div className="flex justify-between items-center mb-5">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-6 h-6 md:w-10 md:h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+              <Clock className="w-3 h-3 md:w-5 md:h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <span onClick={() => navigate('/buyer/recently-viewed?show=used', { replace: true })} className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
-              View All <ArrowRight size={16} />
-            </span>
+            <h2 className="text-base md:text-xl font-bold text-gray-900 dark:text-white">Recently Viewed Used Products</h2>
           </div>
-          {viewedData.usedProductViewed.length === 0 ? (
-            <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
-              <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Eye className="w-8 h-8 text-gray-400" />
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 font-medium">No recently viewed products</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Used products you view will appear here</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
-              <div className="flex gap-4 pb-2">
-                {viewedData.usedProductViewed.slice(0, 10).map((p) => (
-                  <div key={p._id} className="w-[320px] flex-shrink-0">
-                    <UsedProductCard product={p} userRole="buyer" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <span onClick={() => navigate('/buyer/recently-viewed?show=used', { replace: true })} className="text-xs md:text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1">
+            View All <ArrowRight size={16} />
+          </span>
         </div>
+        {viewedData.usedProductViewed.length === 0 ? (
+          <div className="text-center py-16 bg-gray-50 dark:bg-neutral-800 rounded-xl">
+            <div className="w-16 h-16 bg-gray-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Eye className="w-8 h-8 text-gray-400" />
+            </div>
+            <p className="text-gray-500 dark:text-gray-400 font-medium">No recently viewed products</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Used products you view will appear here</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto hide-scrollbar -mx-2 px-2">
+            <div className="flex gap-4 pb-2">
+              {viewedData.usedProductViewed.slice(0, 10).map((p) => (
+                <div key={p._id} className="w-[280px] md:w-[320px] flex-shrink-0">
+                  <UsedProductCard product={p} userRole="buyer" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {showEditProfileModal && (
@@ -403,7 +395,7 @@ export default function Dashboard() {
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Edit Profile</h3>
             <form onSubmit={handleSubmitProfile(onProfileSubmit)} className="space-y-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+                <label htmlFor="name" className="block text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
                 <input
                   id="name"
                   {...registerProfile("name", { required: true })}

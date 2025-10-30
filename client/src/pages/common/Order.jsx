@@ -189,7 +189,7 @@ export default function Order() {
     : 0;
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 dark:bg-neutral-950 pt-20 sm:pt-24 pb-8 px-4">
+    <div className="w-full min-h-screen bg-gray-50 dark:bg-neutral-950 pt-28 pb-8 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <div className="bg-blue-100 dark:bg-blue-900/20 p-2 rounded-lg">

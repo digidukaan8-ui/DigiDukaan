@@ -76,12 +76,12 @@ export default function ReviewForm() {
         setExistingReview(result.data);
         setRating(result.data.rating);
         setRatingConfirmed(true);
-        
+
         if (result.data.text) {
           setIncludeText(true);
           setReviewText(result.data.text);
         }
-        
+
         if (result.data.img) {
           setIncludeImage(true);
           setImageTitle(result.data.img.title);
@@ -89,7 +89,7 @@ export default function ReviewForm() {
           setReviewImage(result.data.img.url);
           setOriginalImageData(result.data.img);
         }
-        
+
         if (result.data.video) {
           setIncludeVideo(true);
           setVideoTitle(result.data.video.title);
@@ -209,7 +209,7 @@ export default function ReviewForm() {
         } else if (imageChanged && originalImageData?.publicId && reviewImage instanceof File) {
           deletedMedia.push(originalImageData.publicId);
         }
-        
+
         if (!includeVideo && originalVideoData?.publicId) {
           deletedMedia.push(originalVideoData.publicId);
         } else if (videoChanged && originalVideoData?.publicId && reviewVideo instanceof File) {
@@ -242,7 +242,7 @@ export default function ReviewForm() {
 
   const deleteReviewHandler = async () => {
     if (!existingReview) return;
-    
+
     const confirmed = window.confirm('Are you sure you want to delete this review?');
     if (!confirmed) return;
 
@@ -273,9 +273,11 @@ export default function ReviewForm() {
       <div className="max-w-2xl mx-auto">
         <div className="bg-white dark:bg-neutral-900 rounded-lg border border-gray-200 dark:border-neutral-800 shadow-lg p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {existingReview ? 'Edit Review' : 'Add Review'}
-            </h2>
+            <div className="flex justify-center items-center w-full">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {existingReview ? 'Edit Review' : 'Add Review'}
+              </h2>
+            </div>
             {existingReview && (
               <button
                 type="button"
@@ -288,7 +290,7 @@ export default function ReviewForm() {
             )}
           </div>
 
-          <div className="flex items-center gap-4 p-4 mb-6 border border-gray-200 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800">
+          <div className="flex flex-col sm:flex-row items-center gap-4 p-4 mb-6 border border-gray-200 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800">
             <img
               src={product.img}
               alt={product.title}

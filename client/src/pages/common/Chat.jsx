@@ -720,7 +720,7 @@ function Chat() {
 
   return (
     <section className="h-screen w-full flex text-black dark:text-white bg-gray-100 dark:bg-neutral-950 pt-[80px]">
-      <div className={`h-full w-full md:w-1/3 border-r border-black dark:border-white ${selectedChat ? "hidden md:flex" : "flex"} flex-col bg-white dark:bg-neutral-900`}>
+      <div className={`h-full w-full md:w-1/3 md:border-r border-black dark:border-white ${selectedChat ? "hidden md:flex" : "flex"} flex-col bg-white dark:bg-neutral-900`}>
         <div className="flex-1 overflow-y-auto">
           {isFetchingChats ? (
             <div className="p-4 flex justify-center items-center text-gray-500 dark:text-gray-400">Loading chats...</div>

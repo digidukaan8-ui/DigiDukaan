@@ -58,7 +58,7 @@ const Home = () => {
   return (
     <>
       {user.role === "buyer" && (
-        <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pt-30">
+        <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 pt-40 md:pt-28">
           <Location />
 
           <div className="flex flex-wrap justify-center gap-4 pb-8 pt-4">
@@ -112,7 +112,7 @@ const Home = () => {
 
                   <div className="flex items-start justify-start gap-4 sm:gap-6 pt-2 overflow-x-auto hide-scrollbar scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent px-4 sm:px-0">
                     {products.map((product) => (
-                      <div key={product._id} className="flex-shrink-0 w-[320px]">
+                      <div key={product._id} className="flex-shrink-0 w-[280px] md:w-[320px]">
                         {activeTab === "used" ? (
                           <UsedProductCard
                             product={product}

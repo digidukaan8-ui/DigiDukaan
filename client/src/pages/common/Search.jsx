@@ -103,7 +103,7 @@ function Search() {
                     {productsToShow.length > 0 ? (
                         <div className="flex items-baseline justify-center flex-wrap gap-10 pt-2">
                             {productsToShow.map((product) => (
-                                <div key={product._id} className="flex-shrink-0 w-[320px]">
+                                <div key={product._id} className="flex-shrink-0 w-[280px] md:w-[320px]">
                                     <ProductComponent
                                         product={product}
                                         userRole="buyer"
