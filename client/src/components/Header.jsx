@@ -270,7 +270,7 @@ export default function Header() {
         </div>
 
         {user?.role !== "seller" &&
-          <div className="px-5 py-2">
+          <div className="sticky top-16 z-[80] bg-white dark:bg-neutral-900 px-5 py-2 md:static shadow-sm">
             <form onSubmit={handleSearch} className="relative" role="search">
               <label htmlFor="mobile-search" className="sr-only">Search products</label>
               <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
