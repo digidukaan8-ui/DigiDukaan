@@ -87,8 +87,8 @@ const Home = () => {
             ))}
           </div>
 
-          <HomeRecommendation />
-          
+          {activeTab === "new" && <HomeRecommendation />}
+
           <div className="space-y-12 bg-gray-100 dark:bg-neutral-950 pb-20">
             {currentCategories.map((categoryObj, index) => {
               const [categoryName, products] = Object.entries(categoryObj)[0];
@@ -97,7 +97,7 @@ const Home = () => {
               return (
                 <div key={index} className="px-0 sm:px-4">
                   <div
-                    onClick={() => navigate(`/category-product?slug=${categoryName}&page=1&show=${activeTab}`)}
+                    onClick={() => navigate(`/category-product?slug=${encodeURIComponent(categoryName)}&page=1&show=${activeTab}`)}
                     className="flex items-center justify-between mx-4 sm:mx-0 p-4 mb-4 border-b border-black dark:border-white cursor-pointer transition-colors"
                   >
                     <h2 className="text-xl sm:text-2xl capitalize font-extrabold text-gray-900 dark:text-white flex items-center gap-3">

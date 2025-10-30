@@ -1,7 +1,7 @@
 import express from 'express';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 import {
-    getViewedProducts, getWishlistProducts, getCartProducts, getReview, getProductReviews,
+    getViewedProducts, getWishlistProducts, getCartProducts, getReview,
     addViewedProduct, addWishlistProduct, addCartProduct, addReview,
     removeViewedProduct, removeWishlistProduct, removeCartProduct, removeReview,
     updateCart, updateReview
@@ -18,7 +18,6 @@ buyerRouter.get('/cart', authMiddleware('buyer'), getCartProducts);
 buyerRouter.get('/wishlist', authMiddleware('buyer'), getWishlistProducts);
 buyerRouter.get('/viewed', authMiddleware('buyer'), getViewedProducts);
 buyerRouter.get('/review/:productId', authMiddleware('buyer'), getReview);
-buyerRouter.get('/products/reviews/:productId', authMiddleware('buyer'), getProductReviews);
 buyerRouter.get('/addresses', authMiddleware('buyer'), getAddresses);
 buyerRouter.get('/orders', authMiddleware('buyer', 'seller'), getOrders);
 buyerRouter.get('/orders/count', authMiddleware('buyer', 'seller'), getOrdersCount);

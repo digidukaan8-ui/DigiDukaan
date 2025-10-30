@@ -1092,6 +1092,23 @@ const updateReview = async (req, res) => {
     }
 };
 
+function toTitleCase(str) {
+    const words = str.toLowerCase().split(/\s|&/g);
+
+    for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+
+        if (word.length > 0) {
+            words[i] = word.charAt(0).toUpperCase() + word.slice(1);
+        }
+    }
+
+    let result = words.join(' ');
+    result = result.replace(/(\s\s+|\s&\s)/g, ' & ');
+
+    return result;
+}
+
 const getProductByCategory = async (req, res) => {
     try {
         const { category, location } = req.params;
@@ -1105,8 +1122,7 @@ const getProductByCategory = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Location is required' })
         }
 
-        const capitalized = category.charAt(0).toUpperCase() + category.slice(1);
-
+        const capitalized = toTitleCase(category);
         const { mappedStoreIds } = await _getLocationData(location);
 
         if (mappedStoreIds.length === 0) {
@@ -1125,7 +1141,7 @@ const getProductByCategory = async (req, res) => {
 
         if (isValidCategory(capitalized)) {
             const query = {
-                "category.slug": category,
+                "category.slug": category.split(' ').join('-'),
                 "isAvailable": true,
                 ...storeMatchCondition
             };
@@ -1137,7 +1153,7 @@ const getProductByCategory = async (req, res) => {
 
         } else if (isValidUsedProductCategory(category)) {
             const query = {
-                "category.slug": category,
+                "category.slug": category.split(' ').join('-'),
                 "isSold": false,
                 "paid": true,
                 ...storeMatchCondition

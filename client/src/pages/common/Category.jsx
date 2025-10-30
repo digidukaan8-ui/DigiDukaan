@@ -27,7 +27,10 @@ function Category() {
         }
     });
 
-    const slug = searchParams.get("slug");
+    let slug = searchParams.get("slug")
+    if (slug) {
+        slug = slug.split('-').join(' ');
+    }
     const type = searchParams.get("show") || "new";
 
     useEffect(() => {
@@ -60,7 +63,7 @@ function Category() {
 
     useEffect(() => {
         if (slug) fetchProducts(slug, page);
-    }, [slug, page, type, location]);
+    }, [page, type, location]);
 
     useEffect(() => {
         setPage(1);

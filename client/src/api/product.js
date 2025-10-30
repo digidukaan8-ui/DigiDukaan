@@ -639,7 +639,7 @@ const getViewedProduct = async () => {
 
 const getProductByCategory = async (catgeory, page, location) => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/category-products/${catgeory}/${location}?page=${page}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/category-products/${encodeURIComponent(catgeory)}/${location}?page=${page}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -815,7 +815,7 @@ const getReview = async (productId) => {
 
 const getProductReviews = async (productId) => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/products/reviews/${productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/products/reviews/${productId}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
