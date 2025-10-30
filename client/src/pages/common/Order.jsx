@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Package, MapPin, Truck, Star, X, CheckCircle, XCircle, Clock, ChevronLeft, Calendar, CreditCard, Phone, Home } from "lucide-react";
+import { Package, MapPin, Truck, Star, CheckCircle, XCircle, Clock, ChevronLeft, Calendar, CreditCard, Phone, Home } from "lucide-react";
 import { toast } from "react-hot-toast";
 import useAuthStore from "../../store/auth";
 import useOrderStore from "../../store/order";
@@ -49,46 +49,47 @@ export default function Order() {
   };
 
   useEffect(() => {
-    const fetchOrder = async () => {
-      if (!orderIdParam) return;
-
-      startLoading("confirmingPayment");
-      try {
-        const result = await verifyOrder(orderIdParam);
-        if (result.success) {
-          addOrder(result.data);
-          fetchCartItems();
-          toast.success("Payment confirmed");
-          searchParams.delete("orderId");
-          setSearchParams(searchParams);
-        }
-      } finally {
-        stopLoading();
-      }
-    };
-
+    if (orders.length === 0 || !isFetched || orderIdParam == null) {
+      fetchOrders();
+    }
+  }, []);
+  
+  useEffect(() => {
     if (orderIdParam !== null) {
       fetchOrder();
     }
   }, [orderIdParam]);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      startLoading('fetchOrder');
-      try {
-        const result = await getOrders();
-        if (result.success) {
-          clearOrders();
-          setOrders(result.data);
-        }
-      } finally {
-        stopLoading();
+  const fetchOrders = async () => {
+    startLoading('fetchOrder');
+    try {
+      const result = await getOrders();
+      if (result.success) {
+        clearOrders();
+        setOrders(result.data);
       }
+    } finally {
+      stopLoading();
     }
-    if (orders.length === 0 && !isFetched && orderIdParam == null) {
-      fetchOrders();
+  }
+
+  const fetchOrder = async () => {
+    if (!orderIdParam) return;
+
+    startLoading("confirmingPayment");
+    try {
+      const result = await verifyOrder(orderIdParam);
+      if (result.success) {
+        addOrder(result.data);
+        fetchCartItems();
+        toast.success("Payment confirmed");
+        searchParams.delete("orderId");
+        setSearchParams(searchParams);
+      }
+    } finally {
+      stopLoading();
     }
-  }, []);
+  };
 
   const handleCancelOrder = async () => {
     if (!selectedOrder) return;
@@ -239,12 +240,20 @@ export default function Order() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => setSelectedOrder(order)}
-                  className="w-full py-2.5 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-                >
-                  View Details
-                </button>
+                <div className="flex flex-wrap justify-center items-center w-full gap-3">
+                  <button
+                    onClick={() => setSelectedOrder(order)}
+                    className="w-50 py-2.5 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    View Details
+                  </button>
+                  <button
+                    onClick={() => navigate('/buyer/bill', { state: { orderId: order._id, replace: true } })}
+                    className="w-50 flex justify-center items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg"
+                  >
+                    View Invoice
+                  </button>
+                </div>
               </div>
             ))}
           </div>

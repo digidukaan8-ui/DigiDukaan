@@ -62,6 +62,7 @@ export default function Loader() {
     addReview: "Adding Review...",
     updateReview: "Updating Review...",
     removeReview: "Removing Review...",
+    fetchInvoice: "Fetching Invoice...",
     default: "Loading...",
   };
 
@@ -112,6 +113,7 @@ export default function Loader() {
     addReview: "text-purple-500",
     updateReview: "text-purple-500",
     removeReview: "text-purple-500",
+    fetchInvoice: "text-purple-500",
     default: "text-gray-500",
   };
 

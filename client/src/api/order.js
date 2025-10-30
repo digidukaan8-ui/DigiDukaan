@@ -198,4 +198,27 @@ const updateOrderStatus = async (orderId, status) => {
     }
 }
 
-export { addOrder, getStoreCharges, verifyOrder, getOrders, getOrdersCount, cancelOrder, updateOrderStatus };
+const getOrderForInvoice = async (orderId) => {
+    try {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/buyers/orders/invoice/${orderId}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        const result = await res.json();
+
+        if (!result.success) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to get orders invoice");
+            throw new Error(result.message || "Failed to get orders invoice");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error in get orders invoice:", error);
+        throw error;
+    }
+};
+
+export { addOrder, getStoreCharges, verifyOrder, getOrders, getOrdersCount, cancelOrder, updateOrderStatus, getOrderForInvoice };

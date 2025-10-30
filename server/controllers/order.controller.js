@@ -454,4 +454,97 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
-export { addOrder, verifyOrderPayment, getOrders, getOrdersCount, cancelOrder, updateOrderStatus };
+const getOrderForInvoice = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const userId = req.user._id;
+
+        const order = await Order.findOne({ _id: orderId, userId })
+            .populate({
+                path: 'storeId',
+                select: 'name address email phone'
+            })
+            .populate({
+                path: 'addressId',
+                select: 'name city state pincode landmark'
+            })
+            .populate({
+                path: 'products.productId',
+                select: 'title unit'
+            })
+            .lean();
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found"
+            });
+        }
+
+        const invoiceData = {
+            _id: order._id,
+            orderNumber: `ORD-${order._id.toString().slice(-8).toUpperCase()}`,
+            createdAt: order.createdAt,
+            storeId: {
+                name: order.storeId.name,
+                address: order.storeId.address || 'Store Address',
+                email: order.storeId.email || 'N/A',
+                phone: order.storeId.phone || 'N/A'
+            },
+            addressId: {
+                name: order.addressId.name || 'Customer',
+                city: order.addressId.city,
+                state: order.addressId.state,
+                pincode: order.addressId.pincode,
+                landmark: order.addressId.landmark || ''
+            },
+            products: order.products.map(product => ({
+                productId: {
+                    title: product.productId.title,
+                    unit: product.productId.unit || 'unit'
+                },
+                quantity: product.quantity,
+                priceDistribution: {
+                    basePrice: product.priceDistribution.basePrice,
+                    discount: product.priceDistribution.discount,
+                    productCharge: product.priceDistribution.productCharge,
+                    platformFee: {
+                        rate: product.priceDistribution.platformFee.rate,
+                        amount: product.priceDistribution.platformFee.amount
+                    },
+                    tax: {
+                        rate: product.priceDistribution.tax.rate,
+                        amount: product.priceDistribution.tax.amount
+                    }
+                },
+                finalPrice: product.finalPrice
+            })),
+            subtotal: order.subtotal,
+            deliveryCharge: {
+                amount: order.deliveryCharge.amount,
+                gst: {
+                    rate: order.deliveryCharge.gst.rate,
+                    amount: order.deliveryCharge.gst.amount
+                },
+                deliverWithInDays: order.deliveryCharge.deliverWithInDays
+            },
+            platformTax: order.platformTax,
+            totalAmount: order.totalAmount,
+            paymentStatus: order.paymentStatus.toLowerCase()
+        };
+
+        return res.status(200).json({
+            success: true,
+            data: invoiceData
+        });
+
+    } catch (error) {
+        console.error("Error fetching order for invoice:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch order details"
+        });
+    }
+};
+
+export { addOrder, verifyOrderPayment, getOrders, getOrdersCount, cancelOrder, updateOrderStatus, getOrderForInvoice };
