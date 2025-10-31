@@ -164,15 +164,20 @@ const sendOTP = async (req, res) => {
         });
 
         const transporter = nodemailer.createTransport({
-            service: "gmail",
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false,
             auth: {
                 user: process.env.APP_EMAIL,
                 pass: process.env.APP_PASSWORD,
             },
+            tls: {
+                rejectUnauthorized: false
+            }
         });
 
         const mailOptions = {
-            from: `"Your App" <${process.env.APP_EMAIL}>`,
+            from: `"DigiDukaan" <${process.env.APP_EMAIL}>`,
             to: email,
             subject: "🔐 Your OTP Code",
             html: `<!DOCTYPE html>
@@ -193,7 +198,6 @@ const sendOTP = async (req, res) => {
                         body { background-color:#121212; color:#fff; }
                         .container { background:#1e1e1e; color:#fff; }
                         .otp-box { background:#333; color:#fff; }
-                        .btn { background:#0d6efd; color:#fff; }
                         }
                         .container {
                         max-width:600px;
@@ -215,17 +219,6 @@ const sendOTP = async (req, res) => {
                         background:#f0f0f0;
                         display:inline-block;
                         }
-                        .btn {
-                        display:inline-block;
-                        padding:12px 20px;
-                        margin-top:15px;
-                        font-size:16px;
-                        font-weight:bold;
-                        text-decoration:none;
-                        background:#007bff;
-                        color:#fff;
-                        border-radius:6px;
-                        }
                         .note {
                         margin-top:20px;
                         font-size:14px;
@@ -238,20 +231,19 @@ const sendOTP = async (req, res) => {
                         <h2>OTP Verification</h2>
                         <p>Use the OTP below to complete your verification. It is valid for <b>10 minutes</b>.</p>
                         <div class="otp-box">${otp}</div>
-                        <br/>
-                        <a href="#" class="btn" onclick="navigator.clipboard.writeText('${otp}')">Copy OTP</a>
-                        <p class="note">If you didn’t request this OTP, you can safely ignore this email.</p>
+                        <p class="note">If you didn't request this OTP, you can safely ignore this email.</p>
                     </div>
                     </body>
                     </html>
-                    `};
+                    `
+        };
 
         await transporter.sendMail(mailOptions);
 
         return res.status(201).json({ success: true, message: "OTP sent successfully" });
     } catch (error) {
         console.error('Error in send OTP controller: ', error);
-        return res.status(500).json({ success: false, message: "Internal server error", error });
+        return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
     }
 };
 
@@ -284,7 +276,7 @@ const verifyOTP = async (req, res) => {
         return res.status(200).json({ success: true, message: "OTP verified successfully" });
     } catch (error) {
         console.error("Error in verify OTP controller: ", error);
-        return res.status(500).json({ success: false, message: "Internal server error", error });
+        return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
     }
 };
 
@@ -317,7 +309,7 @@ const resetPassword = async (req, res) => {
         return res.status(200).json({ success: true, message: "Password reset successful" });
     } catch (error) {
         console.error("Error in resetPassword controller: ", error);
-        return res.status(500).json({ success: false, message: "Internal server error", error });
+        return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
     }
 };
 

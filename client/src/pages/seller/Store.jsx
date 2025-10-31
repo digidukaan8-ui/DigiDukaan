@@ -13,17 +13,14 @@ import { categories as newProductCategories, usedProductCategories, } from "../.
 
 const groupProductsByCategory = (products, categoryList) => {
   const grouped = {};
-  const categoryNames = categoryList.map(cat => cat.name);
-
-  categoryNames.forEach(name => {
-    grouped[name] = [];
-  });
 
   products.forEach(product => {
-    const categoryName = product.category?.name;
-    if (categoryName && grouped.hasOwnProperty(categoryName)) {
-      grouped[categoryName].push(product);
+    const categoryName = product.category?.name || 'Uncategorized';
+    
+    if (!grouped[categoryName]) {
+      grouped[categoryName] = [];
     }
+    grouped[categoryName].push(product);
   });
 
   return Object.entries(grouped).filter(([, prods]) => prods.length > 0);

@@ -194,7 +194,6 @@ const Revenue = () => {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Month</th>
                                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Net Earning</th>
                                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Orders Count</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-neutral-900 divide-y divide-gray-200 dark:divide-neutral-800">
@@ -203,14 +202,6 @@ const Revenue = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{`${item.month}/${item.year}`}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-green-700 dark:text-green-400">₹{item.netEarning.toFixed(2)}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500 dark:text-gray-400">{item.orders}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                                        <button
-                                            onClick={() => navigate(`/seller/income/details?month=${item.monthYear}`)}
-                                            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
-                                        >
-                                            View Details
-                                        </button>
-                                    </td>
                                 </tr>
                             ))}
                         </tbody>
