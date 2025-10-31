@@ -43,8 +43,9 @@ export default function QuickView({ product, type, isOpen, onClose }) {
         console.error("Error adding to viewed:", err);
       }
     };
-
-    addToRecentlyViewed();
+    if (user?.role === "buyer") {
+      addToRecentlyViewed();
+    }
   }, [product?._id]);
 
   const handleWishList = async () => {
@@ -208,7 +209,7 @@ export default function QuickView({ product, type, isOpen, onClose }) {
               </div>
             )}
 
-            {user.role === "buyer" && (<div className="flex items-center gap-2 pt-4">
+            {user?.role === "buyer" && (<div className="flex items-center gap-2 pt-4">
               {type === "new" ? (
                 <button
                   onClick={() => handleCart(product._id)}

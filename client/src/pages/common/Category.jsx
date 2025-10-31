@@ -70,7 +70,7 @@ function Category() {
     }, [slug, type]);
 
     return (
-        <section className="w-full bg-gray-100 dark:bg-neutral-950 pt-30 text-black dark:text-white">
+        <section className="w-full bg-gray-100 dark:bg-neutral-950 pt-40 md:pt-30 text-black dark:text-white">
             <Location />
             <p className="mb-4 px-5 text-gray-700 dark:text-gray-300 text-lg">
                 Showing results for <span className="font-semibold capitalize">{slug}</span> -

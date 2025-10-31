@@ -13,8 +13,8 @@ function RecommendProduct({ id }) {
     });
     const [quickViewProduct, setQuickViewProduct] = useState(null);
     const { editedLocation } = useLocationStore();
-    const [location, setLocation] = useState(()=>{
-         if (editedLocation.pincode) {
+    const [location, setLocation] = useState(() => {
+        if (editedLocation.pincode) {
             return editedLocation.pincode;
         } else if (editedLocation.city) {
             return editedLocation.city;
@@ -56,9 +56,7 @@ function RecommendProduct({ id }) {
             }
         }
 
-        if (id && user?.role === "buyer") {
-            fetchProducts();
-        }
+        fetchProducts();
     }, [id, location]);
 
     if (user?.role === "seller" || user?.role === "admin") {

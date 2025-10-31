@@ -56,9 +56,7 @@ function HomeRecommendation() {
             }
         }
 
-        if (user?.role === "buyer") {
-            fetchProducts();
-        }
+        fetchProducts();
     }, [location]);
 
     if (user?.role === "seller" || user?.role === "admin") {
