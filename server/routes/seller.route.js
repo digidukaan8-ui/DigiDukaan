@@ -6,6 +6,7 @@ import { createStore, updateStore, addDeliveryZone, updateDeliveryZone, removeDe
 import { handleAddProduct, handleUpdateProduct, handleAddUsedProduct, handleUpdateUsedProduct } from '../middlewares/product.middleware.js';
 import { addProduct, getProduct, updateProduct, removeProduct, changeAvailability, addUsedProduct, getUsedProduct, updateUsedProduct, removeUsedProduct } from '../controllers/product.controller.js';
 import { updateOrderStatus } from '../controllers/order.controller.js';
+import { getSellerIncomeSummary, requestWithdrawal } from '../controllers/payment.controller.js';
 
 const sellerRouter = express.Router();
 
@@ -30,5 +31,9 @@ sellerRouter.patch('/used-products/:usedProductId', authMiddleware('seller'), va
 sellerRouter.delete('/used-products/:usedProductId', authMiddleware('seller'), removeUsedProduct);
 
 sellerRouter.put('/orders/status/:orderId', authMiddleware('seller'), updateOrderStatus);
+
+sellerRouter.get('/revenue/:storeId', authMiddleware('seller'), getSellerIncomeSummary);
+
+sellerRouter.post('/withdraw/:storeId', authMiddleware('seller'), requestWithdrawal);
 
 export default sellerRouter;

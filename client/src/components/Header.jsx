@@ -68,6 +68,7 @@ export default function Header() {
         { to: '/seller/order', label: 'Orders' },
         { to: '/seller/chat', label: 'Chat' },
         { to: '/seller/dashboard', label: 'Dashboard' },
+        { to: '/seller/revenue', label: 'Revenue' },
         { to: '/logout', label: 'Logout' },
       ];
     } else {

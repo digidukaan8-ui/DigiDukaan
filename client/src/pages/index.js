@@ -23,8 +23,9 @@ import Whislist from "./buyer/Whislist";
 import View from "./buyer/View";
 import Search from "./common/Search";
 import Bill from "./buyer/Bill";
+import Revenue from "./seller/Revenue";
 
 export {
     Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct,
-    Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout, Order, Whislist, View, Search, Bill
+    Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout, Order, Whislist, View, Search, Bill, Revenue
 };

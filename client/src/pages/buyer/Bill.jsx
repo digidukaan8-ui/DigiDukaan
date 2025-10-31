@@ -1,13 +1,15 @@
-import { FileDown, Store, User, Calendar, FileText } from 'lucide-react';
+import { FileDown, Store, User, Calendar, FileText, Mail, Phone } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import { useEffect, useState } from 'react';
 import { getOrderForInvoice } from '../../api/order';
 import useLoaderStore from '../../store/loader';
+import useAuthStore from '../../store/auth';
 import { toast } from 'react-hot-toast';
 
 const Bill = () => {
   const { state } = useLocation();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
   const orderId = state?.orderId;
   const [orderData, setOrderData] = useState(null);
@@ -24,11 +26,11 @@ const Bill = () => {
           setOrderData(result.data);
         } else {
           toast.error(result.message || 'Failed to fetch invoice');
-          navigate('/buyer/order');
+          navigate(`${user?.role === "seller" ? "/seller/order" : "/buyer/order"}`);
         }
       } catch (error) {
         toast.error('Error fetching invoice details');
-        navigate('/buyer/order');
+        navigate(`${user?.role === "seller" ? "/seller/order" : "/buyer/order"}`);
       } finally {
         stopLoading();
       }
@@ -42,7 +44,7 @@ const Bill = () => {
         <div className="bg-white dark:bg-neutral-900 rounded-lg shadow p-8 text-center">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">No Invoice Data</h2>
           <button
-            onClick={() => navigate('/orders')}
+            onClick={() => navigate(`${user?.role === "seller" ? "/seller/order" : "/buyer/order"}`)}
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
           >
             Go to Orders
@@ -262,7 +264,7 @@ const Bill = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-neutral-950 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-950 pt-30 pb-20 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Invoice</h1>
@@ -302,8 +304,8 @@ const Bill = () => {
                 <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                   <p className="font-semibold text-gray-900 dark:text-white">{orderData.storeId.name}</p>
                   <p>{orderData.storeId.address || 'Store Address'}</p>
-                  <p>📧 {orderData.storeId.email || 'N/A'}</p>
-                  <p>📱 {orderData.storeId.phone || 'N/A'}</p>
+                  <p className='flex justify-start items-center gap-2'><Mail size={14} /> {orderData.storeId.email || 'N/A'}</p>
+                  <p className='flex justify-start items-center gap-2'><Phone size={14} /> {orderData.storeId.phone || 'N/A'}</p>
                 </div>
               </div>
 
@@ -420,14 +422,14 @@ const Bill = () => {
             <div className="flex justify-center gap-4">
               <button
                 onClick={generatePDF}
-                className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                className="flex cursor-pointer items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all"
               >
                 <FileDown className="w-5 h-5" />
                 Download Invoice PDF
               </button>
               <button
-                onClick={() => navigate('/orders')}
-                className="flex items-center gap-2 bg-gray-600 dark:bg-neutral-700 hover:bg-gray-700 dark:hover:bg-neutral-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                onClick={() => navigate(`${user?.role === "seller" ? "/seller/order" : "/buyer/order"}`)}
+                className="flex cursor-pointer items-center gap-2 bg-gray-600 dark:bg-neutral-700 hover:bg-gray-700 dark:hover:bg-neutral-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all"
               >
                 Back to Orders
               </button>
@@ -435,7 +437,7 @@ const Bill = () => {
           </div>
 
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-center py-3">
-            <p className="text-sm italic">Thank you for shopping with us – DigiDukaan ✨</p>
+            <p className="text-sm italic">Thank you for shopping with us – DigiDukaan</p>
           </div>
         </div>
       </div>

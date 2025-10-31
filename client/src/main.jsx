@@ -4,7 +4,7 @@ import App from './App.jsx'
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
 import {
   Home, About, Contact, Login, Register, Faq, TermsOfService, PrivacyPolicy, Support, Logout, Store, Product, UsedProduct,
-  Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout, Order, Whislist, View, Search, Bill
+  Cart, Category, Chat, Dashboard, Address, SellerDashboard, Checkout, Order, Whislist, View, Search, Bill, Revenue
 } from './pages/index.js'
 import {
   BuyerRoute, SellerRoute, AdminRoute, StoreForm, NewProductForm, UsedProductForm, ReviewForm, DeliveryForm,
@@ -58,6 +58,8 @@ const router = createBrowserRouter(
         <Route path='delivery-zone' element={<DeliveryForm />} />
         <Route path='order' element={<Order />} />
         <Route path='review' element={<Review />} />
+        <Route path='bill' element={<Bill />} />
+        <Route path='revenue' element={<Revenue />} />
       </Route>
 
       <Route path='admin' element={<AdminRoute />} >

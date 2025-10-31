@@ -49,11 +49,9 @@ export default function Order() {
   };
 
   useEffect(() => {
-    if (orders.length === 0 || !isFetched || orderIdParam == null) {
-      fetchOrders();
-    }
+    fetchOrders();
   }, []);
-  
+
   useEffect(() => {
     if (orderIdParam !== null) {
       fetchOrder();
@@ -248,8 +246,8 @@ export default function Order() {
                     View Details
                   </button>
                   <button
-                    onClick={() => navigate('/buyer/bill', { state: { orderId: order._id, replace: true } })}
-                    className="w-50 flex justify-center items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg"
+                    onClick={() => navigate(`${user?.role === "seller" ? "/seller/bill" : "/buyer/bill"}`, { state: { orderId: order._id }, replace: true })}
+                    className="w-50 flex justify-center cursor-pointer items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg"
                   >
                     View Invoice
                   </button>

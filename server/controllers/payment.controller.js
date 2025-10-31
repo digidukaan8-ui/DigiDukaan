@@ -3,6 +3,9 @@ import User from "../models/user.model.js";
 import Store from "../models/store.model.js";
 import UsedProduct from "../models/usedProduct.model.js";
 import { getPriceForUsedProduct } from "../utils/category.util.js";
+import Order from '../models/order.model.js';
+import Withdrawal  from '../models/withdrawal.model.js';
+import mongoose from 'mongoose';
 
 const CASHFREE_BASE_URL = "https://sandbox.cashfree.com/pg/orders";
 
@@ -149,4 +152,172 @@ const verifyOrder = async (req, res) => {
     }
 };
 
-export { createOrder, verifyOrder };
+const calculateSellerIncome = async (storeIdParam) => {
+    const sellerId = new mongoose.Types.ObjectId(storeIdParam);
+
+    const salesAggregation = await Order.aggregate([
+        { $match: { 
+            storeId: sellerId, 
+            status: { $in: ["DELIVERED"] },
+            paymentStatus: "SUCCESS"
+        }},
+        
+        { $unwind: '$products' },
+        { $group: {
+            _id: '$_id',
+            orderTotalAmount: { $first: '$totalAmount' },
+            orderPlatformTax: { $first: '$platformTax' },
+            orderDeliveryCharge: { $first: '$deliveryCharge.amount' },
+            
+            totalProductRevenue: { $sum: { $multiply: ['$products.finalPrice', '$products.quantity'] } },
+            totalProductsSold: { $sum: '$products.quantity' },
+            totalProductPlatformFee: { $sum: { $multiply: ['$products.priceDistribution.platformFee.amount', '$products.quantity'] } },
+            totalProductTax: { $sum: { $multiply: ['$products.priceDistribution.tax.amount', '$products.quantity'] } },
+        }},
+
+        { $group: {
+            _id: null,
+            totalRevenue: { $sum: '$totalProductRevenue' },
+            totalProductsSold: { $sum: '$totalProductsSold' },
+            totalPlatformFee: { $sum: '$totalProductPlatformFee' },
+            totalProductTax: { $sum: '$totalProductTax' },
+            
+            totalDeliveryCharge: { $sum: '$orderDeliveryCharge' },
+            totalOrderLevelTax: { $sum: '$orderPlatformTax' }
+        }},
+        { $project: {
+            _id: 0,
+            totalRevenue: 1, 
+            totalProductsSold: 1,
+            totalPlatformFee: 1,
+            totalProductTax: 1,
+            totalDeliveryCharge: 1,
+            totalOrderLevelTax: 1
+        }}
+    ]);
+    
+    const salesData = salesAggregation[0] || {
+        totalRevenue: 0,
+        totalProductsSold: 0,
+        totalPlatformFee: 0,
+        totalProductTax: 0,
+        totalDeliveryCharge: 0,
+        totalOrderLevelTax: 0
+    };
+
+    const withdrawnAggregation = await Withdrawal.aggregate([
+        { $match: { sellerId: sellerId, status: 'COMPLETED' } },
+        { $group: { _id: null, totalWithdrawn: { $sum: '$amount' } } }
+    ]);
+    
+    const totalWithdrawn = withdrawnAggregation[0]?.totalWithdrawn || 0;
+
+    const totalIncomeBeforeWithdrawal = salesData.totalRevenue + salesData.totalDeliveryCharge - salesData.totalPlatformFee;
+    
+    const netIncome = totalIncomeBeforeWithdrawal;
+    const availableBalance = netIncome - totalWithdrawn;
+
+    const monthlyEarnings = await Order.aggregate([
+        { $match: { 
+            storeId: sellerId, 
+            status: { $in: ["DELIVERED"] },
+            paymentStatus: "SUCCESS"
+        }},
+        { $group: {
+            _id: {
+                month: { $month: '$createdAt' },
+                year: { $year: '$createdAt' }
+            },
+            totalSales: { $sum: '$totalAmount' },
+            totalFees: { $sum: '$platformTax' },
+            orderCount: { $sum: 1 }
+        }},
+        { $project: {
+            _id: 0,
+            monthYear: { $concat: [ { $toString: '$_id.month' }, '/', { $toString: '$_id.year' } ] },
+            netEarning: { $subtract: ['$totalSales', '$totalFees'] },
+            orders: '$orderCount',
+            month: '$_id.month',
+            year: '$_id.year'
+        }},
+        { $sort: { year: -1, month: -1 } }
+    ]);
+
+    return {
+        summary: {
+            totalRevenue: salesData.totalRevenue + salesData.totalDeliveryCharge,
+            totalProductsSold: salesData.totalProductsSold,
+            totalPlatformFee: salesData.totalPlatformFee,
+            totalProductTax: salesData.totalProductTax,
+            netIncome: netIncome,
+            totalWithdrawn: totalWithdrawn,
+            availableBalance: availableBalance,
+            totalGST: salesData.totalOrderLevelTax
+        },
+        monthlyEarnings: monthlyEarnings
+    };
+};
+
+const getSellerIncomeSummary = async (req, res) => {
+    try {
+        const storeId = req.params.storeId || req.query.storeId; 
+
+        if (!storeId) {
+            return res.status(400).json({ success: false, message: "Store ID is required." });
+        }
+        
+        const data = await calculateSellerIncome(storeId);
+
+        res.status(200).json({ success: true, data: data });
+
+    } catch (error) {
+        console.error("Seller income fetch error:", error);
+        res.status(500).json({ success: false, message: "Server error while fetching income data." });
+    }
+};
+
+const requestWithdrawal = async (req, res) => {
+    try {
+        const { storeId } = req.params;
+        const { amount } = req.body;
+
+        if (!storeId) {
+            return res.status(400).json({ success: false, message: "Store ID is required for withdrawal." });
+        }
+
+        if (!amount || amount <= 0) {
+            return res.status(400).json({ success: false, message: "Invalid withdrawal amount." });
+        }
+        
+        const summaryData = await calculateSellerIncome(storeId);
+        
+        const availableBalance = summaryData?.summary?.availableBalance; 
+        
+        if (typeof availableBalance === 'undefined' || availableBalance === null) {
+             console.error("Available balance calculation failed. Raw response:", summaryData);
+             return res.status(500).json({ success: false, message: "Failed to calculate current balance. Please try again." });
+        }
+        
+        if (amount > availableBalance) {
+            return res.status(400).json({ success: false, message: `Requested amount exceeds available balance (₹${availableBalance.toFixed(2)}).` });
+        }
+
+        const withdrawal = await Withdrawal.create({
+            sellerId: new mongoose.Types.ObjectId(storeId),
+            amount: amount,
+            payoutMethod: 'Bank Transfer'
+        });
+
+        res.status(201).json({ 
+            success: true, 
+            message: "Withdrawal request submitted successfully. Awaiting admin approval.",
+            data: withdrawal
+        });
+
+    } catch (error) {
+        console.error("Withdrawal request error:", error);
+        res.status(500).json({ success: false, message: "Server error during withdrawal request." });
+    }
+};
+
+export { createOrder, verifyOrder, getSellerIncomeSummary, requestWithdrawal };

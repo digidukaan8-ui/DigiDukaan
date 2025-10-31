@@ -72,4 +72,55 @@ const verifyPayment = async (orderId, productId) => {
     }
 };
 
-export { payNow, verifyPayment };
+const fetchSellerIncome = async (storeId) => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/revenue/${storeId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+            credentials: "include",
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Failed to fetch seller income.");
+            throw new Error(result.message || "Failed to fetch seller income.");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error fetching seller income: ", error);
+        throw error;
+    }
+};
+
+const requestWithdrawal = async (storeId, amount) => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sellers/withdraw/${storeId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            credentials: "include",
+            body: JSON.stringify({ amount: amount })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            logoutHelper(result.message);
+            toast.error(result.message || "Withdrawal request failed.");
+            throw new Error(result.message || "Withdrawal request failed.");
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error requesting withdrawal: ", error);
+        throw error;
+    }
+};
+
+export { payNow, verifyPayment, fetchSellerIncome, requestWithdrawal };

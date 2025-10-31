@@ -457,12 +457,15 @@ const updateOrderStatus = async (req, res) => {
 const getOrderForInvoice = async (req, res) => {
     try {
         const { orderId } = req.params;
-        const userId = req.user._id;
 
-        const order = await Order.findOne({ _id: orderId, userId })
+        const order = await Order.findOne({ _id: orderId })
             .populate({
                 path: 'storeId',
-                select: 'name address email phone'
+                select: 'name addresses userId',
+                populate: {
+                    path: 'userId',
+                    select: 'email phone'
+                }
             })
             .populate({
                 path: 'addressId',
@@ -481,15 +484,22 @@ const getOrderForInvoice = async (req, res) => {
             });
         }
 
+        const storeAddress = order.storeId.addresses && order.storeId.addresses.length > 0
+            ? `${order.storeId.addresses[0].addressLine1}, ${order.storeId.addresses[0].city}, ${order.storeId.addresses[0].pincode}`
+            : 'Store Address Not Available';
+
+        const storeEmail = order.storeId.userId?.email;
+        const storePhone = order.storeId.userId?.phone;
+
         const invoiceData = {
             _id: order._id,
             orderNumber: `ORD-${order._id.toString().slice(-8).toUpperCase()}`,
             createdAt: order.createdAt,
             storeId: {
                 name: order.storeId.name,
-                address: order.storeId.address || 'Store Address',
-                email: order.storeId.email || 'N/A',
-                phone: order.storeId.phone || 'N/A'
+                address: storeAddress,
+                email: storeEmail || 'N/A',
+                phone: storePhone || 'N/A'
             },
             addressId: {
                 name: order.addressId.name || 'Customer',
